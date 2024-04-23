@@ -1,0 +1,166 @@
+{
+  "cookies": [
+    {
+      "name": "_GRECAPTCHA",
+      "value": "09AM6hZhZ5F4lQF1d4MzFMLppCoHngX_c_0VT3JVED411kfbnEtGJFdwyl8US-Ni3Jy-Yp6as70dAFtpwhEu2nnN8",
+      "domain": "www.google.com",
+      "path": "/recaptcha",
+      "expires": 1729399306.93105,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "ka_sessionid",
+      "value": "570277fa7cc697a6d159f8dac5f5ff04",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": 1716473862.06486,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "CSRF-TOKEN",
+      "value": "CfDJ8CYusWan8yNKiDQcrMXOtQEE89YI7ZPDNOVfwWn_qpWvoDKYSJNJXTEwLr0VNxkZjvEndwN7CbpF_n-j5ZMjpE6g602WnmL47ftNC0c0Cg",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "GCLB",
+      "value": "CIPWl6X0yeSx3QEQAw",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "build-hash",
+      "value": "c1c332938dda2e3865168d2e8c9c37a46229f43c",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.359922616.1713847303",
+      "domain": ".kaggle.com",
+      "path": "/",
+      "expires": 1748407306.481447,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Host-KAGGLEID",
+      "value": "CfDJ8CYusWan8yNKiDQcrMXOtQH7YNZPo8xqkNonRXTartZO103HCOO-i69LcEWNF2yN4xNkTFfOPSolDteg7Z7XSZvNJySOU7Qwi1CJSL3WZrOMFz4uJvReCCYC",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": 1715056905.899298,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "XSRF-TOKEN",
+      "value": "CfDJ8CYusWan8yNKiDQcrMXOtQErHvDXaODbf5FbW4sXNPA3gysE_Fm8r006QSfase0ZLM9y7vX9Bw8yPGMAGYfUy2FGCWwxBTYMrIQ2u_cbkbT0pk9K4aSzEdNr6rd_7NKtiXcoyvxrhQ38mRv_GIqXwhA",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "CLIENT-TOKEN",
+      "value": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpc3MiOiJrYWdnbGUiLCJhdWQiOiJjbGllbnQiLCJzdWIiOiJ0ZXN0aGlsbGVsIiwibmJ0IjoiMjAyNC0wNC0yM1QwNDo0MTo0Ni43NzQ3MTczWiIsImlhdCI6IjIwMjQtMDQtMjNUMDQ6NDE6NDYuNzc0NzE3M1oiLCJqdGkiOiJiN2MzOGJkMS01ODQzLTQ2MWUtOWU2Ny1jY2I5ZjhhZjNmMDQiLCJleHAiOiIyMDI0LTA1LTIzVDA0OjQxOjQ2Ljc3NDcxNzNaIiwidWlkIjoxOTA5NTU0NywiZGlzcGxheU5hbWUiOiJUZXN0IEhpbGxlbCIsImVtYWlsIjoiaWxseWFzdHVkMjAwMkBnbWFpbC5jb20iLCJ0aWVyIjoiTm92aWNlIiwidmVyaWZpZWQiOmZhbHNlLCJwcm9maWxlVXJsIjoiL3Rlc3RoaWxsZWwiLCJ0aHVtYm5haWxVcmwiOiJodHRwczovL3N0b3JhZ2UuZ29vZ2xlYXBpcy5jb20va2FnZ2xlLWF2YXRhcnMvdGh1bWJuYWlscy9kZWZhdWx0LXRodW1iLnBuZyIsImZmIjpbIktlcm5lbHNHaXRodWJTeW5jIiwiSW1wb3J0S2VybmVsc0Zyb21Db2xhYiIsIktlcm5lbHNEcmFmdFVwbG9hZEJsb2IiLCJLZXJuZWxzRXhwb3J0TWV0YWRhdGEiLCJLZXJuZWxzRmlyZWJhc2VMb25nUG9sbGluZyIsIkNvbW11bml0eUxvd2VySGVhZGVyU2l6ZXMiLCJBbGxvd0ZvcnVtQXR0YWNobWVudHMiLCJLZXJuZWxzU2F2ZUNlbGxPdXRwdXQiLCJGcm9udGVuZEVycm9yUmVwb3J0aW5nIiwiRGF0YXNldHNNYW5hZ2VkRm9jdXNPbk9wZW4iLCJDaGFuZ2VEYXRhc2V0T3duZXJzaGlwVG9PcmciLCJFeHBvcnREYXRhc2V0QXNDcm9pc3NhbnQiLCJLTVVzZXJQcm9maWxlIiwiTW9kZWxzQ2FjaGVkVGFnU2VydmljZUVuYWJsZWQiLCJEaXNjdXNzaW9uc1JlYWN0aW9ucyIsIkRhdGFzZXRVcGxvYWRlckR1cGxpY2F0ZURldGVjdGlvbiIsIk1vZGVsc0FsbG93U2V0VmlzaWJpbGl0eSIsIkRhdGFzZXRzTWV0YWRhdGFTdWdnZXN0aW9ucyIsIktlcm5lbHNPcGVuTm90ZWJvb2tJbkNvbGFiIiwiTW9kZWxzQm9va21hcmtpbmciLCJLZXJuZWxzRGVsZXRlS2VybmVsRnJvbUVkaXRvciIsIk1vZGVsc0xhbmRpbmdQYWdlQ29tbXVuaXR5U2VjdGlvbkVuYWJsZWQiLCJMaWNlbnNlVXNlU2Vjb25kUmV2aXNpb24iXSwiZmZkIjp7Iktlcm5lbEVkaXRvckF1dG9zYXZlVGhyb3R0bGVNcyI6IjMwMDAwIiwiRW1lcmdlbmN5QWxlcnRCYW5uZXIiOiJ7fSIsIkNsaWVudFJwY1JhdGVMaW1pdFFwcyI6IjQwIiwiQ2xpZW50UnBjUmF0ZUxpbWl0UXBtIjoiNTAwIiwiRmVhdHVyZWRDb21tdW5pdHlDb21wZXRpdGlvbnMiOiI2MDA5NSw1NDAwMCw1NzE2MyIsIkFkZEZlYXR1cmVGbGFnc1RvUGFnZUxvYWRUYWciOiJkaXNhYmxlZCIsIk1vZGVsSWRzQWxsb3dJbmZlcmVuY2UiOiIzMzAxLDM1MzMiLCJNb2RlbEluZmVyZW5jZVBhcmFtZXRlcnMiOiJ7IFwibWF4X3Rva2Vuc1wiOiAxMjgsIFwidGVtcGVyYXR1cmVcIjogMC40LCBcInRvcF9rXCI6IDUgfSIsIlNpbUNvbXBldGl0aW9uSWRzVG9JZ25vcmVVcGxvYWRMaW1pdCI6IjYwMjQzLDYxMjUwIiwiQ29tcGV0aXRpb25NZXRyaWNUaW1lb3V0TWludXRlcyI6IjMwIiwiVGZIdWJLYWdnbGVBbm5vdW5jZW1lbnRVcmwiOiIvZGlzY3Vzc2lvbnMvcHJvZHVjdC1mZWVkYmFjay80NDg0MjUifSwicGlkIjoia2FnZ2xlLTE2MTYwNyIsInN2YyI6IndlYi1mZSIsInNkYWsiOiJBSXphU3lBNGVOcVVkUlJza0pzQ1pXVnotcUw2NTVYYTVKRU1yZUUiLCJibGQiOiJjMWMzMzI5MzhkZGEyZTM4NjUxNjhkMmU4YzljMzdhNDYyMjlmNDNjIn0.",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_T7QHS60L4Q",
+      "value": "GS1.1.1713847302.1.1.1713847306.0.0.0",
+      "domain": ".kaggle.com",
+      "path": "/",
+      "expires": 1748407306.492213,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "recaptcha-ca-t",
+      "value": "AVGAUYy3yLAQrfwehtCqFOWJIyaVTZnKodSQN-Ac388G1mPTFwx1FByj77KcuogLo1m24nVnbOxNVDAGnmoMusESVBsY3j60oDMAvgyZ-woW1Sv73drAsf5RckdYE2ZfMATbSqbaYYPkj7E:U=e67b9acda0000000",
+      "domain": "www.kaggle.com",
+      "path": "/",
+      "expires": 1713849106,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Strict"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://www.kaggle.com",
+      "localStorage": [
+        {
+          "name": "analyticsToken",
+          "value": "{\"value\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTM4NDgyMDcsIlVzZXJJZCI6MTkwOTU1NDd9.Mde73iUdygWLHWDreotOfMneyir-uiUEsZU1dkx13a8\",\"refreshTime\":1713847306547}"
+        },
+        {
+          "name": "KG-THEME",
+          "value": "light"
+        },
+        {
+          "name": "KAGGLE_RECENTLY_EDITED_ITEMS",
+          "value": "[{\"title\":\"333333\",\"url\":\"https://www.kaggle.com/code/testhillel/333333?rvi=1\",\"authorSlug\":\"/testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":55232115,\"itemType\":\"kernel\",\"mostRecentView\":\"2024-04-22T19:28:36.000Z\"},{\"title\":\"Test 222\",\"url\":\"https://www.kaggle.com/datasets/testhillel/test-222?rvi=1\",\"authorSlug\":\"/testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-datasets-images/new-version-temp-images/default-backgrounds-83.png-19095547/dataset-thumbnail.png\",\"id\":4854985,\"itemType\":\"dataset\",\"mostRecentView\":\"2024-04-22T19:12:14.000Z\"},{\"title\":\"notebook829851b8fa\",\"url\":\"https://www.kaggle.com/code/testhillel/notebook829851b8fa?rvi=1\",\"authorSlug\":\"/testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":53262157,\"itemType\":\"kernel\",\"mostRecentView\":\"2024-03-23T19:28:42.000Z\"},{\"title\":\"notebookdbbf3c035c\",\"url\":\"https://www.kaggle.com/code/testhillel/notebookdbbf3c035c?rvi=1\",\"authorSlug\":\"/testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":53254792,\"itemType\":\"kernel\",\"mostRecentView\":\"2024-03-23T16:02:11.000Z\"},{\"title\":\"notebooka8d32b2600\",\"url\":\"https://www.kaggle.com/code/testhillel/notebooka8d32b2600?rvi=1\",\"authorSlug\":\"/testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":53254559,\"itemType\":\"kernel\",\"mostRecentView\":\"2024-03-23T15:55:56.000Z\"}]"
+        },
+        {
+          "name": "KAGGLE_RECENTLY_VIEWED_ITEMS",
+          "value": "[{\"title\":\"Test Model\",\"url\":\"https://www.kaggle.com/models/testhillel/test-model?rvi=1\",\"authorSlug\":\"testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":43895,\"itemType\":\"model\",\"mostRecentView\":\"2024-04-22T19:10:00.000Z\"},{\"title\":\"Leash Bio - Predict New Medicines with BELKA\",\"url\":\"https://www.kaggle.com/competitions/leash-BELKA?rvi=1\",\"authorSlug\":\"\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-competitions/kaggle/67356/logos/thumb76_76.png?GoogleAccessId=web-data@kaggle-161607.iam.gserviceaccount.com&Expires=1713933468&Signature=fOYqnzx6ccL48uAwGBS0Wb5B2vTF3bR7C6Uj5Ep5flf0GrNFx6OpOZInLy%2B7I2XdB%2Fjz1IpShbGTrlCJYVNoJDMSsVnCcpuR4gb%2BF%2FdNiJmkFton0j7j2Ukp7HO9YX5LEJWoV05fxmOqjisrytVfR2PmpSQFrgIDGlLTL09HqM2l1tWFVEF56mczHBaBOuiToOEMuF6AXAoxgCeZf1J400fxzXYjDQCs7CBSsauUnDDEZ6NV3uslBVDKGFOFuQdqQR7xWWZcdWmCrKAkItd7%2F7Uh5OE7Ks%2BomWOQSlZwti2GhATz%2BzSel3vj4xdV6f9TulsDhfLA0u3Xa4wx%2Bwflvg%3D%3D\",\"id\":67356,\"itemType\":\"competition\",\"mostRecentView\":\"2024-04-22T19:08:48.000Z\"},{\"title\":\"Grand Theft Auto V\",\"url\":\"https://www.kaggle.com/datasets/noahx1/grand-theft-auto-v?rvi=1\",\"authorSlug\":\"/noahx1\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-datasets-images/4387661/7533339/6e5fc9c16320e83821cc2494a380cee5/dataset-thumbnail.jpg?t=2024-02-01-19-54-36\",\"id\":4387661,\"itemType\":\"dataset\",\"mostRecentView\":\"2024-03-17T17:23:54.000Z\"},{\"title\":\"test1\",\"url\":\"https://www.kaggle.com/models/testhillel/test1?rvi=1\",\"authorSlug\":\"testhillel\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-avatars/thumbnails/default-thumb.png\",\"id\":18644,\"itemType\":\"model\",\"mostRecentView\":\"2024-03-10T12:40:49.000Z\"},{\"title\":\"Suicides risk factors\",\"url\":\"https://www.kaggle.com/datasets/willianoliveiragibin/suicides-risk-factors?rvi=1\",\"authorSlug\":\"/willianoliveiragibin\",\"thumbnailUrl\":\"https://storage.googleapis.com/kaggle-datasets-images/4539167/7761305/ac5bd05e4a77d1d096b961502a8637b7/dataset-thumbnail.jpg?t=2024-03-04-19-23-31\",\"id\":4539167,\"itemType\":\"dataset\",\"mostRecentView\":\"2024-03-05T19:51:57.000Z\"}]"
+        },
+        {
+          "name": "currentUserIdToken",
+          "value": "19095547"
+        },
+        {
+          "name": "KAGGLE_RECENT_BOOKMARKS",
+          "value": "[]"
+        },
+        {
+          "name": "KAGGLE_NAV_USER_MENUS_OPEN",
+          "value": "{\"viewed\":true,\"edited\":true,\"bookmarks\":true}"
+        },
+        {
+          "name": "_grecaptcha",
+          "value": "09AM6hZhbTD_qyUAIoNGFZM2ZwoweuuX7fzHPCzImxkRo91jQmN8dBcxoYOd4fesSA_EFPKTTaW-NpZiStbTmXWoE4Gsd5EwwR7k4lRA"
+        }
+      ]
+    },
+    {
+      "origin": "https://www.google.com",
+      "localStorage": [
+        {
+          "name": "rc::a",
+          "value": "eW5vYjJzbHRzNTNr"
+        },
+        {
+          "name": "rc::f",
+          "value": "0aAM6hZhY8sn1n1iID9_eHsqo2E_A4Bi734JE9l0LkzerDopVTfQLQDTTvc6LDBwxXWQfp-KBvx1Mff9e0gjYAPpWAawvK"
+        }
+      ]
+    }
+  ]
+}

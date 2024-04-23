@@ -6,7 +6,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto(`${process.env.SITE_URL}`);
 });
 
-test('get started link', async ({ page }) => {
-  await page.pause();
+test.only('get started link', async ({ page }) => {
+  
   await page.goto(`${process.env.SITE_URL}competitions`);
+  await page.pause()
 });
