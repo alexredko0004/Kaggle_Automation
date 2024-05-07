@@ -1,4 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from "dotenv";
+dotenv.config();
 
 /**
  * Read environment variables from file.
@@ -11,6 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  timeout:40*1000,
+  expect: { timeout: 10000 },
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -18,17 +22,22 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html'], ['list']],
+  reporter: [['html',{open:'never'}], ['list']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    headless:false,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://www.kaggle.com/',
+    baseURL: 'https://www.kaggle.com',
     
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    screenshot:'only-on-failure',
+    video: 'on',
+    viewport:{width:1920,height:1080},
+    actionTimeout:30000,
   },
 
   /* Configure projects for major browsers */
@@ -45,8 +54,8 @@ export default defineConfig({
       dependencies: ['setup'],
       use: { 
         ...devices['Desktop Chrome'],
-        storageState: './defaultStorageState.json',
-        headless:false
+        viewport:{width:1440,height:900},
+        storageState: './auth/defaultStorageState.json',
        },
     },
 

@@ -1,6 +1,5 @@
 import {expect, test as setup} from '@playwright/test'
-import dotenv from "dotenv";
-dotenv.config();
+
 
 // setup('Auth', async({request})=>{
 //     const response = await request.post(
@@ -31,6 +30,6 @@ setup ('Autn via UI', async({page,context})=>{
     await page.locator('input[name="password"]').fill(`${process.env.PASSWORD}`);
     await page.getByRole('button',{name:'Sign In'}).click();
     await expect(page.getByTestId('home-page-logged-in-render-tid')).toBeVisible()
-    await page.context().storageState({ path: './defaultStorageState.json' });
+    await page.context().storageState({ path: './auth/defaultStorageState.json' });
 
 })
