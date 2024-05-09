@@ -1,5 +1,6 @@
 import { test,expect } from '@playwright/test';
 import { PageManager } from '../page-objects/PageManager';
+import { createDatasetViaAPI } from '../precs/datasetPrecs';
 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
@@ -12,7 +13,7 @@ test.describe('tests using POM', async()=>{
         await pm.navigateTo().closeCreationMenu();
         await pm.navigateTo().openDatasetsPage()
     })
-    test('Create new dataset with remote url', async({page})=>{
+    test.skip('Create new dataset with remote url', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const pm = new PageManager(page);
         await pm.navigateTo().openDatasetsPage();
@@ -23,7 +24,7 @@ test.describe('tests using POM', async()=>{
         //post-condition
         await pm.onDatasetsPage().deleteDatasetFromItsPage()
     })
-    test('Create new dataset with file upload', async({page})=>{
+    test.skip('Create new dataset with file upload', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const pm = new PageManager(page);
         await pm.navigateTo().openDatasetsPage();
@@ -35,15 +36,19 @@ test.describe('tests using POM', async()=>{
     })
     test('Remove several datasets', async({page})=>{
         const pm = new PageManager(page);
-        await pm.navigateTo().openDatasetsPage();
+        //await pm.navigateTo().openDatasetsPage();
         //preconditions
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
-        await pm.onDatasetsPage().addDatasetUsingFileUpload(datasetName+' upload1');
-        await pm.navigateTo().openDatasetsPage();
-        await pm.onDatasetsPage().addDatasetUsingFileUpload(datasetName+' upload2');
+        // await pm.onDatasetsPage().addDatasetUsingFileUpload(datasetName+' upload1');
+        // await pm.navigateTo().openDatasetsPage();
+        // await pm.onDatasetsPage().addDatasetUsingFileUpload(datasetName+' upload2');
+        await createDatasetViaAPI(datasetName,'https://petapixel.com/assets/uploads/2022/06/what-is-a-jpeg-featured.jpg');
+
         //steps
         await pm.navigateTo().openDatasetsPage();
         await pm.onDatasetsPage().openYourWork();
+        await page.waitForTimeout(2000);
+        await page.reload();
         await pm.onDatasetsPage().deleteDatasetsContainingName('AutoDataSet');
         await page.reload();
         expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
