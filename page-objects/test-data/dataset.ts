@@ -73,12 +73,14 @@ export class Dataset extends BasePage{
         await expect(this.page.locator('#site-content h2').last()).toHaveText('Dataset deleted')
     }
 
-    // async deleteDatasetsContainingName(name:string){
-    //     const itemsToRemove = [];
-    //     itemsToRemove.push(this.page.locator('#site-content [role="listitem"]',{hasText:`${name}`}));
-    //     if (itemsToRemove){
-    //         await itemsToRemove.getByTestId('CheckBoxOutlineBlankIcon').check()
-    //     }
-    //     console.log(itemsToRemove)
-    // }
+    async deleteDatasetsContainingName(name:string){
+        await this.page.waitForTimeout(1500);
+        for(let title of await this.page.locator('#site-content [role="listitem"]',{hasText:`${name}`}).all()){
+            await title.locator('[type="checkbox"]').check();
+        }
+        await this.page.getByTitle('Delete selected items').click();
+        await this.page.locator('.drawer-outer-container input').check();
+        await this.page.locator('.drawer-outer-container button').getByText('Continue').click();
+        await this.page.getByRole('alertdialog').getByRole('button').getByText('Delete').click();
+    }
 }
