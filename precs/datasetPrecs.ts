@@ -1,8 +1,7 @@
-import { request } from "@playwright/test"
 import loggedState from "../auth/defaultStorageState.json"
 import axios from 'axios';
 
-export const createDatasetViaAPI = async (name:string,url:string)=>{
+export const createDataset = async (name:string,url:string)=>{
     const fileName = url.split('/')
     await axios.post('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset',{
         "basicInfo": {

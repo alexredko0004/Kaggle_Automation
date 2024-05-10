@@ -9,7 +9,7 @@ export class BasePage{
         this.yourWorkBtn = page.getByRole('button').getByText('Your Work')
     }
 
-    async openYourWork(){
+    public async openYourWork(){
         await this.yourWorkBtn.click()
     }
 }

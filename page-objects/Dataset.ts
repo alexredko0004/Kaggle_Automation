@@ -1,5 +1,5 @@
 import { Locator, expect} from "@playwright/test";
-import { BasePage } from "../BasePage";
+import { BasePage } from "./BasePage";
 
 export class Dataset extends BasePage{
     newDatasetBtn: Locator
@@ -25,10 +25,13 @@ export class Dataset extends BasePage{
     /**
  * 
  * @param name - name of dataset
- */
+ */ 
+    public async openDatasetsPage(){
+
+    }
     async addDatasetUsingFileUpload(name:string){
         await this.newDatasetBtn.click();
-        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles('./images/123.jpg');
+        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles('./resources/123.jpg');
         await this.datasetTitleField.fill(`${name}`);
         await expect(this.createBtn).not.toHaveAttribute('disabled');
         const responsePromise = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset');
