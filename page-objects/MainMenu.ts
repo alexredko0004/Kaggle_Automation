@@ -5,25 +5,26 @@ export class MainMenu extends BasePage{
     readonly homeBtn: Locator
     readonly plusBtn: Locator
     readonly datasetsItem: Locator
+    readonly modelsItem: Locator
 
     constructor(page){
         super(page)
         this.homeBtn = page.locator('[data-click-log-id="home"]')
         this.plusBtn = page.locator('.mdc-menu-surface--anchor button[data-menutarget="true"]')
-        // this.datasetsItem = page.locator('[data-click-log-id="datasets"]')
+        this.modelsItem = page.locator('ul[role="list"][class="km-list"] li').getByTitle('Models')
         this.datasetsItem = page.locator('ul[role="list"][class="km-list"] li').getByTitle('Datasets')
     }
 
-    async openHomePage(){
+    public async openHomePage(){
         await this.page.goto('/');
     }
 
-    async openCreationMenu(){
+    public async openCreationMenu(){
         await this.plusBtn.click();
         await expect(this.page.locator('.mdc-menu[aria-hidden="false"]')).toBeVisible()
     }
 
-    async closeCreationMenu(){
+    public async closeCreationMenu(){
         if(await this.page.locator('.mdc-menu[aria-hidden="false"]').isVisible()) {
             await this.page.waitForTimeout(500)
             await this.plusBtn.click();
@@ -31,8 +32,13 @@ export class MainMenu extends BasePage{
         await expect(this.page.locator('.mdc-menu[aria-hidden="false"]')).toBeHidden()
     }
 
-    async openDatasetsPage(){
+    public async openDatasetsPage(){
        await this.datasetsItem.click();
        expect(this.page).toHaveURL('/datasets')
     }
+
+    public async openModelsPage(){
+        await this.modelsItem.click();
+        expect(this.page).toHaveURL('/models')
+     }
 }

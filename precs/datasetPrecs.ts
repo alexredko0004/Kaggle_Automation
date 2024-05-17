@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import loggedState from "../auth/defaultStorageState.json"
 import axios from 'axios';
 
@@ -25,4 +26,5 @@ export const createDataset = async (name:string,url:string)=>{
         'X-Xsrf-Token':`${loggedState.cookies[7].value}`,
         'Cookie':`CSRF-TOKEN=${loggedState.cookies[2].value}; CLIENT-TOKEN=${loggedState.cookies[8].value}; __Host-KAGGLEID=${loggedState.cookies[6].value}; ka_sessionid=${loggedState.cookies[1].value}`
     }})
+    console.log(name+' is done!')
 }

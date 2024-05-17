@@ -1,7 +1,7 @@
 import { Locator, expect} from "@playwright/test";
-import { BasePage } from "./BasePage";
+import { Header } from "./Header";
 
-export class Dataset extends BasePage{
+export class Datasets extends Header{
     newDatasetBtn: Locator
     continueBtn: Locator
     createBtn: Locator
@@ -13,7 +13,6 @@ export class Dataset extends BasePage{
 
     constructor(page){
         super(page)
-        this.newDatasetBtn = page.getByRole('button', {name:'New Dataset'})
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
@@ -22,15 +21,16 @@ export class Dataset extends BasePage{
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
     }
-    /**
+    
+    public async openDatasetsPage(){
+        await this.page.goto('/datasets')
+    }
+ /**
  * 
  * @param name - name of dataset
- */ 
-    public async openDatasetsPage(){
-
-    }
-    async addDatasetUsingFileUpload(name:string){
-        await this.newDatasetBtn.click();
+ */
+    public async addDatasetUsingFileUpload(name:string){
+        await this.newBtn.click();
         await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles('./resources/123.jpg');
         await this.datasetTitleField.fill(`${name}`);
         await expect(this.createBtn).not.toHaveAttribute('disabled');
@@ -47,8 +47,8 @@ export class Dataset extends BasePage{
  * @param name - name of dataset
  * @param url - URL of remote file
  */
-    async addDatasetUsingRemoteLink(name:string,url:string){
-        await this.newDatasetBtn.click();
+    public async addDatasetUsingRemoteLink(name:string,url:string){
+        await this.newBtn.click();
         await this.linkTab.click();
         await this.urlField.fill(`${url}`);
         await expect(this.continueBtn).not.toHaveAttribute('disabled');
@@ -63,11 +63,7 @@ export class Dataset extends BasePage{
         await this.page.locator('.drawer-outer-container button').getByText('Go to Dataset').click()
     }
 
-    async openMyDatasetsList(){
-        await super.openYourWork()
-    }
-
-    async deleteDatasetFromItsPage(){
+    public async deleteDatasetFromItsPage(){
         await this.trippleDotsBtn.click();
         await this.page.getByRole('menuitem').getByText('Delete dataset').click();
         await this.page.getByRole('button').getByText('Delete').click();
@@ -76,7 +72,7 @@ export class Dataset extends BasePage{
         await expect(this.page.locator('#site-content h2').last()).toHaveText('Dataset deleted')
     }
 
-    async deleteDatasetsContainingName(name:string){
+    public async deleteDatasetsContainingName(name:string){
         await this.page.waitForTimeout(1500);
         for(let title of await this.page.locator('#site-content [role="listitem"]',{hasText:`${name}`}).all()){
             await title.locator('[type="checkbox"]').check();

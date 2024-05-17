@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(`/`);
 });
 
-test.only('get started link', async ({ page }) => {
+test('get started link', async ({ page }) => {
   
   await page.goto(`/competitions`);
   await page.pause()
