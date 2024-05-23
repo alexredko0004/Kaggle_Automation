@@ -19,7 +19,7 @@ export class Models extends Header{
         this.urlEditBtn = page.locator('.drawer-outer-container').getByText('Edit')
         this.modelURLField = page.locator('input[placeholder=""]')
         this.visibilityDropDown = page.locator('button[role="combobox"]').first()
-        this.createModelBtn = page.locator('//button[.="Create model"]')
+        this.createModelBtn = page.locator('//button[.="Create model"]') 
         this.goToModelDetailBtn = page.locator('.drawer-outer-container button').getByText('Go to model detail page')
     }
     
