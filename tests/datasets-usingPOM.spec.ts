@@ -38,7 +38,7 @@ test.describe('tests using POM', async()=>{
         //post-condition
         await datasetPage.deleteDatasetFromItsPage()
     })
-    test.only('Remove several datasets', async({page,request})=>{
+    test('Remove several datasets', async({page,request})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         await test.step('precs', async()=>{
             await createDatasetViaPW(page, datasetName,datasetRemoteLink1);
