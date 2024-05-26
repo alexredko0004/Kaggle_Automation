@@ -23,4 +23,13 @@ export const createModelViaPW = async (page:Page,name:string,visibility:string)=
     }))
     expect(response.ok()).toBe(true);
     console.log(name+' model is created')
+    return JSON.parse(await response.text())
+}
+
+export const deleteModelViaPW = async (page:Page,id:number)=>{
+    const response = await post(page,`${process.env.DELETE_MODEL_ENDPOINT}`,JSON.stringify({
+        "modelId": id
+    }))
+    expect(response.ok()).toBe(true);
+    console.log('id_'+id+' model is deleted')
 }

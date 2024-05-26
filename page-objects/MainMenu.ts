@@ -11,8 +11,8 @@ export class MainMenu extends BasePage{
         super(page)
         this.homeBtn = page.locator('[data-click-log-id="home"]')
         this.plusBtn = page.locator('.mdc-menu-surface--anchor button[data-menutarget="true"]')
-        this.modelsItem = page.locator('ul[role="list"][class="km-list"] li').getByTitle('Models')
-        this.datasetsItem = page.locator('ul[role="list"][class="km-list"] li').getByTitle('Datasets')
+        this.modelsItem = page.locator('[data-click-log-id="models"]')
+        this.datasetsItem = page.locator('[data-click-log-id="datasets"]')
     }
 
     public async openHomePage(){

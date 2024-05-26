@@ -4,11 +4,13 @@ import { BasePage } from './BasePage'
 export class Header extends BasePage{
     yourWorkBtn: Locator
     newBtn: Locator
+    searchField: Locator
 
     constructor(page){
         super(page)
         this.newBtn = page.getByRole('button', {name:'New'})
         this.yourWorkBtn = page.getByRole('button').getByText('Your Work')
+        this.searchField = page.getByPlaceholder('Search Your Work')
     }
 
     public async clickNewBtn(){
@@ -17,5 +19,9 @@ export class Header extends BasePage{
 
     public async openYourWork(){
         await this.yourWorkBtn.click()
+    }
+
+    public async searchYourWork(searchString:string){
+        await this.searchField.fill(searchString)
     }
 }
