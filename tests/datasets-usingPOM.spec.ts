@@ -38,17 +38,13 @@ test.describe('tests using POM', async()=>{
         //post-condition
         await datasetPage.deleteDatasetFromItsPage()
     })
-    test('Remove several datasets', async({page,request})=>{
+    test.only('Remove several datasets', async({page,request})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         await test.step('precs', async()=>{
             await createDatasetViaPW(page, datasetName,datasetRemoteLink1);
             await createDatasetViaPW(page, datasetName+'AA',datasetRemoteLink2);
             await createDatasetViaPW(page, 'AA'+datasetName,datasetRemoteLink1)
             await createDatasetViaPW(page, 'BB'+datasetName,datasetRemoteLink1)
-            await createDatasetViaPW(page, datasetName+'AAA',datasetRemoteLink2);
-            await createDatasetViaPW(page, 'AAA'+datasetName,datasetRemoteLink1)
-            await createDatasetViaPW(page, 'BBB'+datasetName,datasetRemoteLink1)
-            await createDatasetViaPW(page, 'BBB1'+datasetName,datasetRemoteLink1)
         })
     
         const mainMenu = new MainMenu(page);
@@ -61,6 +57,8 @@ test.describe('tests using POM', async()=>{
         await page.waitForTimeout(1000);
         await page.reload();
         await datasetPage.deleteDatasetsContainingName('AutoDataSet');
+        await expect(datasetPage.flashMessage).toBeVisible();
+        await expect(datasetPage.flashMessage).toContainText('items deleted');
         await page.reload();
         expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
     })

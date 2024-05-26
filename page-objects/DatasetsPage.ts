@@ -74,7 +74,7 @@ export class Datasets extends Header{
 
     public async deleteDatasetsContainingName(name:string){
         await this.page.waitForTimeout(1500);
-        for(let title of await this.page.locator('#site-content [role="listitem"]',{hasText:`${name}`}).all()){
+        for(let title of await this.page.locator('#site-content ul li',{hasText:`${name}`}).all()){
             await title.locator('[type="checkbox"]').check();
         }
         await this.page.getByTitle('Delete selected items').click();
