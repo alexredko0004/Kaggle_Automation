@@ -29,7 +29,10 @@ setup ('Autn via UI', async({page,context})=>{
     await page.locator('input[name="email"]').fill(`${process.env.EMAIL}`);
     await page.locator('input[name="password"]').fill(`${process.env.PASSWORD}`);
     await page.getByRole('button',{name:'Sign In'}).click();
-    await expect(page.getByTestId('home-page-logged-in-render-tid')).toBeVisible()
+    const response = await page.waitForResponse(`${process.env.SITE_URL}/api/i/users.UsersService/GetCurrentUser`);
+    const responseJson = await response.json();
+    await expect(page.getByTestId('home-page-logged-in-render-tid')).toBeVisible();
     await page.context().storageState({ path: './auth/defaultStorageState.json' });
+    process.env['OWNER'] = responseJson.userName
 
 })

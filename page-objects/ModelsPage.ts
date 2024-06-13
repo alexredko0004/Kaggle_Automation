@@ -8,6 +8,12 @@ export class Models extends Header{
     modelURLField: Locator
     createModelBtn: Locator
     visibilityDropDown: Locator
+    frameworkListOnCreate: Locator
+    addNewVariationOnCreateBtn: Locator
+    variationSlugInput: Locator
+    licenseListOnCreate: Locator
+    addTagsBtn: Locator
+    editTagsBtn: Locator
     goToModelDetailBtn: Locator
     pencilEdit: Locator
     modelTitleFieldOnEdit: Locator
@@ -21,7 +27,9 @@ export class Models extends Header{
     addAuthorBtn: Locator
     modelAuthors: Locator
     addSubtitlePendingAction: Locator
+    addTagsPendingAction: Locator
     saveBtn: Locator
+    createBtn: Locator
 
     resetBtn: Locator
     trippleDotsBtn: Locator
@@ -33,6 +41,12 @@ export class Models extends Header{
         this.modelURLField = page.locator('input[placeholder=""]')
         this.visibilityDropDown = page.locator('button[role="combobox"]').first()
         this.createModelBtn = page.locator('//button[.="Create model"]') 
+        this.frameworkListOnCreate = page.getByLabel('Select framework')
+        this.addNewVariationOnCreateBtn = page.locator('button').getByText('addAdd new variation')
+        this.variationSlugInput = page.getByPlaceholder('Enter model variation slug')
+        this.licenseListOnCreate = page.getByText(/Select a license/)
+        this.addTagsBtn = page.getByRole('button').filter({hasText:'Add Tags'})
+        this.editTagsBtn = page.getByLabel('Edit Tags')
         this.goToModelDetailBtn = page.locator('.drawer-outer-container button').getByText('Go to model detail page')
         this.pencilEdit = page.getByLabel('edit',{exact:true})
         this.modelTitleFieldOnEdit = page.getByPlaceholder('Enter a title')
@@ -46,7 +60,9 @@ export class Models extends Header{
         this.autorWebsiteField = page.getByLabel('textfield-Website-label').locator('input')
         this.modelAuthors = page.locator('#site-content p a').all()
         this.addSubtitlePendingAction = page.getByTitle('Add a subtitle')
+        this.addTagsPendingAction = page.getByTitle('Add tags')
         this.saveBtn = page.locator('button',{hasText:'Save'})
+        this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
     }
     
     public async openModelsPage(){
@@ -58,26 +74,6 @@ export class Models extends Header{
  * @param url - ending of url for new model
  * @param visibility - 'Private' or 'Public'
  */
-    public async addModelWithoutVariations(name:string,url:string,visibility:string): Promise<{ ownerSlug: string, modelId: number}>{
-        const requestPromise = this.page.waitForRequest('https://www.kaggle.com/api/i/models.ModelService/CreateModel');
-        const responsePromise = this.page.waitForResponse('https://www.kaggle.com/api/i/models.ModelService/CreateModel');
-        await this.newBtn.click();
-        await expect(this.createModelBtn).toBeDisabled();
-        await this.modelTitleFieldOnCreate.fill(name);
-        await this.urlEditBtn.click();
-        await expect(this.modelURLField).toBeVisible();
-        await this.modelURLField.fill(url);
-        await this.visibilityDropDown.click();
-        await this.page.locator('li',{hasText:'visibility'+visibility}).click();
-        await expect(this.createModelBtn).toBeEnabled();
-        await this.createModelBtn.click();
-        // const response = await this.page.waitForResponse(`${process.env.CREATE_MODEL_ENDPOINT}`);
-        // expect(response.status()).toEqual(200); 
-        await expect(this.page.locator('.mdc-layout-grid__cell').first().getByText(url)).toBeVisible();
-        const request = await (await requestPromise).postDataJSON();
-        const response = await (await responsePromise).json();
-        return { ownerSlug: request.ownerSlug, modelId: response.id }
-    }
     
     public async fillModelTitleFieldOnCreate(name:string){
         await this.modelTitleFieldOnCreate.fill(name)
@@ -92,16 +88,44 @@ export class Models extends Header{
     }
 
     public async selectVisibilityOnCreate(visibility:string){
+        const text = (visibility==='Private')?'visibility_off':'visibility';
         await this.visibilityDropDown.click();
-        await this.page.locator('li',{hasText:'visibility'+visibility}).click();
+        await this.page.locator('li',{hasText:text+visibility}).click();
     }
 
     public async clickCreateModel(){
-        await this.createModelBtn.click();
+        await this.createModelBtn.click()
     }
 
     public async clickGoToModelDetailsBtn(){
-        await this.goToModelDetailBtn.click();
+        await this.goToModelDetailBtn.click()
+    }
+
+    public async selectFrameworkOnCreate(frameworkName:string){
+        await this.frameworkListOnCreate.click();
+        await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:frameworkName}).click()
+    }
+
+    public async clickAddNewVariationBtn(){
+        await this.addNewVariationOnCreateBtn.click()
+    }
+
+    public async uploadVariationFile(path:string){
+        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles(path);
+    }
+
+    public async fillVariationSlugInput(variationSlug:string){
+        await this.variationSlugInput.fill(variationSlug)
+    }
+
+    public async getVariationFutureURL(){
+        await this.page.waitForTimeout(100)
+        return this.page.locator('.mdc-text-field-helper-text').innerText()
+    }
+
+    public async selectLicenseOnVariationCreate(licenseName:string='Unknown'){
+        await this.licenseListOnCreate.click();
+        await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:licenseName}).click()
     }
 
     public async getCreatedModelRequestPromise(){
@@ -151,10 +175,25 @@ export class Models extends Header{
         return await this.modelSubTitleOnView.isVisible()
     }
 
+    public async clickAddTagsBtn(){
+        await this.addTagsBtn.click()
+    }
 
+    public async clickEditTagsBtn(){
+        await this.editTagsBtn.click()
+    }
+ 
     public async clickSaveBtn(){
         await this.saveBtn.click()
     }
+
+    public async clickCreateBtn(){
+        await this.createBtn.click()
+    }
+
+    public randomModelVisibility (list:string[]) {
+        return list[Math.floor((Math.random()*list.length))];
+      }
 
 
 

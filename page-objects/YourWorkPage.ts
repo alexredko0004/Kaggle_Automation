@@ -28,6 +28,14 @@ export class YourWork extends Header{
         return await listItem.locator('span').first().innerText()
     }
 
+    public async getListItemDetailsModel(listItem:Locator): Promise<{ visibility: string, owner: string, countVariations: string, countNotebooks: string}>{
+        await this.page.waitForTimeout(500);
+        const details = await listItem.locator('span').nth(1).allInnerTexts();
+        const detailsArray = details[0].split(' · ');
+        detailsArray[0]!=='Private'?detailsArray.unshift('Public'):detailsArray
+        return {visibility: detailsArray[0], owner: detailsArray[1], countVariations: detailsArray[2], countNotebooks: detailsArray[3]}
+    }
+
     public async searchYourWork(searchString:string){
         await this.page.waitForTimeout(500)
         await this.searchField.fill(searchString)
