@@ -43,7 +43,7 @@ test.describe('tests using POM', async()=>{
         await deleteModelViaPW(page,response.modelId)
     })
     
-    test.only('Edit Title and Subtitle for model', async({page})=>{
+    test('Edit Title and Subtitle for model', async({page})=>{
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const modelNameEdited = 'Edited'+modelName;
         const mainMenu = new MainMenu(page);
@@ -102,16 +102,12 @@ test.describe('tests using POM', async()=>{
         await modelsPage.fillModelTitleFieldOnCreate(modelName);
         await expect(modelsPage.createModelBtn).toBeEnabled();
         await modelsPage.selectVisibilityOnCreate(modelVisibility);
-        const requestPromise = modelsPage.getCreatedModelRequestPromise();
-        const responsePromise = modelsPage.getCreatedModelResponsePromise();
-        await modelsPage.clickCreateModel();
-        const request = await modelsPage.getCreatedModelRequestParams(requestPromise);
-        const response = await modelsPage.getCreatedModelResponseParams(responsePromise);
+        const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
         await modelsPage.selectFrameworkOnCreate('Other');
         await modelsPage.clickAddNewVariationBtn();
-        await modelsPage.uploadVariationFile('./resources/tree.jpg');
+        await modelsPage.uploadVariationFile(['./resources/tree.jpg','./resources/123.jpg']);
         await modelsPage.fillVariationSlugInput(variationSlug);
-        expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${request.ownerSlug}/${modelName.toLowerCase()}/other/`+variationSlug);
+        expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
         await modelsPage.selectLicenseOnVariationCreate('GPL 3');
         await modelsPage.clickCreateBtn();
         await page.waitForTimeout(4000)
@@ -124,7 +120,7 @@ test.describe('tests using POM', async()=>{
         expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
         expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1 Variation');
 
-        await deleteModelViaPW(page,response.modelId)
+        await deleteModelViaPW(page,createdModel.id)
     })
 
     test('Add tags to model', async({page})=>{
@@ -143,7 +139,6 @@ test.describe('tests using POM', async()=>{
         for (let i=0;i<selectedTags.length;i++){
             expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
         }
-        console.log(process.env.OWNER)
         await tagsPanel.clickApplyBtn();
         await page.reload();
         await expect(modelsPage.addTagsBtn).toBeHidden();

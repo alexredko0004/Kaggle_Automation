@@ -105,12 +105,19 @@ export class Models extends Header{
         await this.frameworkListOnCreate.click();
         await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:frameworkName}).click()
     }
-
+    public async saveModelAndGetIdAndSlug(){
+        const responsePromise = this.page.waitForResponse('/api/i/models.ModelService/CreateModel', {
+            timeout: 30000
+        });
+        await this.createModelBtn.click();
+        const response = await (await responsePromise).json();
+        return {id: response.id, ownerSlug: response.owner.slug}
+    }
     public async clickAddNewVariationBtn(){
         await this.addNewVariationOnCreateBtn.click()
     }
 
-    public async uploadVariationFile(path:string){
+    public async uploadVariationFile(path:string[]){
         await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles(path);
     }
 
