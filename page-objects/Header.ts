@@ -10,7 +10,6 @@ export class Header extends BasePage{
         super(page)
         this.newBtn = page.getByRole('button', {name:'New'})
         this.yourWorkBtn = page.getByRole('button').getByText('Your Work')
-        this.searchField = page.getByPlaceholder('Search Your Work')
     }
 
     public async clickNewBtn(){
@@ -21,7 +20,8 @@ export class Header extends BasePage{
         await this.yourWorkBtn.click()
     }
 
-    public async searchYourWork(searchString:string){
-        await this.searchField.fill(searchString)
+    public async openTab(tabName:string){
+        await this.page.getByRole('tab',{name:tabName}).click()
     }
+
 }

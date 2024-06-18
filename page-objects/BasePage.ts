@@ -8,4 +8,9 @@ export class BasePage{
         this.page = page
         this.flashMessage = page.getByRole('alert')
     }
+
+
+    public async getFlashMessageText(){
+        return await this.flashMessage.innerText()
+    }
 }

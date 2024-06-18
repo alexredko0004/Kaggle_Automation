@@ -3,31 +3,44 @@ import { MainMenu } from '../page-objects/MainMenu';
 import { Models } from '../page-objects/ModelsPage';
 import { createModelViaPW, deleteModelViaPW } from '../precs/Models/modelPrecs';
 import { currentYear, currentMonth, currentDate } from '../helpers/dates';
+import { YourWork } from '../page-objects/YourWorkPage';
+import { Tags } from '../page-objects/Tags';
 
+const modelVisibility = 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
         await page.goto('/');
     })
     test('Create new model without variations', async({page})=>{
-        const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
+        const modelName = 'AutoModel'+Date.now().toString();
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
-        
+
         await mainMenu.openModelsPage();
-        const requestPromise = page.waitForRequest('https://www.kaggle.com/api/i/models.ModelService/CreateModel');
-        const responsePromise = page.waitForResponse('https://www.kaggle.com/api/i/models.ModelService/CreateModel');
-        await modelsPage.addModelWithoutVariations(modelName,urlEnding,'Public');
-        const request = (await requestPromise).postDataJSON();
-        const response = (await responsePromise).json();
-        await modelsPage.goToModelDetailBtn.click();
+        await modelsPage.clickNewBtn();
+        await expect(modelsPage.createModelBtn).toBeDisabled();
+        await modelsPage.fillModelTitleFieldOnCreate(modelName);
+        await expect(modelsPage.createModelBtn).toBeEnabled();
+        await modelsPage.clickEditForURLOnCreate();
+        await modelsPage.fillURLFieldOnCreate(urlEnding);
+        await modelsPage.selectVisibilityOnCreate('Public');
+        const requestPromise = modelsPage.getCreatedModelRequestPromise();
+        const responsePromise = modelsPage.getCreatedModelResponsePromise();
+        await modelsPage.clickCreateModel();
+        const request = await modelsPage.getCreatedModelRequestParams(requestPromise);
+        const response = await modelsPage.getCreatedModelResponseParams(responsePromise);
         await page.waitForTimeout(2000);
-        expect(page.url()).toEqual(`${process.env.SITE_URL}`+'/models/'+`${await request.ownerSlug}/`+urlEnding);
-        await expect(modelsPage.modelTitleFieldOnView).toHaveText(modelName);
+        await page.reload();
+        // await modelsPage.clickGoToModelDetailsBtn();
+        await page.goto(`${process.env.SITE_URL}`+'/models/'+`${request.ownerSlug}/`+urlEnding)
+        await page.waitForTimeout(2000);
+        expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${request.ownerSlug}/`+urlEnding);
+        expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
         await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
-        await page.getByRole('tab',{name:"Settings"}).click();
-        expect(await page.locator('.mdc-layout-grid').getByRole('combobox').innerText()).toContain('Public');
-        await deleteModelViaPW(page,(await response).id)
+        await modelsPage.openTab('Settings');
+        expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
+        await deleteModelViaPW(page,response.modelId)
     })
     
     test('Edit Title and Subtitle for model', async({page})=>{
@@ -35,64 +48,106 @@ test.describe('tests using POM', async()=>{
         const modelNameEdited = 'Edited'+modelName;
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
         const model = await createModelViaPW(page,modelName,'Private')
         await mainMenu.openModelsPage();
-        await page.goto(`${process.env.SITE_URL}`+'/models/'+`${await model.owner.slug}/`+`${await model.slug}`);
-        await modelsPage.pencilEdit.click();
-        await modelsPage.modelTitleFieldOnEdit.fill(modelNameEdited);
-        await modelsPage.modelSubtitleFieldOnEdit.fill('Subtitle text for edit 1234567890.');
-        await modelsPage.saveBtn.click();
-        await expect(modelsPage.flashMessage).toBeVisible();
-        await expect(modelsPage.flashMessage).toHaveText('Successfully updated the model.');
+        await page.goto(`${process.env.SITE_URL}/models/${model.owner.slug}/${model.slug}`);
+        await modelsPage.clickPencilEditBtn();
+        await modelsPage.fillTitleOnEdit(modelNameEdited);
+        await modelsPage.fillSubTitleOnEdit('Subtitle text for edit 1234567890.');
+        await modelsPage.clickSaveBtn();
+        await expect(modelsPage.flashMessage).toBeVisible();   //??? How to make this assertion without using the controls from constructor
+        expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
         await page.reload();
-        await expect(modelsPage.modelTitleFieldOnView).toHaveText(modelNameEdited);
-        await expect(page.getByText('Subtitle text for edit 1234567890.')).toBeVisible();
-        await expect(modelsPage.addSubtitlePendingAction).toBeHidden();
+        expect(await modelsPage.getModelTitleOnView()).toEqual(modelNameEdited);
+        await expect(page.getByText('Subtitle text for edit 1234567890.')).toBeVisible();  //??? How to make this assertion without using the controls from constructor 
+        await expect(modelsPage.addSubtitlePendingAction).toBeHidden(); //??? How to make this assertion without using the controls from constructor
+        await page.waitForTimeout(500);
         await mainMenu.openModelsPage();
         await modelsPage.openYourWork();
-        await modelsPage.searchYourWork(modelName);
-        await expect(page.locator('#site-content ul li',{hasText:`${modelName}`})).toBeHidden();
+        await yourWorkPage.searchYourWork(modelName);
+        await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
         await page.reload();
-        await modelsPage.searchYourWork(modelNameEdited);
-        await expect(page.locator('#site-content ul li',{hasText:`${modelNameEdited}`})).toBeVisible();
-        expect(await page.locator('ul').getByRole('link').locator('span').first().innerText()).toEqual('Subtitle text for edit 1234567890.');
-        await page.waitForTimeout(500);
-        await page.locator('#site-content ul li',{hasText:`${modelNameEdited}`}).click();
-        await modelsPage.pencilEdit.click();
-        await modelsPage.modelSubtitleFieldOnEdit.clear();
-        await modelsPage.saveBtn.click();
-        await expect(modelsPage.flashMessage).toBeVisible();
-        await expect(modelsPage.flashMessage).toHaveText('Successfully updated the model.');
+        await yourWorkPage.searchYourWork(modelNameEdited);
+        await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelNameEdited)).toBeVisible();
+        expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('Subtitle text for edit 1234567890.');
+        await yourWorkPage.clickListItem(modelNameEdited);
+        await modelsPage.clickPencilEditBtn();
+        await modelsPage.clearSubTitleOnEdit();
+        await modelsPage.clickSaveBtn();
+        await expect(modelsPage.flashMessage).toBeVisible();  //??? How to make this assertion without using the controls from constructor
+        expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
 
         await mainMenu.openModelsPage();
         await modelsPage.openYourWork();
-        await page.waitForTimeout(500);
         await page.reload();
-        await modelsPage.searchYourWork(modelNameEdited);
-        expect(await page.locator('ul').getByRole('link').locator('span').first().innerText()).toEqual('');
-        await page.locator('#site-content ul li',{hasText:`${modelNameEdited}`}).click();
-        await expect(page.locator('[wrap="hide"] p').nth(1)).toBeHidden();
-        await expect(modelsPage.addSubtitlePendingAction).toBeVisible();
+        await yourWorkPage.searchYourWork(modelNameEdited);
+        expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('');
+        await yourWorkPage.clickListItem(modelNameEdited);
+        expect(await modelsPage.isSubtitleVisibleOnModelProfile()).toEqual(false);
+        await expect(modelsPage.addSubtitlePendingAction).toBeVisible();  //??? How to make this assertion without using the controls from constructor
 
         await deleteModelViaPW(page,model.id)
     })
 
-    // test('Edit authors for model', async({page})=>{
-    //     const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
-    //     const modelNameEdited = 'Edited'+modelName;
-    //     const mainMenu = new MainMenu(page);
-    //     const modelsPage = new Models(page);
-    //     const model = await createModelViaPW(page,modelName,'Public')
-    //     await mainMenu.openModelsPage();
-    //     await page.goto(`${process.env.SITE_URL}`+'/models/'+`${await model.owner.slug}/`+`${await model.slug}`);
-    //     await modelsPage.addModelAuthors('Jimm','Larry');
-    //     await expect(modelsPage.flashMessage).toBeVisible();
-    //     await expect(modelsPage.flashMessage).toHaveText('Successfully updated the authors.');
-    //     await deleteModelViaPW(page,model.id)
-        // await expect(page.locator('#site-content h1')).toHaveText(modelName);
-        // await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
-        // await page.getByRole('tab',{name:"Settings"}).click();
-        // expect(await page.locator('.mdc-layout-grid').getByRole('combobox').innerText()).toContain('Public')
-    //})
+    test('Create new model with variation', async({page})=>{
+        const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
+        const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
+        const mainMenu = new MainMenu(page);
+        const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
+        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        await mainMenu.openModelsPage();
+        await modelsPage.clickNewBtn();
+        await modelsPage.fillModelTitleFieldOnCreate(modelName);
+        await expect(modelsPage.createModelBtn).toBeEnabled();
+        await modelsPage.selectVisibilityOnCreate(modelVisibility);
+        const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
+        await modelsPage.selectFrameworkOnCreate('Other');
+        await modelsPage.clickAddNewVariationBtn();
+        await modelsPage.uploadVariationFile(['./resources/tree.jpg','./resources/123.jpg']);
+        await modelsPage.fillVariationSlugInput(variationSlug);
+        expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
+        await modelsPage.selectLicenseOnVariationCreate('GPL 3');
+        await modelsPage.clickCreateBtn();
+        await page.waitForTimeout(4000)
+        await modelsPage.clickGoToModelDetailsBtn();
+        await expect(page.getByLabel(variationSlug)).toBeVisible();
+        await expect(page.getByTestId('preview-image')).toBeVisible();
+        await mainMenu.openModelsPage();
+        await modelsPage.openYourWork();
+        await yourWorkPage.searchYourWork(modelName);
+        expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
+        expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1 Variation');
 
+        await deleteModelViaPW(page,createdModel.id)
+    })
+
+    test('Add tags to model', async({page})=>{
+        const modelName = 'AutoModel'+Date.now().toString();
+        const mainMenu = new MainMenu(page);
+        const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
+        const tagsPanel = new Tags(page);
+        const tags = ['PIL','D3.Js','Text-To-Text Generation','Os','Brazil','Business'];
+        const model = await createModelViaPW(page,modelName,'Private')
+        await page.goto(`${process.env.SITE_URL}/models/${model.owner.slug}/${model.slug}`);
+        await modelsPage.clickAddTagsBtn();
+        
+        await tagsPanel.searchAndSelectTags(tags);
+        const selectedTags = await tagsPanel.getArrayOfSelectedTags();
+        for (let i=0;i<selectedTags.length;i++){
+            expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
+        }
+        await tagsPanel.clickApplyBtn();
+        await page.reload();
+        await expect(modelsPage.addTagsBtn).toBeHidden();
+        await expect(modelsPage.addTagsPendingAction).toBeHidden();
+        await expect(modelsPage.editTagsBtn).toBeVisible();
+        await modelsPage.clickEditTagsBtn();
+        for (let i=0;i<selectedTags.length;i++){
+            expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
+        }
+        await deleteModelViaPW(page,model.id)
+    })
 })
