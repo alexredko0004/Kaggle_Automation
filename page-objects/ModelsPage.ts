@@ -98,6 +98,9 @@ export class Models extends Header{
     }
 
     public async clickGoToModelDetailsBtn(){
+        await expect.poll(async()=>{
+            return await this.page.getByText('Files Processing...').isVisible()
+        }).toBe(false)
         await this.goToModelDetailBtn.click()
     }
 
@@ -119,6 +122,7 @@ export class Models extends Header{
 
     public async uploadVariationFile(path:string[]){
         await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles(path);
+        await this.page.waitForResponse(response=>response.url().includes('kaggle-models-data/o?uploadType=resumable&upload_id')&&response.status()===200)
     }
 
     public async fillVariationSlugInput(variationSlug:string){
@@ -135,24 +139,24 @@ export class Models extends Header{
         await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:licenseName}).click()
     }
 
-    public async getCreatedModelRequestPromise(){
-        return this.page.waitForRequest(`${process.env.CREATE_MODEL_ENDPOINT}`);
-    }
+    // public async getCreatedModelRequestPromise(){
+    //     return this.page.waitForRequest(`${process.env.CREATE_MODEL_ENDPOINT}`);
+    // }
 
-    public async getCreatedModelRequestParams(promise:any):Promise<{ ownerSlug: number}>{
-        const request = await (await promise).postDataJSON();
-        return {ownerSlug: request.ownerSlug}
-    }
+    // public async getCreatedModelRequestParams(promise:any):Promise<{ ownerSlug: number}>{
+    //     const request = await (await promise).postDataJSON();
+    //     return {ownerSlug: request.ownerSlug}
+    // }
 
-    public async getCreatedModelResponsePromise(){
-        return this.page.waitForResponse(`${process.env.CREATE_MODEL_ENDPOINT}`);
-    }
+    // public async getCreatedModelResponsePromise(){
+    //     return this.page.waitForResponse(`${process.env.CREATE_MODEL_ENDPOINT}`);
+    // }
 
-    public async getCreatedModelResponseParams(promise:any):Promise<{ modelId: number}>{
-        const response = await promise;
-        const responseBody  = await response.json()
-        return { modelId: responseBody.id}
-    }
+    // public async getCreatedModelResponseParams(promise:any):Promise<{ modelId: number}>{
+    //     const response = await promise;
+    //     const responseBody  = await response.json()
+    //     return { modelId: responseBody.id}
+    // }
 
     public async getModelTitleOnView(){
         return this.modelTitleFieldOnView.innerText()

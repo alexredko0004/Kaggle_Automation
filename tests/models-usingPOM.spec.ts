@@ -25,22 +25,18 @@ test.describe('tests using POM', async()=>{
         await modelsPage.clickEditForURLOnCreate();
         await modelsPage.fillURLFieldOnCreate(urlEnding);
         await modelsPage.selectVisibilityOnCreate('Public');
-        const requestPromise = modelsPage.getCreatedModelRequestPromise();
-        const responsePromise = modelsPage.getCreatedModelResponsePromise();
-        await modelsPage.clickCreateModel();
-        const request = await modelsPage.getCreatedModelRequestParams(requestPromise);
-        const response = await modelsPage.getCreatedModelResponseParams(responsePromise);
+        const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
         await page.waitForTimeout(2000);
         await page.reload();
         // await modelsPage.clickGoToModelDetailsBtn();
-        await page.goto(`${process.env.SITE_URL}`+'/models/'+`${request.ownerSlug}/`+urlEnding)
+        await page.goto(`${process.env.SITE_URL}`+'/models/'+`${createdModel.ownerSlug}/${urlEnding}`)
         await page.waitForTimeout(2000);
-        expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${request.ownerSlug}/`+urlEnding);
+        expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
         expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
         await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
         await modelsPage.openTab('Settings');
         expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
-        await deleteModelViaPW(page,response.modelId)
+        await deleteModelViaPW(page,createdModel.id)
     })
     
     test('Edit Title and Subtitle for model', async({page})=>{
@@ -105,7 +101,7 @@ test.describe('tests using POM', async()=>{
         const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
         await modelsPage.selectFrameworkOnCreate('Other');
         await modelsPage.clickAddNewVariationBtn();
-        await modelsPage.uploadVariationFile(['./resources/tree.jpg','./resources/123.jpg']);
+        await modelsPage.uploadVariationFile(['./resources/kaner_testing.pdf','./resources/kaner_testing2.pdf']);
         await modelsPage.fillVariationSlugInput(variationSlug);
         expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
         await modelsPage.selectLicenseOnVariationCreate('GPL 3');
@@ -113,7 +109,7 @@ test.describe('tests using POM', async()=>{
         await page.waitForTimeout(4000)
         await modelsPage.clickGoToModelDetailsBtn();
         await expect(page.getByLabel(variationSlug)).toBeVisible();
-        await expect(page.getByTestId('preview-image')).toBeVisible();
+        await expect(page.getByTestId('preview-pdf')).toBeVisible();
         await mainMenu.openModelsPage();
         await modelsPage.openYourWork();
         await yourWorkPage.searchYourWork(modelName);
