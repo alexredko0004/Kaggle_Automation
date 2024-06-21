@@ -3,8 +3,12 @@ import { Page } from '@playwright/test';
 
 async function setHeaders(page: Page) {
     const cookies = await page.context().cookies()
+    let xsrfToken
+    for(let e of cookies) {
+        if (e.name === 'XSRF-TOKEN')  xsrfToken = e.value
+    }
     return {
-        'X-Xsrf-Token':`${cookies[7].name==='XSRF-TOKEN'?cookies[7].value:cookies[8].value}`
+        'X-Xsrf-Token':`${xsrfToken}`
     };
 }
 

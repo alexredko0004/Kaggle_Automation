@@ -11,6 +11,6 @@ export class BasePage{
 
 
     public async getFlashMessageText(){
-        return await this.flashMessage.innerText()
+        return this.flashMessage.innerText()
     }
 }

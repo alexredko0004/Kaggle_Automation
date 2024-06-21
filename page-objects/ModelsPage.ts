@@ -34,6 +34,7 @@ export class Models extends Header{
     resetBtn: Locator
     trippleDotsBtn: Locator
 
+
     constructor(page){
         super(page)
         this.modelTitleFieldOnCreate = page.getByPlaceholder('Enter model title')
@@ -98,9 +99,8 @@ export class Models extends Header{
     }
 
     public async clickGoToModelDetailsBtn(){
-        await expect.poll(async()=>{
-            return await this.page.getByText('Files Processing...').isVisible()
-        }).toBe(false)
+        await expect.poll(()=> this.page.getByText('Files Processing...').isVisible()).toBe(false)
+        await expect.poll(()=> this.page.getByText('%').isVisible()).toBe(false)
         await this.goToModelDetailBtn.click()
     }
 
@@ -121,8 +121,9 @@ export class Models extends Header{
     }
 
     public async uploadVariationFile(path:string[]){
+        const waitPromise = this.page.waitForResponse(response=>response.url().includes('kaggle-models-data/o?uploadType=resumable&upload_id')&&response.status()===200)
         await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles(path);
-        await this.page.waitForResponse(response=>response.url().includes('kaggle-models-data/o?uploadType=resumable&upload_id')&&response.status()===200)
+        await waitPromise
     }
 
     public async fillVariationSlugInput(variationSlug:string){

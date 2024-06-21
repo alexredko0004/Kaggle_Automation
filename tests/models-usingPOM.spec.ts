@@ -47,7 +47,7 @@ test.describe('tests using POM', async()=>{
         const yourWorkPage = new YourWork(page);
         const model = await createModelViaPW(page,modelName,'Private')
         await mainMenu.openModelsPage();
-        await page.goto(`${process.env.SITE_URL}/models/${model.owner.slug}/${model.slug}`);
+        await page.goto(`/models/${model.owner.slug}/${model.slug}`);
         await modelsPage.clickPencilEditBtn();
         await modelsPage.fillTitleOnEdit(modelNameEdited);
         await modelsPage.fillSubTitleOnEdit('Subtitle text for edit 1234567890.');
