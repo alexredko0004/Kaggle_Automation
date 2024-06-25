@@ -2,34 +2,34 @@ import { Locator, expect} from "@playwright/test";
 import { Header } from "./Header";
 
 export class Models extends Header{
-    newModelBtn: Locator
-    urlEditBtn: Locator
-    modelTitleFieldOnCreate: Locator
-    modelURLField: Locator
+    private readonly newModelBtn: Locator
+    private readonly urlEditBtn: Locator
+    private readonly modelTitleFieldOnCreate: Locator
+    private readonly modelURLField: Locator
     createModelBtn: Locator
-    visibilityDropDown: Locator
-    frameworkListOnCreate: Locator
-    addNewVariationOnCreateBtn: Locator
-    variationSlugInput: Locator
-    licenseListOnCreate: Locator
+    private readonly visibilityDropDown: Locator
+    private readonly frameworkListOnCreate: Locator
+    private readonly addNewVariationOnCreateBtn: Locator
+    private readonly variationSlugInput: Locator
+    private readonly licenseListOnCreate: Locator
     addTagsBtn: Locator
     editTagsBtn: Locator
-    goToModelDetailBtn: Locator
-    pencilEdit: Locator
-    modelTitleFieldOnEdit: Locator
-    modelSubtitleFieldOnEdit: Locator
-    modelTitleFieldOnView: Locator
-    modelSubTitleOnView: Locator
-    modelDescriptionField: Locator
-    modelVisibilityDropDown: Locator
-    authorNameField: Locator
-    autorWebsiteField: Locator
-    addAuthorBtn: Locator
-    modelAuthors: Locator
+    private readonly goToModelDetailBtn: Locator
+    private readonly pencilEdit: Locator
+    private readonly modelTitleFieldOnEdit: Locator
+    private readonly modelSubtitleFieldOnEdit: Locator
+    private readonly modelTitleFieldOnView: Locator
+    private readonly modelSubTitleOnView: Locator
+    private readonly modelDescriptionField: Locator
+    private readonly modelVisibilityDropDown: Locator
+    private readonly authorNameField: Locator
+    private readonly autorWebsiteField: Locator
+    private readonly addAuthorBtn: Locator
+    private readonly modelAuthors: Locator
     addSubtitlePendingAction: Locator
     addTagsPendingAction: Locator
-    saveBtn: Locator
-    createBtn: Locator
+    private readonly saveBtn: Locator
+    private readonly createBtn: Locator
 
     resetBtn: Locator
     trippleDotsBtn: Locator
@@ -139,25 +139,6 @@ export class Models extends Header{
         await this.licenseListOnCreate.click();
         await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:licenseName}).click()
     }
-
-    // public async getCreatedModelRequestPromise(){
-    //     return this.page.waitForRequest(`${process.env.CREATE_MODEL_ENDPOINT}`);
-    // }
-
-    // public async getCreatedModelRequestParams(promise:any):Promise<{ ownerSlug: number}>{
-    //     const request = await (await promise).postDataJSON();
-    //     return {ownerSlug: request.ownerSlug}
-    // }
-
-    // public async getCreatedModelResponsePromise(){
-    //     return this.page.waitForResponse(`${process.env.CREATE_MODEL_ENDPOINT}`);
-    // }
-
-    // public async getCreatedModelResponseParams(promise:any):Promise<{ modelId: number}>{
-    //     const response = await promise;
-    //     const responseBody  = await response.json()
-    //     return { modelId: responseBody.id}
-    // }
 
     public async getModelTitleOnView(){
         return this.modelTitleFieldOnView.innerText()
