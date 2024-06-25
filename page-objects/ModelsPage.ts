@@ -99,8 +99,12 @@ export class Models extends Header{
     }
 
     public async clickGoToModelDetailsBtn(){
-        await expect.poll(()=> this.page.getByText('Files Processing...').isVisible()).toBe(false)
-        await expect.poll(()=> this.page.getByText('%').isVisible()).toBe(false)
+        // await expect.poll(()=> this.page.getByText('Files Processing...').isVisible()).toBe(false);
+        // await expect.poll(()=> this.page.getByText('%').isVisible()).toBe(false);
+        const filesProcessing = this.page.getByText('Files Processing...');
+        const percentage = this.page.getByText('%');
+        await filesProcessing.waitFor({state:'hidden'});
+        await percentage.waitFor({state:'hidden'});
         await this.goToModelDetailBtn.click()
     }
 
