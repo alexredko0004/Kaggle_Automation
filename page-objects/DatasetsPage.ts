@@ -2,46 +2,70 @@ import { Locator, expect} from "@playwright/test";
 import { Header } from "./Header";
 
 export class Datasets extends Header{
-    newDatasetBtn: Locator
+    
     continueBtn: Locator
     createBtn: Locator
-    resetBtn: Locator
     datasetTitleField: Locator
+    goToDatasetBtn: Locator
     linkTab: Locator
-    urlField: Locator
+    newDatasetBtn: Locator
+    resetBtn: Locator
     trippleDotsBtn: Locator
+    urlField: Locator
 
     constructor(page){
         super(page)
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
-        this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
-        this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
-        this.urlField = page.getByPlaceholder('Enter remote URL')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
+        this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
+        this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
+        this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
+        this.urlField = page.getByPlaceholder('Enter remote URL')
     }
     
     public async openDatasetsPage(){
         await this.page.goto('/datasets')
     }
- /**
- * 
- * @param name - name of dataset
- */
-    public async addDatasetUsingFileUpload(name:string){
-        await this.newBtn.click();
-        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles('./resources/123.jpg');
-        await this.datasetTitleField.fill(`${name}`);
-        await expect(this.createBtn).not.toHaveAttribute('disabled');
-        const responsePromise = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset');
-        await this.createBtn.click();
-        await expect(this.page.locator('.drawer-outer-container h2').last()).toHaveText('Success!');
-        const request = await responsePromise;
-        await expect(request.status()).toEqual(200); 
-        await this.page.locator('.drawer-outer-container button').getByText('Go to Dataset').click()
-
+ 
+    public async clickNewDatasetBtn(){
+        await this.newBtn.click()
     }
+
+    public async clickLinkTabWhileCreatingDataset(){
+        await this.linkTab.click()
+    }
+
+    public async fillURLFieldWhileCreatingDataset(url:string){
+        await this.urlField.fill(url);
+    }
+
+    public async clickContinueBtnWhileCreatingDataset(){
+        const waitPromise = this.page.waitForResponse(response=>response.url().includes('api/i/datasets.DatasetService/GetRemoteUrlFileInfo')&&response.status()===200);
+        await this.continueBtn.click();
+        await waitPromise
+    }
+
+    public async fillDatasetNameWhileCreatingDataset(name:string){
+        await this.datasetTitleField.fill(name)
+    }
+
+    public async clickCreateBtnAndGetDatasetID(){
+        const responsePromise1 = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset',{timeout:30000});
+        const waitPromise = this.page.waitForResponse(response=>response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')&&response.status()===200);
+        await this.createBtn.click();
+        const response = await (await responsePromise1).json();
+        console.log(response.datasetVersionReference.id);
+        await waitPromise
+        return response.datasetVersionReference.id
+    }
+
+    public async clickGoToDatasetBtn(){
+        await this.goToDatasetBtn.click()
+    }
+
+    
 /**
  * 
  * @param name - name of dataset
@@ -61,6 +85,20 @@ export class Datasets extends Header{
         const request = await responsePromise;
         await expect(request.status()).toEqual(200); 
         await this.page.locator('.drawer-outer-container button').getByText('Go to Dataset').click()
+    }
+
+    public async addDatasetUsingFileUpload(name:string){
+        await this.newBtn.click();
+        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles('./resources/123.jpg');
+        await this.datasetTitleField.fill(`${name}`);
+        await expect(this.createBtn).not.toHaveAttribute('disabled');
+        const responsePromise = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset');
+        await this.createBtn.click();
+        await expect(this.page.locator('.drawer-outer-container h2').last()).toHaveText('Success!');
+        const request = await responsePromise;
+        await expect(request.status()).toEqual(200); 
+        await this.page.locator('.drawer-outer-container button').getByText('Go to Dataset').click()
+
     }
 
     public async deleteDatasetFromItsPage(){

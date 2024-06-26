@@ -16,11 +16,18 @@ test.describe('tests using POM', async()=>{
         await mainMenu.openDatasetsPage()
     })
     test('Create new dataset with remote url', async({page})=>{
-        const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
+        const datasetName = 'AutoDataSet'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         await mainMenu.openDatasetsPage();
         const datasetPage = new Datasets(page);
-        await datasetPage.addDatasetUsingRemoteLink(datasetName,datasetRemoteLink1);
+        await datasetPage.clickNewDatasetBtn();
+        await datasetPage.clickLinkTabWhileCreatingDataset();
+        await datasetPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
+        await datasetPage.clickContinueBtnWhileCreatingDataset();
+        await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
+        await datasetPage.clickCreateBtnAndGetDatasetID();
+        await datasetPage.clickGoToDatasetBtn();
+        //await datasetPage.addDatasetUsingRemoteLink(datasetName,datasetRemoteLink1);
         await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName);
         await expect(page.getByText('Remote source:')).toBeVisible();
         await expect(page.getByTestId('preview-image')).toBeVisible();
