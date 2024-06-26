@@ -1,5 +1,6 @@
 import { Locator, expect} from "@playwright/test";
 import { Header } from "./Header";
+import { waitForLocator } from "../helpers/waitForLocator";
 
 export class Models extends Header{
     private readonly newModelBtn: Locator
@@ -99,12 +100,29 @@ export class Models extends Header{
     }
 
     public async clickGoToModelDetailsBtn(){
+        //Option_1
         // await expect.poll(()=> this.page.getByText('Files Processing...').isVisible()).toBe(false);
         // await expect.poll(()=> this.page.getByText('%').isVisible()).toBe(false);
-        const filesProcessing = this.page.getByText('Files Processing...');
-        const percentage = this.page.getByText('%');
-        await filesProcessing.waitFor({state:'hidden'});
-        await percentage.waitFor({state:'hidden'});
+
+        //Option_2
+        // const filesProcessing = this.page.getByText('Files Processing...');
+        // const percentage = this.page.getByText('%');
+        // await filesProcessing.waitFor({state:'hidden'});
+        // await percentage.waitFor({state:'hidden'});
+
+        //Option_3
+        await waitForLocator(
+            this.page.getByText('Files Processing...'),
+            async ()=>this.page.getByText('Files Processing...').isHidden(),
+            20000,
+            500
+        )
+        await waitForLocator(
+            this.page.getByText('%'),
+            async ()=>this.page.getByText('%').isHidden(),
+            20000,
+            500
+        )
         await this.goToModelDetailBtn.click()
     }
 
