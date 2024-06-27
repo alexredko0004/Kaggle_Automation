@@ -57,3 +57,12 @@ export const createDatasetViaPW = async (page:Page,name:string,fileUrl:string)=>
     expect(response.ok()).toBe(true);
     console.log(name+' dataset is created')
 }
+
+export const deleteDatasetViaPW = async (page:Page,datasetSlug:string,ownerSlug:string)=>{
+    const response = await post(page,`${process.env.DELETE_DATASET_ENDPOINT}`,JSON.stringify({
+        "datasetSlug": datasetSlug,
+        "ownerSlug": ownerSlug
+    }))
+    expect(response.ok()).toBe(true);
+    console.log(datasetSlug+' dataset is removed')
+}

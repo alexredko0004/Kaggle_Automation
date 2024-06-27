@@ -51,18 +51,32 @@ export class Datasets extends Header{
         await this.datasetTitleField.fill(name)
     }
 
-    public async clickCreateBtnAndGetDatasetID(){
+    public async clickCreateBtnAndGetDatasetProperties():Promise<{datasetID:string,ownerSlug:string,datasetSlug:string}>{
         const responsePromise1 = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset',{timeout:30000});
-        const waitPromise = this.page.waitForResponse(response=>response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')&&response.status()===200);
         await this.createBtn.click();
         const response = await (await responsePromise1).json();
-        console.log(response.datasetVersionReference.id);
-        await waitPromise
-        return response.datasetVersionReference.id
+        return {
+            datasetID:response.datasetVersionReference.datasetId,
+            ownerSlug:response.datasetVersionReference.ownerSlug,
+            datasetSlug:response.datasetVersionReference.slug
+        }
     }
 
     public async clickGoToDatasetBtn(){
+        const waitPromise = this.page.waitForResponse(async response => {
+            if (response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')) {
+              const responseBody = await response.json();
+              return responseBody.creationPercentComplete === 1;
+            }
+            return false;
+          });
+          
+        await waitPromise
         await this.goToDatasetBtn.click()
+    }
+
+    public async getDatasetName(){
+        return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
 
     

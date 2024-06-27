@@ -1,5 +1,5 @@
 import { test,expect,request } from '@playwright/test';
-import { createDatasetViaAxios, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
+import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
 import { datasetRemoteLink1,datasetRemoteLink2 } from '../helpers/constants';
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
@@ -25,14 +25,13 @@ test.describe('tests using POM', async()=>{
         await datasetPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
         await datasetPage.clickContinueBtnWhileCreatingDataset();
         await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
-        await datasetPage.clickCreateBtnAndGetDatasetID();
+        const createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
         await datasetPage.clickGoToDatasetBtn();
-        //await datasetPage.addDatasetUsingRemoteLink(datasetName,datasetRemoteLink1);
-        await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName);
+        expect(await datasetPage.getDatasetName()).toEqual(datasetName);
         await expect(page.getByText('Remote source:')).toBeVisible();
         await expect(page.getByTestId('preview-image')).toBeVisible();
         //post-condition
-        await datasetPage.deleteDatasetFromItsPage()
+        await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
     })
     test('Create new dataset with file upload', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
