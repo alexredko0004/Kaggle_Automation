@@ -64,7 +64,7 @@ test.describe('tests using POM', async()=>{
         await page.reload();
         await datasetPage.deleteDatasetsContainingName('AutoDataSet');
         await expect(datasetPage.flashMessage).toBeVisible();
-        await expect(datasetPage.flashMessage).toContainText('items deleted');
+        expect(await datasetPage.getFlashMessageText()).toEqual('items deleted');
         await page.reload();
         expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
     })

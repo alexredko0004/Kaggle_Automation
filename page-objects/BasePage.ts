@@ -1,6 +1,6 @@
 import {Page, Locator} from '@playwright/test'
 
-export class BasePage{
+export abstract class BasePage{
     page: Page
     flashMessage: Locator
 
@@ -9,8 +9,15 @@ export class BasePage{
         this.flashMessage = page.getByRole('alert')
     }
 
+    public getFlashMessageLocator():Locator{
+        return this.flashMessage
+    }
 
     public async getFlashMessageText(){
         return this.flashMessage.innerText()
     }
+
+    public getLocatorByText(text:string):Locator{
+        return this.page.getByText(text)
+     }
 }

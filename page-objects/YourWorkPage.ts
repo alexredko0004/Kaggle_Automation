@@ -1,7 +1,7 @@
 import { Locator, expect} from "@playwright/test";
-import { Header } from "./Header";
+import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 
-export class YourWork extends Header{
+export class YourWork extends BaseBusinessObjectPage{
     listItem: Locator
     searchField: Locator
 

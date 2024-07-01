@@ -47,17 +47,17 @@ test.describe('tests using POM', async()=>{
         const yourWorkPage = new YourWork(page);
         const model = await createModelViaPW(page,modelName,'Private')
         await mainMenu.openModelsPage();
-        await page.goto(`/models/${model.owner.slug}/${model.slug}`);
+        await modelsPage.openModelProfile(model.owner.slug,model.slug);
         await modelsPage.clickPencilEditBtn();
         await modelsPage.fillTitleOnEdit(modelNameEdited);
         await modelsPage.fillSubTitleOnEdit('Subtitle text for edit 1234567890.');
         await modelsPage.clickSaveBtn();
-        await expect(modelsPage.flashMessage).toBeVisible();   //??? How to make this assertion without using the controls from constructor
+        await expect(modelsPage.getFlashMessageLocator()).toBeVisible();  
         expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
         await page.reload();
         expect(await modelsPage.getModelTitleOnView()).toEqual(modelNameEdited);
-        await expect(page.getByText('Subtitle text for edit 1234567890.')).toBeVisible();  //??? How to make this assertion without using the controls from constructor 
-        await expect(modelsPage.addSubtitlePendingAction).toBeHidden(); //??? How to make this assertion without using the controls from constructor
+        await expect(modelsPage.getLocatorByText('Subtitle text for edit 1234567890.')).toBeVisible(); 
+        await expect(modelsPage.getAddSubtitlePendingAction()).toBeHidden(); //??? How to make this assertion without using the controls from constructor
         await page.waitForTimeout(500);
         await mainMenu.openModelsPage();
         await modelsPage.openYourWork();
@@ -71,7 +71,7 @@ test.describe('tests using POM', async()=>{
         await modelsPage.clickPencilEditBtn();
         await modelsPage.clearSubTitleOnEdit();
         await modelsPage.clickSaveBtn();
-        await expect(modelsPage.flashMessage).toBeVisible();  //??? How to make this assertion without using the controls from constructor
+        await expect(modelsPage.getFlashMessageLocator()).toBeVisible();
         expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
 
         await mainMenu.openModelsPage();
@@ -81,7 +81,7 @@ test.describe('tests using POM', async()=>{
         expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('');
         await yourWorkPage.clickListItem(modelNameEdited);
         expect(await modelsPage.isSubtitleVisibleOnModelProfile()).toEqual(false);
-        await expect(modelsPage.addSubtitlePendingAction).toBeVisible();  //??? How to make this assertion without using the controls from constructor
+        await expect(modelsPage.getAddSubtitlePendingAction()).toBeVisible();  //??? How to make this assertion without using the controls from constructor
 
         await deleteModelViaPW(page,model.id)
     })
@@ -124,18 +124,17 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
-        const tagsPanel = new Tags(page);
         const tags = ['PIL','D3.Js','Text-To-Text Generation','Os','Brazil','Business'];
         const model = await createModelViaPW(page,modelName,'Private')
-        await page.goto(`${process.env.SITE_URL}/models/${model.owner.slug}/${model.slug}`);
+        await modelsPage.openModelProfile(model.owner.slug,model.slug);
         await modelsPage.clickAddTagsBtn();
         
-        await tagsPanel.searchAndSelectTags(tags);
-        const selectedTags = await tagsPanel.getArrayOfSelectedTags();
+        await modelsPage.tagsPanel().searchAndSelectTags(tags);
+        const selectedTags = await modelsPage.tagsPanel().getArrayOfSelectedTags();
         for (let i=0;i<selectedTags.length;i++){
             expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
         }
-        await tagsPanel.clickApplyBtn();
+        await modelsPage.tagsPanel().clickApplyBtn();
         await page.reload();
         await expect(modelsPage.addTagsBtn).toBeHidden();
         await expect(modelsPage.addTagsPendingAction).toBeHidden();

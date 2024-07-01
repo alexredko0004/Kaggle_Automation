@@ -1,7 +1,7 @@
 import { Locator, expect} from "@playwright/test";
-import { Header } from "./Header";
+import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 
-export class Datasets extends Header{
+export class Datasets extends BaseBusinessObjectPage{
     
     continueBtn: Locator
     createBtn: Locator

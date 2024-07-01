@@ -1,8 +1,8 @@
 import { Locator, expect} from "@playwright/test";
-import { Header } from "./Header";
+import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 import { waitForLocator } from "../helpers/waitForLocator";
 
-export class Models extends Header{
+export class Models extends BaseBusinessObjectPage{
     private readonly newModelBtn: Locator
     private readonly urlEditBtn: Locator
     private readonly modelTitleFieldOnCreate: Locator
@@ -70,6 +70,11 @@ export class Models extends Header{
     public async openModelsPage(){
         await this.page.goto('/models')
     }
+     
+    public async openModelProfile(ownerSlug:number,modelSlug:number){
+        await this.page.goto(`/models/${ownerSlug}/${modelSlug}`)
+    }
+
  /**
  * 
  * @param name - name of model
@@ -107,8 +112,8 @@ export class Models extends Header{
         //Option_2
         // const filesProcessing = this.page.getByText('Files Processing...');
         // const percentage = this.page.getByText('%');
-        // await filesProcessing.waitFor({state:'hidden'});
-        // await percentage.waitFor({state:'hidden'});
+        // await filesProcessing.waitFor({state:'hidden',timeout:20000});
+        // await percentage.waitFor({state:'hidden',timeout:20000});
 
         //Option_3
         await waitForLocator(
@@ -209,6 +214,11 @@ export class Models extends Header{
     public randomModelVisibility (list:string[]) {
         return list[Math.floor((Math.random()*list.length))];
       }
+
+    public getAddSubtitlePendingAction():Locator{
+        return this.addSubtitlePendingAction
+    }
+
 
 
 
