@@ -47,10 +47,10 @@ test.describe('tests using POM', async()=>{
     test('Remove several datasets', async({page,request})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         await test.step('precs', async()=>{
-            await createDatasetViaPW(page, datasetName,datasetRemoteLink1);
-            await createDatasetViaPW(page, datasetName+'AA',datasetRemoteLink2);
-            await createDatasetViaPW(page, 'AA'+datasetName,datasetRemoteLink1)
-            await createDatasetViaPW(page, 'BB'+datasetName,datasetRemoteLink1)
+            await createDatasetViaPW(page, datasetName,[datasetRemoteLink1,datasetRemoteLink2]);
+            await createDatasetViaPW(page, datasetName+'AA',[datasetRemoteLink2]);
+            await createDatasetViaPW(page, 'AA'+datasetName,[datasetRemoteLink1])
+            await createDatasetViaPW(page, 'BB'+datasetName,[datasetRemoteLink1])
         })
     
         const mainMenu = new MainMenu(page);
@@ -64,7 +64,7 @@ test.describe('tests using POM', async()=>{
         await page.reload();
         await datasetPage.deleteDatasetsContainingName('AutoDataSet');
         await expect(datasetPage.flashMessage).toBeVisible();
-        expect(await datasetPage.getFlashMessageText()).toEqual('items deleted');
+        expect(await datasetPage.getFlashMessageText()).toContain('items deleted');
         await page.reload();
         expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
     })

@@ -1,7 +1,8 @@
 import { resolve } from "path";
 import { Page, expect} from "@playwright/test";
-import loggedState from "../../auth/defaultStorageState.json"
-import {post} from "../apiRequestsFunctions"
+import loggedState from "../../auth/defaultStorageState.json";
+import {post} from "../apiRequestsFunctions";
+import { Dataset } from "./buildDataset";
 import axios from 'axios';
 
 export const createDatasetViaAxios = async (name:string,url:string)=>{
@@ -32,28 +33,15 @@ export const createDatasetViaAxios = async (name:string,url:string)=>{
     console.log(response.data)
 }
 
-export const createDatasetViaPW = async (page:Page,name:string,fileUrl:string)=>{
-    const fileName = fileUrl.split('/')
-    const response = await post(page,`${process.env.CREATE_DATASET_ENDPOINT}`,JSON.stringify({
-        "basicInfo": {
-            "databundleVersionType": "REMOTE_URL_FILE_SET",
-            "remoteUrlInfos": [
-                {
-                    "name": `${fileName[fileName.length-1]}`,
-                    "url": `${fileUrl}`
-                }
-            ],
-            "files": [],
-            "directories": []
-        },
-        "title": `${name}`,
-        "slug": `${name.toLowerCase()}`,
-        "isPrivate": true,
-        "licenseId": 4,
-        "ownerUserId": 19095547,
-        "referrer": "datasets_km"
-    }))
-    //const json = await response.json();
+export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[])=>{
+    const dataset = Dataset.builder()
+    .setTitle(name)
+    .setSlug()
+    .setOwnerUserId()
+    .setRemoteFiles(fileUrls)
+    .build()
+
+    const response = await post(page,`${process.env.CREATE_DATASET_ENDPOINT}`,JSON.stringify(dataset))
     expect(response.ok()).toBe(true);
     console.log(name+' dataset is created')
 }

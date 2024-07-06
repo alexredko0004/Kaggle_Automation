@@ -132,6 +132,6 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.page.getByTitle('Delete selected items').click();
         await this.page.locator('.drawer-outer-container input').check();
         await this.page.locator('.drawer-outer-container button').getByText('Continue').click();
-        await this.page.getByRole('alertdialog').getByRole('button').getByText('Delete').click();
+        await this.page.getByRole('dialog').getByRole('button').getByText('Delete').click();
     }
 }

@@ -34,5 +34,6 @@ setup ('Autn via UI', async({page,context})=>{
     await expect(page.getByTestId('home-page-logged-in-render-tid')).toBeVisible();
     await page.context().storageState({ path: './auth/defaultStorageState.json' });
     process.env['OWNER'] = responseJson.userName
+    process.env['USER_ID'] = responseJson.id
 
 })
