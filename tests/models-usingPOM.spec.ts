@@ -16,27 +16,32 @@ test.describe('tests using POM', async()=>{
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
-
-        await mainMenu.openModelsPage();
-        await modelsPage.clickNewBtn();
-        await expect(modelsPage.createModelBtn).toBeDisabled();
-        await modelsPage.fillModelTitleFieldOnCreate(modelName);
-        await expect(modelsPage.createModelBtn).toBeEnabled();
-        await modelsPage.clickEditForURLOnCreate();
-        await modelsPage.fillURLFieldOnCreate(urlEnding);
-        await modelsPage.selectVisibilityOnCreate('Public');
-        const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
-        await page.waitForTimeout(2000);
-        await page.reload();
-        // await modelsPage.clickGoToModelDetailsBtn();
-        await page.goto(`${process.env.SITE_URL}`+'/models/'+`${createdModel.ownerSlug}/${urlEnding}`)
-        await page.waitForTimeout(2000);
-        expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
-        expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
-        await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
-        await modelsPage.openTab('Settings');
-        expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
-        await deleteModelViaPW(page,createdModel.id)
+        await test.step('Prec. Open "Models" page', async()=>{
+            await mainMenu.openModelsPage();
+        })
+        await test.step('Verify that button is enabled after filling required fields', async()=>{
+            await modelsPage.clickNewBtn();
+            await expect(modelsPage.createModelBtn).toBeDisabled();
+            await modelsPage.fillModelTitleFieldOnCreate(modelName);
+            await expect(modelsPage.createModelBtn).toBeEnabled();
+        })
+        await test.step('Verify that model is created with provided data', async()=>{
+            await modelsPage.clickEditForURLOnCreate();
+            await modelsPage.fillURLFieldOnCreate(urlEnding);
+            await modelsPage.selectVisibilityOnCreate('Public');
+            const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
+            await page.waitForTimeout(2000);
+            await page.reload();
+            await page.goto(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`)
+            await page.waitForTimeout(2000);
+            expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
+            expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
+            await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
+            await modelsPage.openTab('Settings');
+            expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
+            await deleteModelViaPW(page,createdModel.id)
+        })
+        
     })
     
     test('Edit Title and Subtitle for model', async({page})=>{
@@ -46,44 +51,56 @@ test.describe('tests using POM', async()=>{
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
         const model = await createModelViaPW(page,modelName,'Private')
-        await mainMenu.openModelsPage();
-        await modelsPage.openModelProfile(model.owner.slug,model.slug);
-        await modelsPage.clickPencilEditBtn();
-        await modelsPage.fillTitleOnEdit(modelNameEdited);
-        await modelsPage.fillSubTitleOnEdit('Subtitle text for edit 1234567890.');
-        await modelsPage.clickSaveBtn();
-        await expect(modelsPage.getFlashMessageLocator()).toBeVisible();  
-        expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
-        await page.reload();
-        expect(await modelsPage.getModelTitleOnView()).toEqual(modelNameEdited);
-        await expect(modelsPage.getLocatorByText('Subtitle text for edit 1234567890.')).toBeVisible(); 
-        await expect(modelsPage.getAddSubtitlePendingAction()).toBeHidden(); //??? How to make this assertion without using the controls from constructor
-        await page.waitForTimeout(500);
-        await mainMenu.openModelsPage();
-        await modelsPage.openYourWork();
-        await yourWorkPage.searchYourWork(modelName);
-        await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
-        await page.reload();
-        await yourWorkPage.searchYourWork(modelNameEdited);
-        await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelNameEdited)).toBeVisible();
-        expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('Subtitle text for edit 1234567890.');
-        await yourWorkPage.clickListItem(modelNameEdited);
-        await modelsPage.clickPencilEditBtn();
-        await modelsPage.clearSubTitleOnEdit();
-        await modelsPage.clickSaveBtn();
-        await expect(modelsPage.getFlashMessageLocator()).toBeVisible();
-        expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
+        await test.step('Preconditions', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.openModelProfile(model.owner.slug,model.slug);
+        })
+        await test.step('Verify edited data is saved on model profile', async()=>{
+            await modelsPage.clickPencilEditBtn();
+            await modelsPage.fillTitleOnEdit(modelNameEdited);
+            await modelsPage.fillSubTitleOnEdit('Subtitle text for edit 1234567890.');
+            await modelsPage.clickSaveBtn();
+            await expect(modelsPage.getFlashMessageLocator()).toBeVisible();  
+            expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
+            await page.reload();
+            expect(await modelsPage.getModelTitleOnView()).toEqual(modelNameEdited);
+            await expect(modelsPage.getLocatorByText('Subtitle text for edit 1234567890.')).toBeVisible(); 
+            await expect(modelsPage.getAddSubtitlePendingAction()).toBeHidden();
+        })
+        await test.step('Verify edited data is visible on the list with models', async()=>{
+            await page.waitForTimeout(500);
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            await yourWorkPage.searchYourWork(modelName);
+            await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
+            await page.reload();
+            await yourWorkPage.searchYourWork(modelNameEdited);
+            await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelNameEdited)).toBeVisible();
+            expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('Subtitle text for edit 1234567890.');
+        })
+        await test.step('Verify removing of subtitle', async()=>{
+            await yourWorkPage.clickListItem(modelNameEdited);
+            await modelsPage.clickPencilEditBtn();
+            await modelsPage.clearSubTitleOnEdit();
+            await modelsPage.clickSaveBtn();
+            await expect(modelsPage.getFlashMessageLocator()).toBeVisible();
+            expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
 
-        await mainMenu.openModelsPage();
-        await modelsPage.openYourWork();
-        await page.reload();
-        await yourWorkPage.searchYourWork(modelNameEdited);
-        expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('');
-        await yourWorkPage.clickListItem(modelNameEdited);
-        expect(await modelsPage.isSubtitleVisibleOnModelProfile()).toEqual(false);
-        await expect(modelsPage.getAddSubtitlePendingAction()).toBeVisible();  //??? How to make this assertion without using the controls from constructor
-
-        await deleteModelViaPW(page,model.id)
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            await page.reload();
+            await yourWorkPage.searchYourWork(modelNameEdited);
+            expect(await yourWorkPage.getListItemSubtitle(yourWorkPage.listItem)).toContain('');
+        })
+        await test.step('Verify that subtitle is removed on model profile', async()=>{
+            await yourWorkPage.clickListItem(modelNameEdited);
+            expect(await modelsPage.isSubtitleVisibleOnModelProfile()).toEqual(false);
+            await expect(modelsPage.getAddSubtitlePendingAction()).toBeVisible();
+        })
+        await test.step('Post condition. Remove model', async()=>{
+            await deleteModelViaPW(page,model.id)
+        })
+        
     })
 
     test('Create new model with variation', async({page})=>{

@@ -36,13 +36,16 @@ test.describe('tests using POM', async()=>{
     test('Create new dataset with file upload', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
-        await mainMenu.openDatasetsPage();
         const datasetPage = new Datasets(page);
-        await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
-        await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
-        await expect(page.getByTestId('preview-image')).toBeVisible();
-        //post-condition
-        await datasetPage.deleteDatasetFromItsPage()
+        await test.step('Add dataset', async()=>{
+            await mainMenu.openDatasetsPage();
+            await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
+            await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
+            await expect(page.getByTestId('preview-image')).toBeVisible();
+        })
+        await test.step('Postcondition. Remove created dataset', async()=>{
+            await datasetPage.deleteDatasetFromItsPage()
+        })
     })
     test('Remove several datasets', async({page,request})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
