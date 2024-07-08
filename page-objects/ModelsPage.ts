@@ -208,6 +208,7 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async clickCreateBtn(){
+        await this.page
         await this.createBtn.click()
     }
 

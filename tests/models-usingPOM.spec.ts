@@ -123,10 +123,9 @@ test.describe('tests using POM', async()=>{
         expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
         await modelsPage.selectLicenseOnVariationCreate('GPL 3');
         await modelsPage.clickCreateBtn();
-        await page.waitForTimeout(4000)
         await modelsPage.clickGoToModelDetailsBtn();
-        await expect(page.getByLabel(variationSlug)).toBeVisible();
-        await expect(page.getByTestId('preview-pdf')).toBeVisible();
+        expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true);
+        await expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
         await mainMenu.openModelsPage();
         await modelsPage.openYourWork();
         await yourWorkPage.searchYourWork(modelName);
@@ -142,24 +141,35 @@ test.describe('tests using POM', async()=>{
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
         const tags = ['PIL','D3.Js','Text-To-Text Generation','Os','Brazil','Business'];
-        const model = await createModelViaPW(page,modelName,'Private')
-        await modelsPage.openModelProfile(model.owner.slug,model.slug);
-        await modelsPage.clickAddTagsBtn();
+        const model = await createModelViaPW(page,modelName,'Private');
+        await test.step('Preconditions',async()=>{
+            await modelsPage.openModelProfile(model.owner.slug,model.slug);
+            await modelsPage.clickAddTagsBtn();
+        })
+        await test.step('Search and select tags', async()=>{
+            await modelsPage.tagsPanel().searchAndSelectTags(tags);
+            const selectedTags = await modelsPage.tagsPanel().getArrayOfSelectedTags();
+            for (let i=0;i<selectedTags.length;i++){
+                expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
+            }
+        })
+        await test.step('Save added tags and verify pending action disappearing', async()=>{
+            await modelsPage.tagsPanel().clickApplyBtn();
+            await page.reload();
+            await expect(modelsPage.addTagsBtn).toBeHidden();
+            await expect(modelsPage.addTagsPendingAction).toBeHidden();
+            await expect(modelsPage.editTagsBtn).toBeVisible();
+        })
+        await test.step('Open tags panel and verify that selected items are saved', async()=>{
+            await modelsPage.clickEditTagsBtn();
+            const selectedTags = await modelsPage.tagsPanel().getArrayOfSelectedTags();
+            for (let i=0;i<selectedTags.length;i++){
+                expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
+            }
+        })
+        await test.step('Post condition. Remove model',async()=>{
+            await deleteModelViaPW(page,model.id)
+        })
         
-        await modelsPage.tagsPanel().searchAndSelectTags(tags);
-        const selectedTags = await modelsPage.tagsPanel().getArrayOfSelectedTags();
-        for (let i=0;i<selectedTags.length;i++){
-            expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
-        }
-        await modelsPage.tagsPanel().clickApplyBtn();
-        await page.reload();
-        await expect(modelsPage.addTagsBtn).toBeHidden();
-        await expect(modelsPage.addTagsPendingAction).toBeHidden();
-        await expect(modelsPage.editTagsBtn).toBeVisible();
-        await modelsPage.clickEditTagsBtn();
-        for (let i=0;i<selectedTags.length;i++){
-            expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
-        }
-        await deleteModelViaPW(page,model.id)
     })
 })
