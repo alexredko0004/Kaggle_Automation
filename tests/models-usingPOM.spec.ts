@@ -6,7 +6,7 @@ import { currentYear, currentMonth, currentDate } from '../helpers/dates';
 import { YourWork } from '../page-objects/YourWorkPage';
 import { Tags } from '../page-objects/Tags';
 
-const modelVisibility = 
+let createdModel
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
         await page.goto('/');
@@ -16,29 +16,34 @@ test.describe('tests using POM', async()=>{
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
+        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
         await test.step('Prec. Open "Models" page', async()=>{
             await mainMenu.openModelsPage();
         })
         await test.step('Verify that button is enabled after filling required fields', async()=>{
             await modelsPage.clickNewBtn();
-            await expect(modelsPage.createModelBtn).toBeDisabled();
+            expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
             await modelsPage.fillModelTitleFieldOnCreate(modelName);
-            await expect(modelsPage.createModelBtn).toBeEnabled();
+            expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
         })
         await test.step('Verify that model is created with provided data', async()=>{
             await modelsPage.clickEditForURLOnCreate();
             await modelsPage.fillURLFieldOnCreate(urlEnding);
-            await modelsPage.selectVisibilityOnCreate('Public');
-            const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
-            await page.waitForTimeout(2000);
-            await page.reload();
-            await page.goto(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`)
-            await page.waitForTimeout(2000);
+            await modelsPage.selectVisibilityOnCreate(modelVisibility);
+            expect(await modelsPage.getModelTitleOnCreate()).toEqual(modelName);
+            expect(await modelsPage.getModelURLEndingOnCreate()).toEqual(urlEnding);
+            expect(await modelsPage.getModelSelectedVisibilityOnCreate()).toEqual(modelVisibility)
+        })
+        await test.step('Verify that created model has just provided data', async()=>{
+            createdModel = await modelsPage.saveModelAndGetIdAndSlug();
+            await modelsPage.openModelProfile(createdModel.ownerSlug,urlEnding);
             expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
             expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
-            await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.`+`${currentMonth()}.`+`${currentDate()}`);
+            await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
             await modelsPage.openTab('Settings');
             expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
+        })
+        await test.step('Post condition. Remove model', async()=>{
             await deleteModelViaPW(page,createdModel.id)
         })
         
@@ -110,29 +115,37 @@ test.describe('tests using POM', async()=>{
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
         const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
-        await mainMenu.openModelsPage();
-        await modelsPage.clickNewBtn();
-        await modelsPage.fillModelTitleFieldOnCreate(modelName);
-        await expect(modelsPage.createModelBtn).toBeEnabled();
-        await modelsPage.selectVisibilityOnCreate(modelVisibility);
-        const createdModel = await modelsPage.saveModelAndGetIdAndSlug();
-        await modelsPage.selectFrameworkOnCreate('Other');
-        await modelsPage.clickAddNewVariationBtn();
-        await modelsPage.uploadVariationFile(['./resources/kaner_testing.pdf','./resources/kaner_testing2.pdf']);
-        await modelsPage.fillVariationSlugInput(variationSlug);
-        expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
-        await modelsPage.selectLicenseOnVariationCreate('GPL 3');
-        await modelsPage.clickCreateBtn();
-        await modelsPage.clickGoToModelDetailsBtn();
-        expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true);
-        await expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
-        await mainMenu.openModelsPage();
-        await modelsPage.openYourWork();
-        await yourWorkPage.searchYourWork(modelName);
-        expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
-        expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1 Variation');
-
-        await deleteModelViaPW(page,createdModel.id)
+        await test.step('Preconditions', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.clickNewBtn();
+        })
+        await test.step('Verify that variation can be added with different parameters', async()=>{
+            await modelsPage.fillModelTitleFieldOnCreate(modelName);
+            await modelsPage.selectVisibilityOnCreate(modelVisibility);
+            createdModel = await modelsPage.saveModelAndGetIdAndSlug();
+            await modelsPage.selectFrameworkOnCreate('Other');
+            await modelsPage.clickAddNewVariationBtn();
+            await modelsPage.uploadVariationFile(['./resources/kaner_testing.pdf','./resources/kaner_testing2.pdf']);
+            await modelsPage.fillVariationSlugInput(variationSlug);
+            expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
+        })
+        await test.step('Verify that variation is added to newly created model', async()=>{
+            await modelsPage.selectLicenseOnVariationCreate('GPL 3');
+            await modelsPage.clickCreateBtn();
+            await modelsPage.clickGoToModelDetailsBtn();
+            expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true); //INVESTIGATE WHY IT FAILS HERE. Probably waiting for clickCreateBtn() should be added
+            expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
+        })
+        await test.step('Verify that model is contains variation in the list of models', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            await yourWorkPage.searchYourWork(modelName);
+            expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
+            expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1 Variation');
+        })
+        await test.step('Post condition. Remove model', async()=>{
+            await deleteModelViaPW(page,createdModel.id)
+        })
     })
 
     test('Add tags to model', async({page})=>{

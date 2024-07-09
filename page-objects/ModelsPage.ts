@@ -71,16 +71,10 @@ export class Models extends BaseBusinessObjectPage{
         await this.page.goto('/models')
     }
      
-    public async openModelProfile(ownerSlug:number,modelSlug:number){
+    public async openModelProfile(ownerSlug:string,modelSlug:string){
         await this.page.goto(`/models/${ownerSlug}/${modelSlug}`)
+        await this.page.waitForTimeout(2000)
     }
-
- /**
- * 
- * @param name - name of model
- * @param url - ending of url for new model
- * @param visibility - 'Private' or 'Public'
- */
     
     public async fillModelTitleFieldOnCreate(name:string){
         await this.modelTitleFieldOnCreate.fill(name)
@@ -98,6 +92,25 @@ export class Models extends BaseBusinessObjectPage{
         const text = (visibility==='Private')?'visibility_off':'visibility';
         await this.visibilityDropDown.click();
         await this.page.locator('li',{hasText:text+visibility}).click();
+    }
+    
+    public async isCreateButtonEnabled(){
+        return await this.createBtn.isEnabled()
+    }
+
+    public async getModelTitleOnCreate(){
+        const title = await this.modelTitleFieldOnCreate.inputValue();
+        return title
+    }
+
+    public async getModelURLEndingOnCreate(){
+        const urlEnding = await this.modelURLField.inputValue();
+        return urlEnding
+    }
+
+    public async getModelSelectedVisibilityOnCreate(){
+        const visibility = await this.visibilityDropDown.getAttribute('aria-label');
+        return visibility
     }
 
     public async clickCreateModel(){
@@ -173,6 +186,14 @@ export class Models extends BaseBusinessObjectPage{
 
     public async getModelVisibilitySettingOnView(){
         return this.modelVisibilityDropDown.innerText()
+    }
+
+    public async getModelVariationSlugVisibilityOnView(variationSlug){
+        return this.page.getByLabel(variationSlug).isVisible()
+    }
+
+    public async getModelVariationAttachmentVisibilityOnView(){
+        return this.page.getByTestId('preview-pdf')
     }
 
     public async clickPencilEditBtn(){
