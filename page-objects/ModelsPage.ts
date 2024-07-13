@@ -123,24 +123,33 @@ export class Models extends BaseBusinessObjectPage{
         // await expect.poll(()=> this.page.getByText('%').isVisible()).toBe(false);
 
         //Option_2
-        // const filesProcessing = this.page.getByText('Files Processing...');
-        // const percentage = this.page.getByText('%');
+        const panel = this.page.locator("//div[@class='drawer-outer-container']//h2[.='Upload Data']");
+        await panel.waitFor({state:'hidden',timeout:20000});
+        const filesProcessing = this.page.getByText('Files processing...');
+        const percentage = this.page.getByText('% processed');
         // await filesProcessing.waitFor({state:'hidden',timeout:20000});
         // await percentage.waitFor({state:'hidden',timeout:20000});
-
+        // await Promise.race([
+        //     filesProcessing.waitFor({ state: 'visible',timeout:10000}),
+        //     percentage.waitFor({ state: 'visible' }),
+        //   ])
         //Option_3
+        if (await filesProcessing.isVisible()){
+            await waitForLocator(
+                this.page.getByText('Files processing...'),
+                async ()=>this.page.getByText('Files processing...').isHidden(),
+                20000,
+                500
+            )
+        }else{
+        await percentage.isVisible() 
         await waitForLocator(
-            this.page.getByText('Files Processing...'),
-            async ()=>this.page.getByText('Files Processing...').isHidden(),
+            this.page.getByText('% processed'),
+            async ()=>this.page.getByText('% processed').isHidden(),
             20000,
             500
         )
-        await waitForLocator(
-            this.page.getByText('%'),
-            async ()=>this.page.getByText('%').isHidden(),
-            20000,
-            500
-        )
+        }
         await this.goToModelDetailBtn.click()
     }
 
@@ -189,11 +198,12 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async getModelVariationSlugVisibilityOnView(variationSlug){
-        return this.page.getByLabel(variationSlug).isVisible()
+        await this.page.waitForTimeout(2000);
+        return await this.page.getByLabel(variationSlug).isVisible()
     }
 
     public async getModelVariationAttachmentVisibilityOnView(){
-        return this.page.getByTestId('preview-pdf')
+        return await this.page.getByTestId('preview-pdf').isVisible()
     }
 
     public async clickPencilEditBtn(){

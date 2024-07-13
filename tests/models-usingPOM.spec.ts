@@ -133,7 +133,7 @@ test.describe('tests using POM', async()=>{
             await modelsPage.selectLicenseOnVariationCreate('GPL 3');
             await modelsPage.clickCreateBtn();
             await modelsPage.clickGoToModelDetailsBtn();
-            expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true); //INVESTIGATE WHY IT FAILS HERE. Probably waiting for clickCreateBtn() should be added
+            expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true);
             expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
         })
         await test.step('Verify that model is contains variation in the list of models', async()=>{
