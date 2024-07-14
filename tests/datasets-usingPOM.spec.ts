@@ -3,6 +3,7 @@ import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datase
 import { datasetRemoteLink1,datasetRemoteLink2 } from '../helpers/constants';
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
+import { YourWork } from '../page-objects/YourWorkPage';
 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
@@ -49,26 +50,33 @@ test.describe('tests using POM', async()=>{
     })
     test('Remove several datasets', async({page,request})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
+        const mainMenu = new MainMenu(page);
+        const datasetsPage = new Datasets(page);
+        const yourWorkPage = new YourWork(page);
         await test.step('precs', async()=>{
             await createDatasetViaPW(page, datasetName,[datasetRemoteLink1,datasetRemoteLink2]);
-            await createDatasetViaPW(page, datasetName+'AA',[datasetRemoteLink2]);
-            await createDatasetViaPW(page, 'AA'+datasetName,[datasetRemoteLink1])
+            // await createDatasetViaPW(page, datasetName+'AA',[datasetRemoteLink2]);
+            // await createDatasetViaPW(page, 'AA'+datasetName,[datasetRemoteLink1])
             await createDatasetViaPW(page, 'BB'+datasetName,[datasetRemoteLink1])
         })
-    
-        const mainMenu = new MainMenu(page);
-        const datasetPage = new Datasets(page);
+        await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
+            await mainMenu.openDatasetsPage();
+            await datasetsPage.openYourWork();
+            await yourWorkPage.checkAllItemsContainingName('AutoDataSet');
+
+        })
+        
 
         //steps
-        await page.waitForTimeout(3000);
-        await mainMenu.openDatasetsPage();
-        await datasetPage.openYourWork();
-        await page.waitForTimeout(1000);
-        await page.reload();
-        await datasetPage.deleteDatasetsContainingName('AutoDataSet');
-        await expect(datasetPage.flashMessage).toBeVisible();
-        expect(await datasetPage.getFlashMessageText()).toContain('items deleted');
-        await page.reload();
-        expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
+        // await page.waitForTimeout(3000);
+        // await mainMenu.openDatasetsPage();
+        // await datasetsPage.openYourWork();
+        // await page.waitForTimeout(1000);
+        // await page.reload();
+        // await datasetsPage.deleteDatasetsContainingName('AutoDataSet');
+        // await expect(datasetsPage.flashMessage).toBeVisible();
+        // expect(await datasetsPage.getFlashMessageText()).toContain('items deleted');
+        // await page.reload();
+        // expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
     })
 })

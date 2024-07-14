@@ -37,10 +37,6 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.linkTab.click()
     }
 
-    public async fillURLFieldWhileCreatingDataset(url:string){
-        await this.urlField.fill(url);
-    }
-
     public async clickContinueBtnWhileCreatingDataset(){
         const waitPromise = this.page.waitForResponse(response=>response.url().includes('api/i/datasets.DatasetService/GetRemoteUrlFileInfo')&&response.status()===200);
         await this.continueBtn.click();
@@ -49,6 +45,10 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async fillDatasetNameWhileCreatingDataset(name:string){
         await this.datasetTitleField.fill(name)
+    }
+
+    public async fillURLFieldWhileCreatingDataset(url:string){
+        await this.urlField.fill(url);
     }
 
     public async clickCreateBtnAndGetDatasetProperties():Promise<{datasetID:string,ownerSlug:string,datasetSlug:string}>{
@@ -128,6 +128,7 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.page.waitForTimeout(1500);
         for(let title of await this.page.locator('#site-content ul li',{hasText:`${name}`}).all()){
             await title.locator('[type="checkbox"]').check();
+            console.log(title+' is checked')
         }
         await this.page.getByTitle('Delete selected items').click();
         await this.page.locator('.drawer-outer-container input').check();

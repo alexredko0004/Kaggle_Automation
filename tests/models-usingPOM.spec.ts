@@ -41,7 +41,7 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
             await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
             await modelsPage.openTab('Settings');
-            expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual('Public');
+            expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual(modelVisibility);
         })
         await test.step('Post condition. Remove model', async()=>{
             await deleteModelViaPW(page,createdModel.id)

@@ -118,7 +118,6 @@ export class Dataset {
             };
             this.remoteUrlInfos.push(object);
         }
-        console.log(this.remoteUrlInfos)
         return this
     }
 }
