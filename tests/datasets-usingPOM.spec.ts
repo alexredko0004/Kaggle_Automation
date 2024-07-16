@@ -53,17 +53,46 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         const datasetsPage = new Datasets(page);
         const yourWorkPage = new YourWork(page);
-        await test.step('precs', async()=>{
-            await createDatasetViaPW(page, datasetName,[datasetRemoteLink1,datasetRemoteLink2]);
-            // await createDatasetViaPW(page, datasetName+'AA',[datasetRemoteLink2]);
-            // await createDatasetViaPW(page, 'AA'+datasetName,[datasetRemoteLink1])
-            await createDatasetViaPW(page, 'BB'+datasetName,[datasetRemoteLink1])
+        const datasetNames = ['1'+datasetName,'2'+datasetName,'3'+datasetName,'4'+datasetName,'5'+datasetName]
+        let checkedItems
+        await test.step('Preconditions', async()=>{
+            await createDatasetViaPW(page, datasetNames[0],[datasetRemoteLink1,datasetRemoteLink2]);
+            await createDatasetViaPW(page, datasetNames[1],[datasetRemoteLink2]);
+            await createDatasetViaPW(page, datasetNames[2],[datasetRemoteLink1])
+            await createDatasetViaPW(page, datasetNames[3],[datasetRemoteLink1])
         })
         await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
             await mainMenu.openDatasetsPage();
             await datasetsPage.openYourWork();
-            await yourWorkPage.checkAllItemsContainingName('AutoDataSet');
-
+            checkedItems = await yourWorkPage.checkAllItemsContainingNameAndReturnTheirNames('AutoDataSet');
+            expect(checkedItems.length).toEqual(4)
+        })
+        await test.step('Verify that just checked items are shown on the panel before removal', async()=>{
+            const trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
+            await yourWorkPage.clickDeleteBtn();
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(4);
+            const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
+            expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
+            for (let item of itemsOnPanel){
+                expect(trueCheckedItems.includes(item)).toBe(true)
+            }
+        })
+        await test.step('Verify that items to remove can be edited', async()=>{
+            await yourWorkPage.clickCancelBtnOnConfirmDialog();
+            let trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
+            expect(trueCheckedItems.length).toEqual(4);
+            const uncheckedItems = await yourWorkPage.uncheckItemsWithProvidedNamesAndReturnTheirNames([datasetNames[1]]);
+            trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
+            for (let uncheckedName of uncheckedItems){
+                expect(trueCheckedItems.includes(uncheckedName)).toBe(false) 
+            }
+            await yourWorkPage.clickDeleteBtn();
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(3);
+            const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
+            expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
+            for (let item of itemsOnPanel){
+                expect(trueCheckedItems.includes(item)).toBe(true)
+            }
         })
         
 
