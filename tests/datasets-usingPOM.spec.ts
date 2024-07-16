@@ -70,7 +70,7 @@ test.describe('tests using POM', async()=>{
         await test.step('Verify that just checked items are shown on the panel before removal', async()=>{
             const trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
             await yourWorkPage.clickDeleteBtn();
-            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(4);
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(4); //add here some automatic calculations based on precs
             const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
             expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
             for (let item of itemsOnPanel){
@@ -87,12 +87,13 @@ test.describe('tests using POM', async()=>{
                 expect(trueCheckedItems.includes(uncheckedName)).toBe(false) 
             }
             await yourWorkPage.clickDeleteBtn();
-            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(3);
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(3); //add here some automatic calculations based on precs
             const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
             expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
             for (let item of itemsOnPanel){
                 expect(trueCheckedItems.includes(item)).toBe(true)
             }
+            // add method to check items containing exact values from a given array of strings. And then add additional check here with selecting an additional item to delete
         })
         
 
