@@ -40,10 +40,12 @@ export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[]
     .setOwnerUserId()
     .setRemoteFiles(fileUrls)
     .build()
-
+    
     const response = await post(page,`${process.env.CREATE_DATASET_ENDPOINT}`,JSON.stringify(dataset))
     expect(response.ok()).toBe(true);
-    console.log(name+' dataset is created')
+    const createdDataset = JSON.parse(await response.text())
+    console.log(name+' dataset is created');
+    return createdDataset
 }
 
 export const deleteDatasetViaPW = async (page:Page,datasetSlug:string,ownerSlug:string)=>{

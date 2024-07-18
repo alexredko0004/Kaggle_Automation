@@ -14,6 +14,7 @@ export abstract class BasePage{
     }
 
     public async getFlashMessageText(){
+        await this.flashMessage.isVisible();
         return this.flashMessage.innerText()
     }
 

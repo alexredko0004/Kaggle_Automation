@@ -48,65 +48,90 @@ test.describe('tests using POM', async()=>{
             await datasetPage.deleteDatasetFromItsPage()
         })
     })
-    test('Remove several datasets', async({page,request})=>{
+    test('Remove several datasets', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const datasetsPage = new Datasets(page);
         const yourWorkPage = new YourWork(page);
-        const datasetNames = ['1'+datasetName,'2'+datasetName,'3'+datasetName,'4'+datasetName,'5'+datasetName]
-        let checkedItems
+        const datasetNames = ['1'+datasetName,'2'+datasetName,'3'+datasetName,'4'+datasetName,'5'+datasetName];
+        const initialCheckedItems = [datasetNames[0],datasetNames[1],datasetNames[2],'kjwewekjrkjwekjrwe'];
+        let remainingDataset;
+        let checkedItems;
+        let initialCount;
+        let finalCount;
         await test.step('Preconditions', async()=>{
             await createDatasetViaPW(page, datasetNames[0],[datasetRemoteLink1,datasetRemoteLink2]);
-            await createDatasetViaPW(page, datasetNames[1],[datasetRemoteLink2]);
-            await createDatasetViaPW(page, datasetNames[2],[datasetRemoteLink1])
-            await createDatasetViaPW(page, datasetNames[3],[datasetRemoteLink1])
+            remainingDataset = await createDatasetViaPW(page, datasetNames[1],[datasetRemoteLink2]);
+            await createDatasetViaPW(page, datasetNames[2],[datasetRemoteLink1]);
+            await createDatasetViaPW(page, datasetNames[3],[datasetRemoteLink1]);
         })
         await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
             await mainMenu.openDatasetsPage();
             await datasetsPage.openYourWork();
-            checkedItems = await yourWorkPage.checkAllItemsContainingNameAndReturnTheirNames('AutoDataSet');
-            expect(checkedItems.length).toEqual(4)
+            checkedItems = await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNames(initialCheckedItems);
+            initialCount = await yourWorkPage.getCountOfItemsOnTab('Datasets');
+            expect(checkedItems.length).toEqual(initialCheckedItems.length-1)
         })
         await test.step('Verify that just checked items are shown on the panel before removal', async()=>{
-            const trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
+            checkedItems = await yourWorkPage.getCheckedItemsNames();
             await yourWorkPage.clickDeleteBtn();
-            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(4); //add here some automatic calculations based on precs
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(initialCheckedItems.length-1);
             const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
-            expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
+            expect(checkedItems.length).toEqual(itemsOnPanel.length);
             for (let item of itemsOnPanel){
-                expect(trueCheckedItems.includes(item)).toBe(true)
+                expect(checkedItems.includes(item)).toBe(true)
             }
         })
         await test.step('Verify that items to remove can be edited', async()=>{
-            await yourWorkPage.clickCancelBtnOnConfirmDialog();
-            let trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
-            expect(trueCheckedItems.length).toEqual(4);
+            await yourWorkPage.clickCancelBtnOnPanel();
+            checkedItems = await yourWorkPage.getCheckedItemsNames();
+            expect(checkedItems.length).toEqual(initialCheckedItems.length-1);
             const uncheckedItems = await yourWorkPage.uncheckItemsWithProvidedNamesAndReturnTheirNames([datasetNames[1]]);
-            trueCheckedItems = await yourWorkPage.getCheckedItemsNames();
+            checkedItems = await yourWorkPage.getCheckedItemsNames();
             for (let uncheckedName of uncheckedItems){
-                expect(trueCheckedItems.includes(uncheckedName)).toBe(false) 
+                expect(checkedItems.includes(uncheckedName)).toBe(false) 
             }
-            await yourWorkPage.clickDeleteBtn();
-            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(3); //add here some automatic calculations based on precs
-            const itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
-            expect(trueCheckedItems.length).toEqual(itemsOnPanel.length);
-            for (let item of itemsOnPanel){
-                expect(trueCheckedItems.includes(item)).toBe(true)
-            }
-            // add method to check items containing exact values from a given array of strings. And then add additional check here with selecting an additional item to delete
-        })
-        
 
-        //steps
-        // await page.waitForTimeout(3000);
-        // await mainMenu.openDatasetsPage();
-        // await datasetsPage.openYourWork();
-        // await page.waitForTimeout(1000);
-        // await page.reload();
-        // await datasetsPage.deleteDatasetsContainingName('AutoDataSet');
-        // await expect(datasetsPage.flashMessage).toBeVisible();
-        // expect(await datasetsPage.getFlashMessageText()).toContain('items deleted');
-        // await page.reload();
-        // expect(page.locator('#site-content [role="listitem"]').getByText('AutoDataSet')).toBeHidden();
+            await yourWorkPage.clickDeleteBtn();
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(initialCheckedItems.length-2);
+            let itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
+            expect(checkedItems.length).toEqual(itemsOnPanel.length);
+            for (let item of itemsOnPanel){
+                expect(checkedItems.includes(item)).toBe(true)
+            }
+
+            await yourWorkPage.clickCancelBtnOnPanel();
+            const newCheckedItem = await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout([datasetNames[3]]);
+            checkedItems = await yourWorkPage.getCheckedItemsNames();
+            expect(checkedItems.length).toEqual(initialCheckedItems.length-1);
+            for (let uncheckedName of uncheckedItems){
+                expect(checkedItems.includes(uncheckedName)).toBe(false) 
+            }
+
+            await yourWorkPage.clickDeleteBtn();
+            expect(await yourWorkPage.getCountOfItemsOnDeleteWarningPanel()).toEqual(initialCheckedItems.length-1);
+            itemsOnPanel = await yourWorkPage.getNamesOfItemsOnDeleteWarningPanel();
+            expect(checkedItems.length).toEqual(itemsOnPanel.length);
+            for (let item of itemsOnPanel){
+                expect(checkedItems.includes(item)).toBe(true)
+            }
+            expect(itemsOnPanel.includes(newCheckedItem[0]));
+        })
+        await test.step('Verify that corresponding selected items are removed', async()=>{
+            await yourWorkPage.checkAgreementCheckbox();
+            await yourWorkPage.clickContinueBtnOnPanel();
+            expect(await yourWorkPage.getConfirmationPopUpText()).toEqual(`You are about to delete ${checkedItems.length} files. Deletion is irreversible.`);
+            await yourWorkPage.clickDeleteBtnOnConfirmDialog();
+            expect(await yourWorkPage.getFlashMessageText()).toEqual(`${checkedItems.length} items deleted.`);
+            finalCount = await yourWorkPage.getCountOfItemsOnTab('Datasets');
+            expect(finalCount).toEqual(initialCount-checkedItems.length);
+            expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetNames[1])).toBeVisible();
+            expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetNames[0])).toBeHidden();
+            expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetNames[2])).toBeHidden();
+            expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetNames[3])).toBeHidden();
+        })
+        await test.step('Postcondition. Remove remaining dataset', async()=>{
+            await deleteDatasetViaPW(page,remainingDataset.datasetVersionReference.slug,remainingDataset.datasetVersionReference.ownerSlug)
+        })
     })
 })

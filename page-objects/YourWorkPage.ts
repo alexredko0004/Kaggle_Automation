@@ -3,8 +3,9 @@ import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 
 export class YourWork extends BaseBusinessObjectPage{
     agreementCheckbox: Locator
-    cancelBtnOnConfirmDialog: Locator
+    cancelBtnOnPanel: Locator
     continueBtnOnPanel: Locator
+    //counterLabel: Locator
     deleteBtn: Locator
     deleteBtnOnConfirmDialog: Locator
     itemOnConfirmationDialog: Locator
@@ -15,8 +16,9 @@ export class YourWork extends BaseBusinessObjectPage{
     constructor(page){
         super(page)
         this.agreementCheckbox = page.locator('.drawer-outer-container input')
-        this.cancelBtnOnConfirmDialog = page.locator('.drawer-outer-container button').getByText('Cancel')
+        this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Cancel')
         this.continueBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Continue')
+        //this.counterLabel = page.getByText(`Your ${param}`)
         this.deleteBtn = page.getByTitle('Delete selected items')
         this.deleteBtnOnConfirmDialog = page.getByRole('dialog').getByRole('button').getByText('Delete')
         this.listItem = page.locator('#site-content ul li')
@@ -42,12 +44,45 @@ export class YourWork extends BaseBusinessObjectPage{
         return checkedItemsNames
     }
 
+    public async checkItemsWithProvidedNamesAndReturnTheirNames(names:string[]){
+        await this.page.waitForTimeout(7000);
+        await this.page.reload();
+        await this.page.waitForTimeout(1000);
+        let itemsToCheck:Array<Locator> = []
+        for(let name of names){
+            if (await this.listItem.filter({hasText:`${name}`}).isVisible()){
+            itemsToCheck.push(this.listItem.filter({hasText:`${name}`}));
+            } else itemsToCheck
+        }
+        let checkedItemsNames:Array<string|null> = []
+        for(let item of itemsToCheck){
+            await item.locator('[type="checkbox"]').check();
+            checkedItemsNames.push(await item.locator('a').first().getAttribute('aria-label'))
+        }
+        return checkedItemsNames
+    }
+
+    public async checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout(names:string[]){
+        let itemsToCheck:Array<Locator> = []
+        for(let name of names){
+            if (await this.listItem.filter({hasText:`${name}`}).isVisible()){
+            itemsToCheck.push(this.listItem.filter({hasText:`${name}`}));
+            } else itemsToCheck
+        }
+        let checkedItemsNames:Array<string|null> = []
+        for(let item of itemsToCheck){
+            await item.locator('[type="checkbox"]').check();
+            checkedItemsNames.push(await item.locator('a').first().getAttribute('aria-label'))
+        }
+        return checkedItemsNames
+    }
+
     public async clickContinueBtnOnPanel(){
         await this.continueBtnOnPanel.click()
     }
 
-    public async clickCancelBtnOnConfirmDialog(){
-        await this.cancelBtnOnConfirmDialog.click()
+    public async clickCancelBtnOnPanel(){
+        await this.cancelBtnOnPanel.click()
     }
 
     public async clickDeleteBtn(){
@@ -73,6 +108,20 @@ export class YourWork extends BaseBusinessObjectPage{
             checkedItemsNames.push(await item.locator('a').first().getAttribute('aria-label'))
         }
         return checkedItemsNames
+    }
+
+    public async getConfirmationPopUpText(){
+        const text = await this.page.getByRole('dialog').locator('p').innerText();
+        return text
+    }
+
+    public async getCountOfItemsOnTab(tabName:string){
+        const regexPattern = new RegExp(`Your ${tabName} \\(\\d+\\)`);
+        const element = await this.page.getByText(regexPattern);
+        const label = await element.evaluate(node => (node as HTMLElement).innerText);
+        const stringArray = label.split(' ');
+        let number = stringArray[2].replace('(','').replace(')','');
+        return parseInt(number)
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){
