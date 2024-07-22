@@ -3,6 +3,7 @@ import { MainMenu } from '../page-objects/MainMenu';
 import { Models } from '../page-objects/ModelsPage';
 import { createModelViaPW, deleteModelViaPW } from '../precs/Models/modelPrecs';
 import { currentYear, currentMonth, currentDate } from '../helpers/dates';
+import {modelDeletionConfirmationPopupInnerText} from "../helpers/constants";
 import { YourWork } from '../page-objects/YourWorkPage';
 import { Tags } from '../page-objects/Tags';
 
@@ -182,6 +183,40 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Post condition. Remove model',async()=>{
             await deleteModelViaPW(page,model.id)
+        })
+        
+    })
+
+    test('Delete model from its page', async({page})=>{
+        const modelName = 'AutoModel'+Date.now().toString();
+        const mainMenu = new MainMenu(page);
+        const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
+        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        const model = await createModelViaPW(page,modelName,modelVisibility);
+        await test.step('Prec. Open "Models" page', async()=>{
+            await modelsPage.openModelProfile(model.owner.slug,model.slug);
+        })
+        await test.step('Verify that confirmaton pop-up is shown when trying to delete a model', async()=>{
+            await modelsPage.clickThreeDotsBtnOnProfile();
+            await modelsPage.selectOptionFromThreeDotsMenu('Delete model');
+            expect(await modelsPage.isConfirmationPopupShown()).toBe(true);
+            expect(await modelsPage.getConfirmationPopupHeaderInnerText()).toEqual('Confirm Deletion');
+            expect(await modelsPage.getConfirmationPopupInnerText()).toEqual(modelDeletionConfirmationPopupInnerText);
+        })
+        await test.step('Verify that redirect happens once model is removed', async()=>{
+            await modelsPage.clickBtnOnConfirmationDialog('Delete');
+            await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Deletion in progress');
+            await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Successfully deleted your model. This page will reload shortly.');
+            expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual('https://www.kaggle.com/models');
+        })
+        await test.step('Verify that removed model is not shown in the list of models', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            await page.reload();
+            expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
+            await yourWorkPage.searchYourWork(modelName);
+            await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
         })
         
     })

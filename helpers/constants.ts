@@ -8,3 +8,5 @@ Text for check.
 ## Test header
 
 Text for check2`
+
+export const modelDeletionConfirmationPopupInnerText = 'Deletion is irreversible and any public or private Notebooks using this model will no longer be executable. Are you sure you want to permanently delete this model?'

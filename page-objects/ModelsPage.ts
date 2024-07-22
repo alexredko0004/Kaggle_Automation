@@ -27,6 +27,8 @@ export class Models extends BaseBusinessObjectPage{
     private readonly autorWebsiteField: Locator
     private readonly addAuthorBtn: Locator
     private readonly modelAuthors: Locator
+    private readonly threeDotsBtnOnModelProfile: Locator
+    private readonly listItemUnderThreeDots: Locator
     addSubtitlePendingAction: Locator
     addTagsPendingAction: Locator
     private readonly saveBtn: Locator
@@ -61,6 +63,8 @@ export class Models extends BaseBusinessObjectPage{
         this.authorNameField = page.getByLabel('textfield-Author Name-label').locator('input')
         this.autorWebsiteField = page.getByLabel('textfield-Website-label').locator('input')
         this.modelAuthors = page.locator('#site-content p a').all()
+        this.threeDotsBtnOnModelProfile = page.getByLabel("more_vert")
+        this.listItemUnderThreeDots = page.getByRole('menuitem')
         this.addSubtitlePendingAction = page.getByTitle('Add a subtitle')
         this.addTagsPendingAction = page.getByTitle('Add tags')
         this.saveBtn = page.locator('button',{hasText:'Save'})
@@ -208,6 +212,14 @@ export class Models extends BaseBusinessObjectPage{
 
     public async clickPencilEditBtn(){
         await this.pencilEdit.click()
+    }
+
+    public async clickThreeDotsBtnOnProfile(){
+        await this.threeDotsBtnOnModelProfile.click()
+    }
+
+    public async selectOptionFromThreeDotsMenu(option:string){
+        await this.listItemUnderThreeDots.getByText(option,{exact:true}).click()
     }
 
     public async fillTitleOnEdit(title:string){
