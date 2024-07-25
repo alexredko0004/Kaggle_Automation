@@ -18,7 +18,6 @@ export class YourWork extends BaseBusinessObjectPage{
         this.agreementCheckbox = page.locator('.drawer-outer-container input')
         this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Cancel')
         this.continueBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Continue')
-        //this.counterLabel = page.getByText(`Your ${param}`)
         this.deleteBtn = page.getByTitle('Delete selected items')
         this.deleteBtnOnConfirmDialog = page.getByRole('dialog').getByRole('button').getByText('Delete')
         this.listItem = page.locator('#site-content ul li')

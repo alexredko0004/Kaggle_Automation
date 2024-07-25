@@ -12,7 +12,7 @@ test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
         await page.goto('/');
     })
-    test('Create new model without variations', async({page})=>{
+    test.skip('Create new model without variations', async({page})=>{   //Rewrite with new panel for model creation
         const modelName = 'AutoModel'+Date.now().toString();
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
@@ -109,7 +109,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Create new model with variation', async({page})=>{
+    test.skip('Create new model with variation', async({page})=>{   //Rewrite with new panel for model creation
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
@@ -214,10 +214,52 @@ test.describe('tests using POM', async()=>{
             await mainMenu.openModelsPage();
             await modelsPage.openYourWork();
             await page.reload();
-            expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
+            await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
             await yourWorkPage.searchYourWork(modelName);
             await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
         })
+        
+    })
+
+    test('Upvote model', async({page})=>{
+        const modelName = 'AutoModel'+Date.now().toString();
+        const mainMenu = new MainMenu(page);
+        const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
+        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        const model = await createModelViaPW(page,modelName,modelVisibility);
+        let initialUpvoteCount = 0;
+        let currentUpvoteCount
+        await test.step('Prec. Open "Models" page', async()=>{
+            await modelsPage.openModelProfile(model.owner.slug,model.slug);
+        })
+        await test.step('Verify that model can be upvoted from its profile', async()=>{
+            await modelsPage.hoverOverUpvoteBtn();
+            await expect(modelsPage.getTooltipLocator()).toBeVisible();
+            expect(await modelsPage.getTooltipText()).toEqual('Upvote');
+            expect(await modelsPage.getUpvoteBtnMode()).toBe('default');
+            await modelsPage.clickUpvoteBtn();
+            currentUpvoteCount = await modelsPage.getUpvotesCounterValue();
+            expect(currentUpvoteCount).toEqual(initialUpvoteCount+1);
+            await modelsPage.hoverOverUpvoteBtn();
+            await expect(modelsPage.getTooltipLocator()).toBeVisible();
+            expect(await modelsPage.getTooltipText()).toEqual('Undo upvote');
+            expect(await modelsPage.getUpvoteBtnMode()).toBe('selected');
+        })
+        // await test.step('Verify that model is upvoted on 'Your Work' page', async()=>{
+        //     await modelsPage.clickBtnOnConfirmationDialog('Delete');
+        //     await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Deletion in progress');
+        //     await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Successfully deleted your model. This page will reload shortly.');
+        //     expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual('https://www.kaggle.com/models');
+        // })
+        // await test.step('Verify that removed model is not shown in the list of models', async()=>{
+        //     await mainMenu.openModelsPage();
+        //     await modelsPage.openYourWork();
+        //     await page.reload();
+        //     await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
+        //     await yourWorkPage.searchYourWork(modelName);
+        //     await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
+        // })
         
     })
 })

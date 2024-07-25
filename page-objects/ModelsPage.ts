@@ -33,6 +33,8 @@ export class Models extends BaseBusinessObjectPage{
     addTagsPendingAction: Locator
     private readonly saveBtn: Locator
     private readonly createBtn: Locator
+    private readonly upvoteBtn: Locator
+    private readonly upvotesCounter: Locator
 
     resetBtn: Locator
     trippleDotsBtn: Locator
@@ -69,6 +71,8 @@ export class Models extends BaseBusinessObjectPage{
         this.addTagsPendingAction = page.getByTitle('Add tags')
         this.saveBtn = page.locator('button',{hasText:'Save'})
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
+        this.upvoteBtn = page.getByTestId('upvotebutton__upvote')
+        this.upvotesCounter = page.locator('//button/following-sibling::button[@mode]')
     }
     
     public async openModelsPage(){
@@ -251,7 +255,6 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async clickCreateBtn(){
-        await this.page
         await this.createBtn.click()
     }
 
@@ -261,6 +264,24 @@ export class Models extends BaseBusinessObjectPage{
 
     public getAddSubtitlePendingAction():Locator{
         return this.addSubtitlePendingAction
+    }
+
+    public async clickUpvoteBtn(){
+        await this.upvoteBtn.click()
+    }
+
+    public async hoverOverUpvoteBtn(){
+        await this.upvoteBtn.hover()
+    }
+
+    public async getUpvoteBtnMode(){
+        const mode = await this.upvoteBtn.getAttribute('mode')
+        return mode
+    }
+
+    public async getUpvotesCounterValue(){
+        const counterValue = await this.upvotesCounter.innerText()
+        return parseInt(counterValue)
     }
 
 
