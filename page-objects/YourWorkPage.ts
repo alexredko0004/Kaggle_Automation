@@ -5,12 +5,12 @@ export class YourWork extends BaseBusinessObjectPage{
     agreementCheckbox: Locator
     cancelBtnOnPanel: Locator
     continueBtnOnPanel: Locator
-    //counterLabel: Locator
     deleteBtn: Locator
     deleteBtnOnConfirmDialog: Locator
     itemOnConfirmationDialog: Locator
     listItem: Locator
     searchField: Locator
+    upvoteBtn: Locator
     
 
     constructor(page){
@@ -23,6 +23,7 @@ export class YourWork extends BaseBusinessObjectPage{
         this.listItem = page.locator('#site-content ul li')
         this.itemOnConfirmationDialog = page.locator('.drawer-outer-container ul li a')
         this.searchField = page.getByPlaceholder('Search Your Work')
+        this.upvoteBtn = page.getByTestId('upvotebutton__upvote')
     }
     
     public async checkAgreementCheckbox(){
@@ -115,12 +116,19 @@ export class YourWork extends BaseBusinessObjectPage{
     }
 
     public async getCountOfItemsOnTab(tabName:string){
-        const regexPattern = new RegExp(`Your ${tabName} \\(\\d+\\)`);
-        const element = await this.page.getByText(regexPattern);
-        const label = await element.evaluate(node => (node as HTMLElement).innerText);
-        const stringArray = label.split(' ');
-        let number = stringArray[2].replace('(','').replace(')','');
-        return parseInt(number)
+        const regexPattern = new RegExp(`Your ${tabName} \\(\\d{1,}\\)`);
+        const element = await this.page.getByText(regexPattern).innerText();
+        //const label = await element.evaluate(node => (node as HTMLElement).innerText);
+        const label:string = element ?? 'not found';
+        // const stringArray = label.split(' ');
+        // let number = stringArray[2].replace('(','').replace(')','');
+        const match = label.match(/\d{1,}/);
+        if (match) {
+        const number = match[0];
+        return +number; // to convert string to number
+        } else {
+        throw new Error(`No number found in label: ${label}`);
+        }
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){
@@ -129,16 +137,7 @@ export class YourWork extends BaseBusinessObjectPage{
         return parseInt(stringArray[8])
     }
 
-    public async getNamesOfItemsOnDeleteWarningPanel(){
-        const arrayOfLocators = await this.itemOnConfirmationDialog.all();
-        let arrayOfNames:Array<string|null> = []
-        for (let locator of arrayOfLocators){
-            arrayOfNames.push(await locator.getAttribute('aria-label'))
-        }
-        return arrayOfNames
-    }
-
-    public async getListItemByNameOrSubtitle(itemNameOrSubtitle:string){
+    public async getListItemByNameOrSubtitle(itemNameOrSubtitle:string):Promise<Locator>{
         await this.page.waitForTimeout(500)
         return this.listItem.filter({hasText:itemNameOrSubtitle})
     }
@@ -154,6 +153,30 @@ export class YourWork extends BaseBusinessObjectPage{
         const detailsArray = details[0].split(' · ');
         detailsArray[0]!=='Private'?detailsArray.unshift('Public'):detailsArray
         return {visibility: detailsArray[0], owner: detailsArray[1], countVariations: detailsArray[2], countNotebooks: detailsArray[3]}
+    }
+
+    public async getNamesOfItemsOnDeleteWarningPanel(){
+        const arrayOfLocators = await this.itemOnConfirmationDialog.all();
+        let arrayOfNames:Array<string|null> = []
+        for (let locator of arrayOfLocators){
+            arrayOfNames.push(await locator.getAttribute('aria-label'))
+        }
+        return arrayOfNames
+    }
+
+    public async getNamesOfUpvotedItems(){
+        await this.page.waitForTimeout(500)
+        const arrayOfLocators = await this.listItem.filter({has:this.page.locator('button[mode="selected"]')}).all();
+        let arrayOfNames:Array<string|null> = []
+        for (let locator of arrayOfLocators){
+            arrayOfNames.push(await locator.locator('a').getAttribute('aria-label'))
+        }
+        return arrayOfNames
+    }
+
+    public async isListItemUpvoted(listItem:Locator){
+        const mode = await listItem.getByTestId('upvotebutton__upvote').getAttribute('mode')
+        return mode==='selected'
     }
 
     public async searchYourWork(searchString:string){

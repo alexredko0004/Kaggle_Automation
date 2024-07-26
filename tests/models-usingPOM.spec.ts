@@ -229,7 +229,8 @@ test.describe('tests using POM', async()=>{
         const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
         const model = await createModelViaPW(page,modelName,modelVisibility);
         let initialUpvoteCount = 0;
-        let currentUpvoteCount
+        let currentUpvoteCount;
+        let upvotedItemsNames;
         await test.step('Prec. Open "Models" page', async()=>{
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
         })
@@ -246,13 +247,17 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.getTooltipText()).toEqual('Undo upvote');
             expect(await modelsPage.getUpvoteBtnMode()).toBe('selected');
         })
-        // await test.step('Verify that model is upvoted on 'Your Work' page', async()=>{
-        //     await modelsPage.clickBtnOnConfirmationDialog('Delete');
-        //     await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Deletion in progress');
-        //     await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Successfully deleted your model. This page will reload shortly.');
-        //     expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual('https://www.kaggle.com/models');
-        // })
-        // await test.step('Verify that removed model is not shown in the list of models', async()=>{
+        await test.step('Verify that model is upvoted on "Your Work" page', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
+            for (let name of upvotedItemsNames){
+                expect(upvotedItemsNames.includes(modelName)).toBe(true)
+            }
+            let model1 = await yourWorkPage.getListItemByNameOrSubtitle(modelName);
+            expect(await yourWorkPage.isListItemUpvoted(model1)).toBe(true);
+        })
+        // await test.step('Verify that upvote can be removed on "Your Work" page', async()=>{
         //     await mainMenu.openModelsPage();
         //     await modelsPage.openYourWork();
         //     await page.reload();
@@ -260,6 +265,9 @@ test.describe('tests using POM', async()=>{
         //     await yourWorkPage.searchYourWork(modelName);
         //     await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
         // })
+        await test.step('Post condition. Remove model',async()=>{
+            await deleteModelViaPW(page,model.id)
+        })
         
     })
 })
