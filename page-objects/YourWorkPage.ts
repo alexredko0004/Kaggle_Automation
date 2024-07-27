@@ -10,7 +10,7 @@ export class YourWork extends BaseBusinessObjectPage{
     itemOnConfirmationDialog: Locator
     listItem: Locator
     searchField: Locator
-    upvoteBtn: Locator
+    //upvoteBtn: Locator
     
 
     constructor(page){
@@ -23,7 +23,7 @@ export class YourWork extends BaseBusinessObjectPage{
         this.listItem = page.locator('#site-content ul li')
         this.itemOnConfirmationDialog = page.locator('.drawer-outer-container ul li a')
         this.searchField = page.getByPlaceholder('Search Your Work')
-        this.upvoteBtn = page.getByTestId('upvotebutton__upvote')
+        //this.upvoteBtn = page.getByTestId('upvotebutton__upvote')
     }
     
     public async checkAgreementCheckbox(){
@@ -101,6 +101,10 @@ export class YourWork extends BaseBusinessObjectPage{
         await this.listItem.filter({hasText:itemName}).click()
     }
 
+    public async clickUpvoteBtnForListItem(listItem:Locator){
+        await listItem.getByTestId('upvotebutton__upvote').click()
+    }
+
     public async getCheckedItemsNames(){
         const items = await this.listItem.filter({has:this.page.getByTestId('CheckBoxIcon')}).all();
         let checkedItemsNames: Array<string|null> = []
@@ -135,6 +139,11 @@ export class YourWork extends BaseBusinessObjectPage{
         const stringOnPanel = await this.page.locator('.drawer-outer-container p').first().innerText();
         const stringArray = stringOnPanel.split(' ');
         return parseInt(stringArray[8])
+    }
+
+    public async getCountOfUpvotesForListItem(listItem:Locator){
+        const count = listItem.locator('//button/following-sibling::span[@mode]').innerText()
+        return +count
     }
 
     public async getListItemByNameOrSubtitle(itemNameOrSubtitle:string):Promise<Locator>{

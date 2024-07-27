@@ -231,6 +231,7 @@ test.describe('tests using POM', async()=>{
         let initialUpvoteCount = 0;
         let currentUpvoteCount;
         let upvotedItemsNames;
+        let modelInTheList;
         await test.step('Prec. Open "Models" page', async()=>{
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
         })
@@ -254,17 +255,45 @@ test.describe('tests using POM', async()=>{
             for (let name of upvotedItemsNames){
                 expect(upvotedItemsNames.includes(modelName)).toBe(true)
             }
-            let model1 = await yourWorkPage.getListItemByNameOrSubtitle(modelName);
-            expect(await yourWorkPage.isListItemUpvoted(model1)).toBe(true);
+            modelInTheList = await yourWorkPage.getListItemByNameOrSubtitle(modelName);
+            expect(await yourWorkPage.isListItemUpvoted(modelInTheList)).toBe(true);
         })
-        // await test.step('Verify that upvote can be removed on "Your Work" page', async()=>{
-        //     await mainMenu.openModelsPage();
-        //     await modelsPage.openYourWork();
-        //     await page.reload();
-        //     await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
-        //     await yourWorkPage.searchYourWork(modelName);
-        //     await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
-        // })
+        await test.step('Verify that upvote can be removed on "Your Work" page', async()=>{
+            await yourWorkPage.clickUpvoteBtnForListItem(modelInTheList);
+            upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
+            for (let name of upvotedItemsNames){
+                expect(upvotedItemsNames.includes(modelName)).toBe(false)
+            }
+            expect(await yourWorkPage.isListItemUpvoted(modelInTheList)).toBe(false);
+        })
+        await test.step('Verify that removed upvote on "Your Work" page is applied to model profile', async()=>{
+            await yourWorkPage.clickListItem(modelName);
+            currentUpvoteCount = await modelsPage.getUpvotesCounterValue();
+            expect(currentUpvoteCount).toEqual(initialUpvoteCount);
+            await modelsPage.hoverOverUpvoteBtn();
+            await expect(modelsPage.getTooltipLocator()).toBeVisible();
+            expect(await modelsPage.getTooltipText()).toEqual('Upvote');
+            expect(await modelsPage.getUpvoteBtnMode()).toBe('default');
+
+        })
+        await test.step('Verify that upvote made on "Your Work" page is applied to model profile', async()=>{
+            await mainMenu.openModelsPage();
+            await modelsPage.openYourWork();
+            await yourWorkPage.clickUpvoteBtnForListItem(modelInTheList);
+            upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
+            for (let name of upvotedItemsNames){
+                expect(upvotedItemsNames.includes(modelName)).toBe(true)
+            }
+            expect(await yourWorkPage.isListItemUpvoted(modelInTheList)).toBe(true);
+
+            await yourWorkPage.clickListItem(modelName);
+            currentUpvoteCount = await modelsPage.getUpvotesCounterValue();
+            expect(currentUpvoteCount).toEqual(initialUpvoteCount+1);
+            await modelsPage.hoverOverUpvoteBtn();
+            await expect(modelsPage.getTooltipLocator()).toBeVisible();
+            expect(await modelsPage.getTooltipText()).toEqual('Undo upvote');
+            expect(await modelsPage.getUpvoteBtnMode()).toBe('selected');
+        })
         await test.step('Post condition. Remove model',async()=>{
             await deleteModelViaPW(page,model.id)
         })
