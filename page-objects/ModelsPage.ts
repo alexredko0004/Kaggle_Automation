@@ -5,17 +5,17 @@ import { waitForLocator } from "../helpers/waitForLocator";
 export class Models extends BaseBusinessObjectPage{
     private readonly newModelBtn: Locator
     private readonly urlEditBtn: Locator
-    private readonly modelTitleFieldOnCreate: Locator
+    private readonly modelNameFieldOnCreate: Locator
     private readonly modelURLField: Locator
     createModelBtn: Locator
     private readonly visibilityDropDown: Locator
     private readonly frameworkListOnCreate: Locator
     private readonly addNewVariationOnCreateBtn: Locator
-    private readonly variationSlugInput: Locator
+    private readonly variationNameInput: Locator
     private readonly licenseListOnCreate: Locator
     addTagsBtn: Locator
     editTagsBtn: Locator
-    private readonly goToModelDetailBtn: Locator
+    private readonly goToModelBtn: Locator
     private readonly pencilEdit: Locator
     private readonly modelTitleFieldOnEdit: Locator
     private readonly modelSubtitleFieldOnEdit: Locator
@@ -42,18 +42,18 @@ export class Models extends BaseBusinessObjectPage{
 
     constructor(page){
         super(page)
-        this.modelTitleFieldOnCreate = page.getByPlaceholder('Enter model title')
-        this.urlEditBtn = page.locator('.drawer-outer-container').getByText('Edit')
+        this.modelNameFieldOnCreate = page.getByPlaceholder('Model Name')
+        this.urlEditBtn = page.locator('.drawer-outer-container span[role="button"]').first()
         this.modelURLField = page.locator('input[placeholder=""]')
-        this.visibilityDropDown = page.locator('button[role="combobox"]').first()
+        this.visibilityDropDown = page.locator('.drawer-outer-container').getByLabel('Private')
         this.createModelBtn = page.locator('//button[.="Create model"]') 
         this.frameworkListOnCreate = page.getByLabel('Select framework')
         this.addNewVariationOnCreateBtn = page.locator('button').getByText('addAdd new variation')
-        this.variationSlugInput = page.getByPlaceholder('Enter model variation slug')
+        this.variationNameInput = page.getByPlaceholder('Variation Name')
         this.licenseListOnCreate = page.getByText(/Select a license/)
         this.addTagsBtn = page.getByRole('button').filter({hasText:'Add Tags'})
         this.editTagsBtn = page.getByLabel('Edit Tags')
-        this.goToModelDetailBtn = page.locator('.drawer-outer-container button').getByText('Go to model detail page')
+        this.goToModelBtn = page.locator('.drawer-outer-container button').getByText('Go to Model')
         this.pencilEdit = page.getByLabel('edit',{exact:true})
         this.modelTitleFieldOnEdit = page.getByPlaceholder('Enter a title')
         this.modelSubtitleFieldOnEdit = page.locator('#site-content [maxlength="255"]')
@@ -84,8 +84,8 @@ export class Models extends BaseBusinessObjectPage{
         await this.page.waitForTimeout(2000)
     }
     
-    public async fillModelTitleFieldOnCreate(name:string){
-        await this.modelTitleFieldOnCreate.fill(name)
+    public async fillModelNameFieldOnCreate(name:string){
+        await this.modelNameFieldOnCreate.fill(name)
     }
 
     public async clickEditForURLOnCreate(){
@@ -107,7 +107,7 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async getModelTitleOnCreate(){
-        const title = await this.modelTitleFieldOnCreate.inputValue();
+        const title = await this.modelNameFieldOnCreate.inputValue();
         return title
     }
 
@@ -158,18 +158,32 @@ export class Models extends BaseBusinessObjectPage{
             500
         )
         }
-        await this.goToModelDetailBtn.click()
+        await this.goToModelBtn.click()
+    }
+
+    public async clickGoToModelBtn(){
+        const waitPromise = this.page.waitForResponse(async response => {
+            if (response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')) {
+              const responseBody = await response.json();
+              return responseBody.creationPercentComplete === 1;
+            }
+            return false;
+          });
+          
+        await waitPromise
+        await this.goToModelBtn.click();
+        await this.page.waitForTimeout(500)
     }
 
     public async selectFrameworkOnCreate(frameworkName:string){
         await this.frameworkListOnCreate.click();
-        await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:frameworkName}).click()
+        await this.page.locator('[role="menuitem"]').getByText(frameworkName).nth(1).click()
     }
-    public async saveModelAndGetIdAndSlug(){
+    public async clickCreateAndGetIdAndSlug(){
         const responsePromise = this.page.waitForResponse('/api/i/models.ModelService/CreateModel', {
             timeout: 30000
         });
-        await this.createModelBtn.click();
+        await this.createBtn.click();
         const response = await (await responsePromise).json();
         return {id: response.id, ownerSlug: response.owner.slug}
     }
@@ -183,11 +197,11 @@ export class Models extends BaseBusinessObjectPage{
         await waitPromise
     }
 
-    public async fillVariationSlugInput(variationSlug:string){
-        await this.variationSlugInput.fill(variationSlug)
+    public async fillVariationNameInput(variationSlug:string){
+        await this.variationNameInput.fill(variationSlug)
     }
 
-    public async getVariationFutureURL(){
+    public async getVariationFutureURL(){  //deprecated
         await this.page.waitForTimeout(100)
         return this.page.locator('.mdc-text-field-helper-text').innerText()
     }

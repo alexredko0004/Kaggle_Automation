@@ -12,43 +12,6 @@ test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
         await page.goto('/');
     })
-    test.skip('Create new model without variations', async({page})=>{   //Rewrite with new panel for model creation
-        const modelName = 'AutoModel'+Date.now().toString();
-        const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
-        const mainMenu = new MainMenu(page);
-        const modelsPage = new Models(page);
-        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
-        await test.step('Prec. Open "Models" page', async()=>{
-            await mainMenu.openModelsPage();
-        })
-        await test.step('Verify that button is enabled after filling required fields', async()=>{
-            await modelsPage.clickNewBtn();
-            expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
-            await modelsPage.fillModelTitleFieldOnCreate(modelName);
-            expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
-        })
-        await test.step('Verify that model is created with provided data', async()=>{
-            await modelsPage.clickEditForURLOnCreate();
-            await modelsPage.fillURLFieldOnCreate(urlEnding);
-            await modelsPage.selectVisibilityOnCreate(modelVisibility);
-            expect(await modelsPage.getModelTitleOnCreate()).toEqual(modelName);
-            expect(await modelsPage.getModelURLEndingOnCreate()).toEqual(urlEnding);
-            expect(await modelsPage.getModelSelectedVisibilityOnCreate()).toEqual(modelVisibility)
-        })
-        await test.step('Verify that created model has just provided data', async()=>{
-            createdModel = await modelsPage.saveModelAndGetIdAndSlug();
-            await modelsPage.openModelProfile(createdModel.ownerSlug,urlEnding);
-            expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
-            expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
-            await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
-            await modelsPage.openTab('Settings');
-            expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual(modelVisibility);
-        })
-        await test.step('Post condition. Remove model', async()=>{
-            await deleteModelViaPW(page,createdModel.id)
-        })
-        
-    })
     
     test('Edit Title and Subtitle for model', async({page})=>{
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
@@ -109,9 +72,10 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test.skip('Create new model with variation', async({page})=>{   //Rewrite with new panel for model creation
+    test('Create new model with variation', async({page})=>{   //Rewrite with new panel for model creation
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
+        const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
@@ -120,22 +84,28 @@ test.describe('tests using POM', async()=>{
             await mainMenu.openModelsPage();
             await modelsPage.clickNewBtn();
         })
-        await test.step('Verify that variation can be added with different parameters', async()=>{
-            await modelsPage.fillModelTitleFieldOnCreate(modelName);
-            await modelsPage.selectVisibilityOnCreate(modelVisibility);
-            createdModel = await modelsPage.saveModelAndGetIdAndSlug();
-            await modelsPage.selectFrameworkOnCreate('Other');
-            await modelsPage.clickAddNewVariationBtn();
+        await test.step('Verify that creation is forbidden till all required fields are filled in', async()=>{
             await modelsPage.uploadVariationFile(['./resources/kaner_testing.pdf','./resources/kaner_testing2.pdf']);
-            await modelsPage.fillVariationSlugInput(variationSlug);
-            expect(await modelsPage.getVariationFutureURL()).toContain(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${modelName.toLowerCase()}/other/${variationSlug}`);
-        })
-        await test.step('Verify that variation is added to newly created model', async()=>{
+            await modelsPage.fillModelNameFieldOnCreate(modelName);
+            await modelsPage.clickEditForURLOnCreate();
+            await modelsPage.fillURLFieldOnCreate(urlEnding);
+            await modelsPage.selectVisibilityOnCreate(modelVisibility);
+            expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
+            await modelsPage.selectFrameworkOnCreate('Keras'); //Rewrite this method to pick a random option from the list
             await modelsPage.selectLicenseOnVariationCreate('GPL 3');
-            await modelsPage.clickCreateBtn();
-            await modelsPage.clickGoToModelDetailsBtn();
+            expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
+        })
+        await test.step('Verify that created model contains just added variation on model profile', async()=>{
+            await modelsPage.fillVariationNameInput(variationSlug);
+            createdModel = await modelsPage.clickCreateAndGetIdAndSlug();
+            await modelsPage.clickGoToModelBtn();
+            expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
             expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true);
             expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
+            expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
+            await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
+            await modelsPage.openTab('Settings');
+            expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual(modelVisibility)
         })
         await test.step('Verify that model is contains variation in the list of models', async()=>{
             await mainMenu.openModelsPage();
