@@ -226,6 +226,7 @@ test.describe('tests using POM', async()=>{
                 expect(upvotedItemsNames.includes(modelName)).toBe(true)
             }
             modelInTheList = await yourWorkPage.getListItemByNameOrSubtitle(modelName);
+            expect(await yourWorkPage.getUpvotesCountForListItem(modelInTheList)).toEqual(initialUpvoteCount+1);
             expect(await yourWorkPage.isListItemUpvoted(modelInTheList)).toBe(true);
         })
         await test.step('Verify that upvote can be removed on "Your Work" page', async()=>{
@@ -234,6 +235,7 @@ test.describe('tests using POM', async()=>{
             for (let name of upvotedItemsNames){
                 expect(upvotedItemsNames.includes(modelName)).toBe(false)
             }
+            expect(await yourWorkPage.getUpvotesCountForListItem(modelInTheList)).toEqual(initialUpvoteCount);
             expect(await yourWorkPage.isListItemUpvoted(modelInTheList)).toBe(false);
         })
         await test.step('Verify that removed upvote on "Your Work" page is applied to model profile', async()=>{

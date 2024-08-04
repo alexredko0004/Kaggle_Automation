@@ -19,22 +19,33 @@ test.describe('tests using POM', async()=>{
     test('Create new dataset with remote url', async({page})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const mainMenu = new MainMenu(page);
-        await mainMenu.openDatasetsPage();
         const datasetPage = new Datasets(page);
-        await datasetPage.clickNewDatasetBtn();
-        await datasetPage.clickLinkTabWhileCreatingDataset();
-        await datasetPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
-        await datasetPage.clickContinueBtnWhileCreatingDataset();
-        await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
-        const createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
-        await datasetPage.clickGoToDatasetBtn();
-        expect(await datasetPage.getDatasetName()).toEqual(datasetName);
-        await expect(page.getByText('Remote source:')).toBeVisible();
-        await expect(page.getByTestId('preview-image')).toBeVisible();
-        //post-condition
-        await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
+        let createdDataset
+        await test.step('Preconditions', async()=>{
+            await mainMenu.openDatasetsPage();
+            await datasetPage.clickNewDatasetBtn();
+        })
+        await test.step('Verify that "Create" button becomes enabled after providing dataset name', async()=>{
+            await datasetPage.clickLinkTabWhileCreatingDataset();
+            await datasetPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
+            await datasetPage.clickContinueBtnWhileCreatingDataset();
+            await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
+            expect(await datasetPage.isCreateBtnEnabled()).toBe(true)
+        })
+        await test.step('Verify that dataset is created and contains resource from the remote link', async()=>{
+            createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
+            await datasetPage.clickGoToDatasetBtn();
+            expect(await datasetPage.getDatasetName()).toEqual(datasetName);
+            await expect(page.getByText('Remote source:')).toBeVisible();
+            await expect(page.getByTestId('preview-image')).toBeVisible();
+        })
+        await test.step('Postcondition. Remove created dataset', async()=>{
+            await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
+        })
     })
-    test('Create new dataset with file upload', async({page})=>{
+
+
+    test('Create new dataset with file upload', async({page})=>{   //REWRITE THIS TEST WITH MODULAR METHODS
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);
@@ -48,6 +59,7 @@ test.describe('tests using POM', async()=>{
             await datasetPage.deleteDatasetFromItsPage()
         })
     })
+
     test('Remove several datasets', async({page})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
         const mainMenu = new MainMenu(page);
@@ -136,6 +148,21 @@ test.describe('tests using POM', async()=>{
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,remainingDataset1.datasetVersionReference.slug,remainingDataset1.datasetVersionReference.ownerSlug)
             await deleteDatasetViaPW(page,remainingDataset2.datasetVersionReference.slug,remainingDataset2.datasetVersionReference.ownerSlug)
+        })
+    })
+
+    test('Edit dataset', async({page})=>{   //CRESTE TEST WITH PENDING ACTIONS INTERACTIONS
+        const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
+        const mainMenu = new MainMenu(page);
+        const datasetPage = new Datasets(page);
+        await test.step('Add dataset', async()=>{
+            await mainMenu.openDatasetsPage();
+            await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
+            await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
+            await expect(page.getByTestId('preview-image')).toBeVisible();
+        })
+        await test.step('Postcondition. Remove created dataset', async()=>{
+            await datasetPage.deleteDatasetFromItsPage()
         })
     })
 })

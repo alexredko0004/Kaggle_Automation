@@ -34,11 +34,11 @@ export class MainMenu extends BasePage{
 
     public async openDatasetsPage(){
        await this.datasetsItem.click();
-       expect(this.page).toHaveURL('/datasets')
+       await expect(this.page).toHaveURL('/datasets')
     }
 
     public async openModelsPage(){
         await this.modelsItem.click();
-        expect(this.page).toHaveURL('/models')
+        await expect(this.page).toHaveURL('/models')
      }
 }

@@ -28,27 +28,11 @@ export class Datasets extends BaseBusinessObjectPage{
     public async openDatasetsPage(){
         await this.page.goto('/datasets')
     }
- 
-    public async clickNewDatasetBtn(){
-        await this.newBtn.click()
-    }
-
-    public async clickLinkTabWhileCreatingDataset(){
-        await this.linkTab.click()
-    }
-
+    
     public async clickContinueBtnWhileCreatingDataset(){
         const waitPromise = this.page.waitForResponse(response=>response.url().includes('api/i/datasets.DatasetService/GetRemoteUrlFileInfo')&&response.status()===200);
         await this.continueBtn.click();
         await waitPromise
-    }
-
-    public async fillDatasetNameWhileCreatingDataset(name:string){
-        await this.datasetTitleField.fill(name)
-    }
-
-    public async fillURLFieldWhileCreatingDataset(url:string){
-        await this.urlField.fill(url);
     }
 
     public async clickCreateBtnAndGetDatasetProperties():Promise<{datasetID:string,ownerSlug:string,datasetSlug:string}>{
@@ -75,8 +59,28 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.goToDatasetBtn.click()
     }
 
+    public async clickLinkTabWhileCreatingDataset(){
+        await this.linkTab.click()
+    }
+    
+    public async clickNewDatasetBtn(){
+        await this.newBtn.click()
+    }
+
+    public async fillDatasetNameWhileCreatingDataset(name:string){
+        await this.datasetTitleField.fill(name)
+    }
+
+    public async fillURLFieldWhileCreatingDataset(url:string){
+        await this.urlField.fill(url);
+    }
+
     public async getDatasetName(){
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
+    }
+
+    public async isCreateBtnEnabled(){
+        return await this.createBtn.isEnabled()
     }
 
     
