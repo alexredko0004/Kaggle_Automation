@@ -122,17 +122,15 @@ export class YourWork extends BaseBusinessObjectPage{
     public async getCountOfItemsOnTab(tabName:string){
         const regexPattern = new RegExp(`Your ${tabName} \\(\\d{1,}\\)`);
         const element = await this.page.getByText(regexPattern).innerText();
-        //const label = await element.evaluate(node => (node as HTMLElement).innerText);
         const label:string = element ?? 'not found';
-        // const stringArray = label.split(' ');
-        // let number = stringArray[2].replace('(','').replace(')','');
-        const match = label.match(/\d{1,}/);
-        if (match) {
-        const number = match[0];
-        return +number; // to convert string to number
-        } else {
-        throw new Error(`No number found in label: ${label}`);
-        }
+        const match = label.match(/\d+/);
+        if (match) return +match[0]
+        //     {
+        // const number = match[0];
+        // return +number; // to convert string to number
+        // } else {
+        //  throw new Error(`No number found in label: ${label}`);
+        // }
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){
