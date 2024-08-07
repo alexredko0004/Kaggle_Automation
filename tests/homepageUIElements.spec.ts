@@ -15,6 +15,7 @@ test('Verify that images on home page correspond to screenshots', async ({ page 
     expect(await browseInspiringDataBlockImage.screenshot()).toMatchSnapshot()
   })
   await test.step('Verify that main menu icons correspond to screenshots',async()=>{
+    await page.getByText('OK, Got it.').click();
     const homeItemIcon = page.locator("i[title='Home']");
     const competitionsIcon = page.locator("i[title='Competitions']");
     const datasetsIcon = page.locator("i[title='Datasets']");
