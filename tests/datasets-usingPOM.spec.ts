@@ -151,18 +151,31 @@ test.describe('tests using POM', async()=>{
         })
     })
 
-    test('Edit dataset', async({page})=>{   //CRESTE TEST WITH PENDING ACTIONS INTERACTIONS
-        const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
-        const mainMenu = new MainMenu(page);
+    test('Edit dataset via pending actions', async({page})=>{   //CRESTE TEST WITH PENDING ACTIONS INTERACTIONS
+        const datasetName = 'AutoDataSet'+Date.now().toString();
         const datasetPage = new Datasets(page);
-        await test.step('Add dataset', async()=>{
-            await mainMenu.openDatasetsPage();
-            await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
-            await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
-            await expect(page.getByTestId('preview-image')).toBeVisible();
+        let createdDataset
+        await test.step('Preconditions', async()=>{
+            createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
+            await datasetPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
+            await datasetPage.reloadPage();
         })
-        await test.step('Postcondition. Remove created dataset', async()=>{
-            await datasetPage.deleteDatasetFromItsPage()
+        await test.step('Add subtitle via pending action', async()=>{
+            await datasetPage.clickAddSubtitlePendingAction();
+            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
+            await datasetPage.fillSubtitleWhileEditingDataset(`NEW SUBTITLE 123123123123123 EDIT`);
+            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(true);
+            await datasetPage.acceptCookies();
+            await page.waitForTimeout(2200);
+            await datasetPage.clickSaveChangesBtn();
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset.');
+            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
+            await datasetPage.reloadPage();
+            expect (await datasetPage.getSubtitleInputValue()).toEqual(`NEW SUBTITLE 123123123123123 EDIT`);
+        })
+        await test.step('Postcondition. Remove remaining dataset', async()=>{
+            await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
     })
 })

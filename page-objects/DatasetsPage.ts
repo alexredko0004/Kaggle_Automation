@@ -3,30 +3,44 @@ import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 
 export class Datasets extends BaseBusinessObjectPage{
     
+    addSubtitlePendingAction:Locator
     continueBtn: Locator
     createBtn: Locator
     datasetTitleField: Locator
+    datasetSubtitleField: Locator
     goToDatasetBtn: Locator
     linkTab: Locator
     newDatasetBtn: Locator
     resetBtn: Locator
+    saveChangesBtn: Locator
     trippleDotsBtn: Locator
     urlField: Locator
 
     constructor(page){
         super(page)
+        this.addSubtitlePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a subtitle')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
+        this.datasetSubtitleField = page.locator('input.MuiInputBase-input').nth(1)
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
+        this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
         this.urlField = page.getByPlaceholder('Enter remote URL')
     }
     
+    public async openDatasetProfile(datasetName:string,datasetOwnerSlug:string){
+        await this.page.goto(`/datasets/${datasetOwnerSlug}/${datasetName}`)
+    }
+
     public async openDatasetsPage(){
         await this.page.goto('/datasets')
+    }
+
+    public async clickAddSubtitlePendingAction(){
+        await this.addSubtitlePendingAction.click()
     }
     
     public async clickContinueBtnWhileCreatingDataset(){
@@ -67,6 +81,10 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.newBtn.click()
     }
 
+    public async clickSaveChangesBtn(){
+        await this.saveChangesBtn.click({force:true})
+    }
+
     public async fillDatasetNameWhileCreatingDataset(name:string){
         await this.datasetTitleField.fill(name)
     }
@@ -75,13 +93,29 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.urlField.fill(url);
     }
 
+    public async fillSubtitleWhileEditingDataset(subtitle:string){
+        await this.datasetSubtitleField.fill(subtitle);
+    }
+
     public async getDatasetName(){
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
+    }
+
+    public async getSubtitleInputValue(){
+        return await this.datasetSubtitleField.getAttribute('value')
     }
 
     public async isCreateBtnEnabled(){
         return await this.createBtn.isEnabled()
     }
+
+    public async isSaveChangesBtnEnabled(){
+        return await this.saveChangesBtn.isEnabled()
+    }
+
+    // public async isTabWithNameSelected(tabName:string){    ADD A SOLUTION FOR THIS METHOD AND USE THE METHOD IN TEST
+    //     return await this.saveChangesBtn.isEnabled()
+    // }
 
     
 /**

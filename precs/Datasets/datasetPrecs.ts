@@ -33,7 +33,7 @@ export const createDatasetViaAxios = async (name:string,url:string)=>{
     console.log(response.data)
 }
 
-export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[])=>{
+export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[]):Promise<{datasetId:string,ownerSlug:string,datasetSlug:string}>=>{
     const dataset = Dataset.builder()
     .setTitle(name)
     .setSlug()
@@ -45,7 +45,11 @@ export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[]
     expect(response.ok()).toBe(true);
     const createdDataset = JSON.parse(await response.text())
     console.log(name+' dataset is created');
-    return createdDataset
+    return {
+        datasetSlug:createdDataset.datasetVersionReference.slug,          
+        ownerSlug:createdDataset.datasetVersionReference.ownerSlug,
+        datasetId:createdDataset.datasetVersionReference.datasetId
+    }
 }
 
 export const deleteDatasetViaPW = async (page:Page,datasetSlug:string,ownerSlug:string)=>{

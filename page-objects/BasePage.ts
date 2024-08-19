@@ -16,6 +16,11 @@ export abstract class BasePage{
     public async clickBtnOnConfirmationDialog(btnName:string){
         await this.confirmationDialog.locator('button',{has:this.page.getByText(btnName)}).click()
     }
+    
+    public async acceptCookies(){
+        if (await this.page.getByText('OK, Got it.').isVisible()) await this.page.getByText('OK, Got it.').click()
+    }
+    
 
     public async getConfirmationPopupHeaderInnerText(){
         const innerText = await this.confirmationDialog.locator('h2').innerText();
@@ -27,7 +32,7 @@ export abstract class BasePage{
         return innerText
     }
 
-    public getFlashMessageLocator():Locator{    //USAGE OF THIS??
+    public getFlashMessageLocator():Locator{   
         return this.flashMessage
     }
 
@@ -57,5 +62,9 @@ export abstract class BasePage{
 
     public async isConfirmationPopupShown(){
         return await this.confirmationDialog.isVisible()
+    }
+
+    public async reloadPage(){
+        await this.page.reload()
     }
 }
