@@ -162,17 +162,18 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Add subtitle via pending action', async()=>{
             await datasetPage.clickAddSubtitlePendingAction();
+            expect (await datasetPage.isTabWithNameSelected('Settings')).toBe(true);
             expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
             await datasetPage.fillSubtitleWhileEditingDataset(`NEW SUBTITLE 123123123123123 EDIT`);
             expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(true);
             await datasetPage.acceptCookies();
-            await page.waitForTimeout(2200);
             await datasetPage.clickSaveChangesBtn();
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset.');
             expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
             await datasetPage.reloadPage();
             expect (await datasetPage.getSubtitleInputValue()).toEqual(`NEW SUBTITLE 123123123123123 EDIT`);
+            expect (await datasetPage.getSubtitleOnView()).toEqual('NEW SUBTITLE 123123123123123 EDIT');
         })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)

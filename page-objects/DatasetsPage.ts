@@ -8,6 +8,7 @@ export class Datasets extends BaseBusinessObjectPage{
     createBtn: Locator
     datasetTitleField: Locator
     datasetSubtitleField: Locator
+    datasetSubtitleOnView: Locator
     goToDatasetBtn: Locator
     linkTab: Locator
     newDatasetBtn: Locator
@@ -23,6 +24,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
         this.datasetSubtitleField = page.locator('input.MuiInputBase-input').nth(1)
+        this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
@@ -82,7 +84,8 @@ export class Datasets extends BaseBusinessObjectPage{
     }
 
     public async clickSaveChangesBtn(){
-        await this.saveChangesBtn.click({force:true})
+        await this.page.waitForTimeout(2000);
+        await this.saveChangesBtn.click()
     }
 
     public async fillDatasetNameWhileCreatingDataset(name:string){
@@ -105,6 +108,10 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.datasetSubtitleField.getAttribute('value')
     }
 
+    public async getSubtitleOnView(){
+        return await this.datasetSubtitleOnView.innerText()
+    }
+
     public async isCreateBtnEnabled(){
         return await this.createBtn.isEnabled()
     }
@@ -113,9 +120,10 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.saveChangesBtn.isEnabled()
     }
 
-    // public async isTabWithNameSelected(tabName:string){    ADD A SOLUTION FOR THIS METHOD AND USE THE METHOD IN TEST
-    //     return await this.saveChangesBtn.isEnabled()
-    // }
+    public async isTabWithNameSelected(tabName:string){
+        const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
+        return (isSelected==='true')
+    }
 
     
 /**
