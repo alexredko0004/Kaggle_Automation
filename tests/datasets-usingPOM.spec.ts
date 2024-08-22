@@ -151,7 +151,7 @@ test.describe('tests using POM', async()=>{
         })
     })
 
-    test('Edit dataset via pending actions', async({page})=>{   
+    test.only('Edit dataset via pending actions', async({page})=>{   
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const datasetPage = new Datasets(page);
         let createdDataset
@@ -176,20 +176,18 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.getSubtitleOnView()).toEqual('NEW SUBTITLE 123123123123123 EDIT');
             await datasetPage.selectTabOnDatasetProfile('Data Card');
             expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
-            await page.waitForTimeout(2000)
-            while (await datasetPage.isRightBtnEnabled()){               //INVESTIGATE WHY THIS ITERATOR DOESN"T WORK AND METHOD ALWAYS RETURNS NULL
+            while (await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickRightBtnForPendingActions();
                 expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
-                console.log('OOOOOOOOO')
             }
-            // await datasetPage.clickRightBtnForPendingActions();
-            // expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
-            // await datasetPage.clickRightBtnForPendingActions();
-            // expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
         })
-        // await test.step('Add description via pending action', async()=>{
-        //     await
-        // })
+        await test.step('Add description via pending action', async()=>{
+            while (!await datasetPage.isRightBtnEnabled()){              
+                await datasetPage.clickLeftBtnForPendingActions();
+            }
+            await datasetPage.clickAddDescriptionPendingAction();
+            expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
+        })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })

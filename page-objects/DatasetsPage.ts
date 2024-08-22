@@ -3,12 +3,14 @@ import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 
 export class Datasets extends BaseBusinessObjectPage{
     
+    addDescriptionPendingAction: Locator
     addSubtitlePendingAction:Locator
     continueBtn: Locator
     createBtn: Locator
-    datasetTitleField: Locator
+    datasetDescriptionField: Locator
     datasetSubtitleField: Locator
     datasetSubtitleOnView: Locator
+    datasetTitleField: Locator
     goToDatasetBtn: Locator
     leftBtnForPendingActions: Locator
     linkTab: Locator
@@ -21,14 +23,16 @@ export class Datasets extends BaseBusinessObjectPage{
 
     constructor(page){
         super(page)
+        this.addDescriptionPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a description')
         this.addSubtitlePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a subtitle')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
+        this.datasetDescriptionField = page.getByTestId('markdownEditor').locator('textarea.MuiInputBase-inputMultiline').first()
         this.datasetSubtitleField = page.locator('input.MuiInputBase-input').nth(1)
         this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
-        this.leftBtnForPendingActions = page.getByLabel('chevron_right')
+        this.leftBtnForPendingActions = page.getByLabel('chevron_left')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
         this.rightBtnForPendingActions = page.getByLabel('chevron_right')
@@ -43,6 +47,9 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async openDatasetsPage(){
         await this.page.goto('/datasets')
+    }
+    public async clickAddDescriptionPendingAction(){
+        await this.addDescriptionPendingAction.click()
     }
 
     public async clickAddSubtitlePendingAction(){
@@ -133,10 +140,13 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.createBtn.isEnabled()
     }
 
+    public async isDatasetDescriptionFieldVisible(){
+        return await this.datasetDescriptionField.isVisible()
+    }
+
     public async isRightBtnEnabled(){
-        console.log(await this.leftBtnForPendingActions.getAttribute('disabled'))
-        console.log(await this.rightBtnForPendingActions.getAttribute('disabled'))
-        return await this.rightBtnForPendingActions.getAttribute('disabled')
+        await this.page.waitForTimeout(1000);
+        return await this.rightBtnForPendingActions.getAttribute('disabled')===null
     }
 
     public async isSaveChangesBtnEnabled(){
