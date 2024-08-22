@@ -140,9 +140,9 @@ test.describe('tests using POM', async()=>{
         await test.step('Save added tags and verify pending action disappearing', async()=>{
             await modelsPage.tagsPanel().clickApplyBtn();
             await page.reload();
-            await expect(modelsPage.addTagsBtn).toBeHidden();
-            await expect(modelsPage.addTagsPendingAction).toBeHidden();
-            await expect(modelsPage.editTagsBtn).toBeVisible();
+            await expect(modelsPage.getAddTagsBtn()).toBeHidden();
+            await expect(modelsPage.getAddTagsPendingAction()).toBeHidden();
+            await expect(modelsPage.getEditTagsBtn()).toBeVisible();
         })
         await test.step('Open tags panel and verify that selected items are saved', async()=>{
             await modelsPage.clickEditTagsBtn();

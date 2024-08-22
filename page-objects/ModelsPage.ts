@@ -280,6 +280,18 @@ export class Models extends BaseBusinessObjectPage{
         return this.addSubtitlePendingAction
     }
 
+    public getAddTagsBtn():Locator{
+        return this.addTagsBtn
+    }
+
+    public getAddTagsPendingAction():Locator{
+        return this.addTagsPendingAction
+    }
+
+    public getEditTagsBtn():Locator{
+        return this.editTagsBtn
+    }
+
     public async clickUpvoteBtn(){
         await this.upvoteBtn.click()
     }

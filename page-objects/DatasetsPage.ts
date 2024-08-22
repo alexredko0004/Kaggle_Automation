@@ -10,9 +10,11 @@ export class Datasets extends BaseBusinessObjectPage{
     datasetSubtitleField: Locator
     datasetSubtitleOnView: Locator
     goToDatasetBtn: Locator
+    leftBtnForPendingActions: Locator
     linkTab: Locator
     newDatasetBtn: Locator
     resetBtn: Locator
+    rightBtnForPendingActions: Locator
     saveChangesBtn: Locator
     trippleDotsBtn: Locator
     urlField: Locator
@@ -26,8 +28,10 @@ export class Datasets extends BaseBusinessObjectPage{
         this.datasetSubtitleField = page.locator('input.MuiInputBase-input').nth(1)
         this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
+        this.leftBtnForPendingActions = page.getByLabel('chevron_right')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
+        this.rightBtnForPendingActions = page.getByLabel('chevron_right')
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
         this.urlField = page.getByPlaceholder('Enter remote URL')
@@ -75,12 +79,21 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.goToDatasetBtn.click()
     }
 
+    public async clickLeftBtnForPendingActions(){
+        await this.leftBtnForPendingActions.click()
+    }
+
     public async clickLinkTabWhileCreatingDataset(){
         await this.linkTab.click()
     }
     
     public async clickNewDatasetBtn(){
         await this.newBtn.click()
+    }
+
+    public async clickRightBtnForPendingActions(){
+        await this.page.waitForTimeout(500);
+        await this.rightBtnForPendingActions.click()
     }
 
     public async clickSaveChangesBtn(){
@@ -112,8 +125,18 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.datasetSubtitleOnView.innerText()
     }
 
+    public async isAddSubtitlePendingActionVisible(){
+        return await this.addSubtitlePendingAction.isVisible()
+    }
+
     public async isCreateBtnEnabled(){
         return await this.createBtn.isEnabled()
+    }
+
+    public async isRightBtnEnabled(){
+        console.log(await this.leftBtnForPendingActions.getAttribute('disabled'))
+        console.log(await this.rightBtnForPendingActions.getAttribute('disabled'))
+        return await this.rightBtnForPendingActions.getAttribute('disabled')
     }
 
     public async isSaveChangesBtnEnabled(){
@@ -123,6 +146,10 @@ export class Datasets extends BaseBusinessObjectPage{
     public async isTabWithNameSelected(tabName:string){
         const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
         return (isSelected==='true')
+    }
+
+    public async selectTabOnDatasetProfile(tabName:string){
+        await this.page.getByRole('tab').getByText(tabName).click()
     }
 
     
