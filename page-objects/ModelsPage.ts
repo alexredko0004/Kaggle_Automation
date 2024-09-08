@@ -201,11 +201,6 @@ export class Models extends BaseBusinessObjectPage{
         await this.variationNameInput.fill(variationSlug)
     }
 
-    public async getVariationFutureURL(){  //deprecated
-        await this.page.waitForTimeout(100)
-        return this.page.locator('.mdc-text-field-helper-text').innerText()
-    }
-
     public async selectLicenseOnVariationCreate(licenseName:string='Unknown'){
         await this.licenseListOnCreate.click();
         await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:licenseName}).click()

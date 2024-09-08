@@ -1,6 +1,6 @@
 import { test,expect,request } from '@playwright/test';
 import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
-import { datasetRemoteLink1,datasetRemoteLink2 } from '../helpers/constants';
+import { datasetRemoteLink1,datasetRemoteLink2,datasetDescription1,datasetDescriptionH1,datasetDescriptionH2,datasetDescriptionParagraph } from '../helpers/constants';
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
@@ -187,6 +187,18 @@ test.describe('tests using POM', async()=>{
             }
             await datasetPage.clickAddDescriptionPendingAction();
             expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
+            await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
+            await datasetPage.clickSaveForSection('About Dataset');
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+            await datasetPage.reloadPage();
+            while (await datasetPage.isRightBtnEnabled()){              
+                await datasetPage.clickRightBtnForPendingActions();
+                expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            }
+            expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
+            expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
+            expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
         })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)

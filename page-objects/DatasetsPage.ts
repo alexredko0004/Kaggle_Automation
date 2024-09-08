@@ -108,8 +108,20 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.saveChangesBtn.click()
     }
 
+    public async clickSaveForSection(sectionName:string){
+        const saveBtn = this.page.locator(`//h2[contains(text(),'${sectionName}')]/parent::div/parent::div/parent::div/parent::div`)
+                                       .getByRole('button').filter({hasText:'Save'});
+        await saveBtn.click();
+        await this.page.waitForTimeout(1000);
+    }
+
+    
     public async fillDatasetNameWhileCreatingDataset(name:string){
         await this.datasetTitleField.fill(name)
+    }
+
+    public async fillDescriptionWhileEditingDataset(description:string){
+        await this.datasetDescriptionField.fill(description);
     }
 
     public async fillURLFieldWhileCreatingDataset(url:string){
@@ -124,12 +136,23 @@ export class Datasets extends BaseBusinessObjectPage{
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
 
+    public async getDescriptionOnView(){
+        const h1 = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//h1`).innerText();
+        const h2 = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//h2`).innerText();
+        const paragraph = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//p`).innerText();
+        return {h1:h1, h2:h2, p:paragraph}
+    }
+
     public async getSubtitleInputValue(){
         return await this.datasetSubtitleField.getAttribute('value')
     }
 
     public async getSubtitleOnView(){
         return await this.datasetSubtitleOnView.innerText()
+    }
+
+    public async isAddDescriptionPendingActionVisible(){
+        return await this.addDescriptionPendingAction.isVisible()
     }
 
     public async isAddSubtitlePendingActionVisible(){

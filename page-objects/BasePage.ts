@@ -9,7 +9,7 @@ export abstract class BasePage{
     constructor(page){
         this.page = page
         this.confirmationDialog = page.getByRole('dialog')
-        this.flashMessage = page.getByRole('alert')
+        this.flashMessage = page.getByRole('presentation').getByRole('alert')
         this.tooltip = page.locator('.rmwc-tooltip').getByRole('tooltip')
     }
     
