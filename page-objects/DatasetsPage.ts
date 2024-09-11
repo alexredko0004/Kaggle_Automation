@@ -20,6 +20,7 @@ export class Datasets extends BaseBusinessObjectPage{
     saveChangesBtn: Locator
     trippleDotsBtn: Locator
     urlField: Locator
+    usabilityValue: Locator
 
     constructor(page){
         super(page)
@@ -39,6 +40,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
         this.urlField = page.getByPlaceholder('Enter remote URL')
+        this.usabilityValue = page.getByTestId('usability-value')
     }
     
     public async openDatasetProfile(datasetName:string,datasetOwnerSlug:string){
@@ -132,6 +134,29 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.datasetSubtitleField.fill(subtitle);
     }
 
+    public async getDatasetCompletenessCredibilityCompatibilityStats():Promise<{completeness:{value:number},credibility:object,compatibility:object}>{
+        const datasetUsabilityStatsTooltip = this.page.locator('[role="presentation"] .MuiPaper-elevation');
+        const usabilityInfoIcon = this.page.getByRole('tooltip');
+        await usabilityInfoIcon.waitFor();
+        await usabilityInfoIcon.hover();
+        const completenessMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').first().innerText()).match(/\d+/);
+        const completenessValue = (completenessMatch&&completenessMatch.length>0)?+completenessMatch[0]:0;
+        await this.page.getByTestId('dataset-detail-render-tid').click({force:true});
+        await expect.poll(async () => await datasetUsabilityStatsTooltip.isVisible(), {timeout: 10000,}).toBe(false);
+        return {
+          completeness:{
+            value:completenessValue,
+            // subtitle,
+            // tag,
+            // description,
+            // coverImage
+          },
+          credibility:{},
+          compatibility:{}
+
+        }
+    }
+
     public async getDatasetName(){
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
@@ -150,6 +175,18 @@ export class Datasets extends BaseBusinessObjectPage{
     public async getSubtitleOnView(){
         return await this.datasetSubtitleOnView.innerText()
     }
+
+    public async getUsabilityValue(){
+        await this.usabilityValue.waitFor();
+        const value = await this.usabilityValue.innerText();
+        return +value
+    }
+
+    // public async hoverOverUsabilityInfoIcon(){
+    //     const usabilityInfoIcon = this.page.getByRole('tooltip');
+    //     await usabilityInfoIcon.waitFor();
+    //     await usabilityInfoIcon.hover()
+    // }
 
     public async isAddDescriptionPendingActionVisible(){
         return await this.addDescriptionPendingAction.isVisible()

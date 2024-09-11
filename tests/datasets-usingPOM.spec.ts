@@ -155,12 +155,19 @@ test.describe('tests using POM', async()=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const datasetPage = new Datasets(page);
         let createdDataset
+        let usabilityValue = 0;
+        let datasetStats;
+        let datasetCredibility = 0;
+        let datasetCompatibility = 0;
         await test.step('Preconditions', async()=>{
             createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
             await datasetPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
             await datasetPage.reloadPage();
+            //await datasetPage.hoverOverUsabilityInfoIcon();
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()
         })
         await test.step('Add subtitle via pending action', async()=>{
+            usabilityValue = await datasetPage.getUsabilityValue();
             await datasetPage.clickAddSubtitlePendingAction();
             expect (await datasetPage.isTabWithNameSelected('Settings')).toBe(true);
             expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
@@ -171,10 +178,17 @@ test.describe('tests using POM', async()=>{
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset.');
             expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
+
             await datasetPage.reloadPage();
             expect (await datasetPage.getSubtitleInputValue()).toEqual(`NEW SUBTITLE 123123123123123 EDIT`);
             expect (await datasetPage.getSubtitleOnView()).toEqual('NEW SUBTITLE 123123123123123 EDIT');
+
             await datasetPage.selectTabOnDatasetProfile('Data Card');
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+
+            //ADD THE BLOCK ABOVE TO ALL THE FOLLOWING CHECKS
             expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
             while (await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickRightBtnForPendingActions();
@@ -192,6 +206,8 @@ test.describe('tests using POM', async()=>{
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
             await datasetPage.reloadPage();
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
             while (await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickRightBtnForPendingActions();
                 expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
