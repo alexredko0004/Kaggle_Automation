@@ -134,25 +134,74 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.datasetSubtitleField.fill(subtitle);
     }
 
-    public async getDatasetCompletenessCredibilityCompatibilityStats():Promise<{completeness:{value:number},credibility:object,compatibility:object}>{
+    public async getDatasetCompletenessCredibilityCompatibilityStats():
+    Promise<{completeness:{
+            value:number,
+            isSubtitleChecked:boolean,
+            isTagChecked:boolean,
+            isDescriptionChecked:boolean,
+            isCoverImageChecked:boolean
+        },
+        credibility:{
+            value:number,
+            isUpdateFrequencyChecked:boolean
+        },
+        compatibility:{
+            value:number,
+            isLicenseChecked:boolean,
+            isFileDescriptionChecked:boolean
+        }}>{
         const datasetUsabilityStatsTooltip = this.page.locator('[role="presentation"] .MuiPaper-elevation');
         const usabilityInfoIcon = this.page.getByRole('tooltip');
         await usabilityInfoIcon.waitFor();
         await usabilityInfoIcon.hover();
+
+        //get value for comleteness:
         const completenessMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').first().innerText()).match(/\d+/);
         const completenessValue = (completenessMatch&&completenessMatch.length>0)?+completenessMatch[0]:0;
+            //get subtitle item sign:
+            const subtitleSign = await datasetUsabilityStatsTooltip.getByLabel('Subtitle List Item').locator('i').innerText();
+            //get tag item sign:
+            const tagSign = await datasetUsabilityStatsTooltip.getByLabel('Tag List Item').locator('i').innerText();
+            //get description item sign:
+            const descriptionSign = await datasetUsabilityStatsTooltip.getByLabel('Description List Item',{exact:true}).locator('i').innerText();
+            //get cover image item sign:
+            const coverImageSign = await datasetUsabilityStatsTooltip.getByLabel('Cover Image List Item').locator('i').innerText();
+
+        //get value for credibility:
+        const credibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
+        const credibilityValue = (credibilityMatch&&credibilityMatch.length>0)?+credibilityMatch[0]:0;
+            //get cover image item sign:
+            const updateFrequencySign = await datasetUsabilityStatsTooltip.getByLabel('Update Frequency List Item').locator('i').innerText();
+
+        //get value for compatibility:
+        const compatibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
+        const compatibilityValue = (compatibilityMatch&&compatibilityMatch.length>0)?+compatibilityMatch[0]:0;
+            //get cover image item sign:
+            const licenseSign = await datasetUsabilityStatsTooltip.getByLabel('License List Item').locator('i').innerText();
+            //get file description item sign:
+            const fileDescriptionSign = await datasetUsabilityStatsTooltip.getByLabel('File Description List Item').locator('i').innerText();
+
+
         await this.page.getByTestId('dataset-detail-render-tid').click({force:true});
         await expect.poll(async () => await datasetUsabilityStatsTooltip.isVisible(), {timeout: 10000,}).toBe(false);
         return {
           completeness:{
             value:completenessValue,
-            // subtitle,
-            // tag,
-            // description,
-            // coverImage
+            isSubtitleChecked:subtitleSign==="check",
+            isTagChecked:tagSign==="check",
+            isDescriptionChecked:descriptionSign==="check",
+            isCoverImageChecked:coverImageSign==="check"
           },
-          credibility:{},
-          compatibility:{}
+          credibility:{
+            value:credibilityValue,
+            isUpdateFrequencyChecked:updateFrequencySign==="check"
+          },
+          compatibility:{
+            value:compatibilityValue,
+            isLicenseChecked:licenseSign==="check",
+            isFileDescriptionChecked:fileDescriptionSign==="check"
+          }
 
         }
     }

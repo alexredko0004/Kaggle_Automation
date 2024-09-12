@@ -75,9 +75,11 @@ test.describe('tests using POM', async()=>{
         await test.step('Preconditions', async()=>{
             await createDatasetViaPW(page, datasetNames[0],[datasetRemoteLink1,datasetRemoteLink2]);
             remainingDataset1 = await createDatasetViaPW(page, datasetNames[1],[datasetRemoteLink2]);
+            console.log(remainingDataset1)
             await createDatasetViaPW(page, datasetNames[2],[datasetRemoteLink1]);
             await createDatasetViaPW(page, datasetNames[3],[datasetRemoteLink1]);
             remainingDataset2 = await createDatasetViaPW(page, datasetNames[4],[datasetRemoteLink2]);
+            console.log(remainingDataset2)
         })
         await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
             await mainMenu.openDatasetsPage();
@@ -146,12 +148,12 @@ test.describe('tests using POM', async()=>{
             expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetNames[3])).toBeHidden();
         })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
-            await deleteDatasetViaPW(page,remainingDataset1.datasetVersionReference.slug,remainingDataset1.datasetVersionReference.ownerSlug)
-            await deleteDatasetViaPW(page,remainingDataset2.datasetVersionReference.slug,remainingDataset2.datasetVersionReference.ownerSlug)
+            await deleteDatasetViaPW(page,remainingDataset1.datasetSlug,remainingDataset1.ownerSlug)
+            await deleteDatasetViaPW(page,remainingDataset2.datasetSlug,remainingDataset2.ownerSlug)
         })
     })
 
-    test.only('Edit dataset via pending actions', async({page})=>{   
+    test('Edit dataset via pending actions', async({page})=>{   
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const datasetPage = new Datasets(page);
         let createdDataset
@@ -163,8 +165,7 @@ test.describe('tests using POM', async()=>{
             createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
             await datasetPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
             await datasetPage.reloadPage();
-            //await datasetPage.hoverOverUsabilityInfoIcon();
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
         })
         await test.step('Add subtitle via pending action', async()=>{
             usabilityValue = await datasetPage.getUsabilityValue();
@@ -187,8 +188,8 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-
-            //ADD THE BLOCK ABOVE TO ALL THE FOLLOWING CHECKS
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isSubtitleChecked).toBe(true);
+            
             expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
             while (await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickRightBtnForPendingActions();
@@ -199,6 +200,7 @@ test.describe('tests using POM', async()=>{
             while (!await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickLeftBtnForPendingActions();
             }
+
             await datasetPage.clickAddDescriptionPendingAction();
             expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
             await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
@@ -206,8 +208,11 @@ test.describe('tests using POM', async()=>{
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
             await datasetPage.reloadPage();
+
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+
             while (await datasetPage.isRightBtnEnabled()){              
                 await datasetPage.clickRightBtnForPendingActions();
                 expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
