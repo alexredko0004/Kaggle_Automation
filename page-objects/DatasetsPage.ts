@@ -19,6 +19,7 @@ export class Datasets extends BaseBusinessObjectPage{
     rightBtnForPendingActions: Locator
     saveChangesBtn: Locator
     trippleDotsBtn: Locator
+    uploadImagePendingAction: Locator
     urlField: Locator
     usabilityValue: Locator
 
@@ -39,6 +40,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.rightBtnForPendingActions = page.getByLabel('chevron_right')
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
+        this.uploadImagePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Upload an image')
         this.urlField = page.getByPlaceholder('Enter remote URL')
         this.usabilityValue = page.getByTestId('usability-value')
     }
@@ -117,7 +119,16 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.page.waitForTimeout(1000);
     }
 
-    
+    public async clickSaveOnEditDatasetImagePanel(){
+        const saveBtn = this.page.locator('.drawer-outer-container button').nth(2);
+        await saveBtn.click();
+        await this.page.waitForRequest('https://www.kaggle.com/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
+    }
+
+    public async clickUploadImagePendingAction(){
+        await this.uploadImagePendingAction.click()
+    }
+
     public async fillDatasetNameWhileCreatingDataset(name:string){
         await this.datasetTitleField.fill(name)
     }
@@ -144,7 +155,8 @@ export class Datasets extends BaseBusinessObjectPage{
         },
         credibility:{
             value:number,
-            isUpdateFrequencyChecked:boolean
+            isUpdateFrequencyChecked:boolean,
+            isSourceProvenanceChecked:boolean
         },
         compatibility:{
             value:number,
@@ -171,13 +183,15 @@ export class Datasets extends BaseBusinessObjectPage{
         //get value for credibility:
         const credibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
         const credibilityValue = (credibilityMatch&&credibilityMatch.length>0)?+credibilityMatch[0]:0;
-            //get cover image item sign:
+            //get update frequency sign:
             const updateFrequencySign = await datasetUsabilityStatsTooltip.getByLabel('Update Frequency List Item').locator('i').innerText();
+            //get source/provenance sign:
+            const sourceProvenanceSign = await datasetUsabilityStatsTooltip.getByLabel('Source/Provenance List Item').locator('i').innerText();
 
         //get value for compatibility:
         const compatibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
         const compatibilityValue = (compatibilityMatch&&compatibilityMatch.length>0)?+compatibilityMatch[0]:0;
-            //get cover image item sign:
+            //get license item sign:
             const licenseSign = await datasetUsabilityStatsTooltip.getByLabel('License List Item').locator('i').innerText();
             //get file description item sign:
             const fileDescriptionSign = await datasetUsabilityStatsTooltip.getByLabel('File Description List Item').locator('i').innerText();
@@ -195,7 +209,8 @@ export class Datasets extends BaseBusinessObjectPage{
           },
           credibility:{
             value:credibilityValue,
-            isUpdateFrequencyChecked:updateFrequencySign==="check"
+            isUpdateFrequencyChecked:updateFrequencySign==="check",
+            isSourceProvenanceChecked:sourceProvenanceSign==="check"
           },
           compatibility:{
             value:compatibilityValue,
@@ -253,6 +268,11 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.datasetDescriptionField.isVisible()
     }
 
+    public async isEditDatasetImagePanelVisible(){
+        await this.page.waitForTimeout(500);
+        return await this.page.locator('.drawer-outer-container').isVisible()
+    }
+
     public async isRightBtnEnabled(){
         await this.page.waitForTimeout(1000);
         return await this.rightBtnForPendingActions.getAttribute('disabled')===null
@@ -265,6 +285,10 @@ export class Datasets extends BaseBusinessObjectPage{
     public async isTabWithNameSelected(tabName:string){
         const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
         return (isSelected==='true')
+    }
+
+    public async isUploadImagePendingActionVisible(){
+        return await this.uploadImagePendingAction.isVisible()
     }
 
     public async selectTabOnDatasetProfile(tabName:string){

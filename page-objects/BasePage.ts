@@ -20,7 +20,6 @@ export abstract class BasePage{
     public async acceptCookies(){
         if (await this.page.getByText('OK, Got it.').isVisible()) await this.page.getByText('OK, Got it.').click()
     }
-    
 
     public async getConfirmationPopupHeaderInnerText(){
         const innerText = await this.confirmationDialog.locator('h2').innerText();
@@ -63,6 +62,11 @@ export abstract class BasePage{
     public async isConfirmationPopupShown(){
         return await this.confirmationDialog.isVisible()
     }
+    
+    public async selectFilesForUpload(filePaths:string[]){
+        await this.page.getByPlaceholder('Drag and drop image to upload').setInputFiles(filePaths);
+    }
+    
 
     public async reloadPage(){
         await this.page.reload()
