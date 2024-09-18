@@ -30,6 +30,11 @@ export class Tags extends BasePage{
         await this.applyBtn.click()
     }
 
+    public async isTagsPanelOpened(){
+        await this.page.waitForTimeout(500);
+        return await this.tagsPanel.isVisible({timeout:1000})
+    }
+
     public async searchAndSelectTags(tags:string[]){
         for(let e of tags){
             await this.searchField.fill(e)
@@ -45,17 +50,4 @@ export class Tags extends BasePage{
         const selectedTags = await this.selectedTagOnPanel.locator('span').allInnerTexts();
         return selectedTags
     }
-
-    // public async getListItemDetailsModel(listItem:Locator): Promise<{ visibility: string, owner: string, countVariations: string, countNotebooks: string}>{
-    //     await this.page.waitForTimeout(500);
-    //     const details = await listItem.locator('span').nth(1).allInnerTexts();
-    //     const detailsArray = details[0].split(' · ');
-    //     detailsArray[0]!=='Private'?detailsArray.unshift('Public'):detailsArray
-    //     return {visibility: detailsArray[0], owner: detailsArray[1], countVariations: detailsArray[2], countNotebooks: detailsArray[3]}
-    // }
-
-    // public async searchYourWork(searchString:string){
-    //     await this.page.waitForTimeout(500)
-    //     await this.searchField.fill(searchString)
-    // }
 }

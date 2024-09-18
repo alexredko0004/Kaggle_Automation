@@ -5,6 +5,7 @@ export class Datasets extends BaseBusinessObjectPage{
     
     addDescriptionPendingAction: Locator
     addSubtitlePendingAction:Locator
+    addTagsPendingAction: Locator
     continueBtn: Locator
     createBtn: Locator
     datasetDescriptionField: Locator
@@ -27,11 +28,12 @@ export class Datasets extends BaseBusinessObjectPage{
         super(page)
         this.addDescriptionPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a description')
         this.addSubtitlePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a subtitle')
+        this.addTagsPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add tags')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
         this.datasetDescriptionField = page.getByTestId('markdownEditor').locator('textarea.MuiInputBase-inputMultiline').first()
-        this.datasetSubtitleField = page.locator('input.MuiInputBase-input').nth(1)
+        this.datasetSubtitleField = page.locator('input.MuiInputBase-input[minlength="20"]')
         this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.leftBtnForPendingActions = page.getByLabel('chevron_left')
@@ -58,6 +60,10 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async clickAddSubtitlePendingAction(){
         await this.addSubtitlePendingAction.click()
+    }
+
+    public async clickAddTagsPendingAction(){
+        await this.addTagsPendingAction.click()
     }
     
     public async clickContinueBtnWhileCreatingDataset(){
@@ -225,6 +231,12 @@ export class Datasets extends BaseBusinessObjectPage{
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
 
+    public async getDatasetTags():Promise<string[]>{
+        const tagsArray = await this.page.locator('#combo-tags-menu-chipset a span').allInnerTexts();
+        console.log(tagsArray)
+        return tagsArray
+    }
+
     public async getDescriptionOnView(){
         const h1 = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//h1`).innerText();
         const h2 = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//h2`).innerText();
@@ -246,18 +258,21 @@ export class Datasets extends BaseBusinessObjectPage{
         return +value
     }
 
-    // public async hoverOverUsabilityInfoIcon(){
-    //     const usabilityInfoIcon = this.page.getByRole('tooltip');
-    //     await usabilityInfoIcon.waitFor();
-    //     await usabilityInfoIcon.hover()
-    // }
-
     public async isAddDescriptionPendingActionVisible(){
         return await this.addDescriptionPendingAction.isVisible()
     }
 
     public async isAddSubtitlePendingActionVisible(){
         return await this.addSubtitlePendingAction.isVisible()
+    }
+
+    public async isAddTagsBtnVisible(){
+        const addTagsBtn = this.page.getByRole('button').getByText('Add Tags')
+        return await addTagsBtn.isVisible()
+    }
+
+    public async isAddTagsPendingActionVisible(){
+        return await this.addTagsPendingAction.isVisible()
     }
 
     public async isCreateBtnEnabled(){

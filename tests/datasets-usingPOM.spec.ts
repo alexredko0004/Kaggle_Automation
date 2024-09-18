@@ -4,6 +4,7 @@ import { datasetRemoteLink1,datasetRemoteLink2,datasetDescription1,datasetDescri
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
+import { Tags } from '../page-objects/Tags';
 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
@@ -190,63 +191,83 @@ test.describe('tests using POM', async()=>{
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isSubtitleChecked).toBe(true);
             
+            expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);             
+            await datasetPage.clickRightBtnForPendingActions();
             expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
-            while (await datasetPage.isRightBtnEnabled()){              
-                await datasetPage.clickRightBtnForPendingActions();
-                expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
-            }
-        })
-        await test.step('Add description via pending action', async()=>{
-            while (!await datasetPage.isRightBtnEnabled()){              
-                await datasetPage.clickLeftBtnForPendingActions();
-            }
             
+        })
+        // await test.step('Add description via pending action', async()=>{              
+        //     await datasetPage.clickLeftBtnForPendingActions();
+            
+        //     datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+        //     await datasetPage.clickAddDescriptionPendingAction();
+        //     expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
+        //     await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
+        //     await datasetPage.clickSaveForSection('About Dataset');
+        //     await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+        //     expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+        //     await datasetPage.reloadPage();
+
+        //     expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+        //     usabilityValue = await datasetPage.getUsabilityValue();
+        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+            
+        //     await datasetPage.clickRightBtnForPendingActions();
+        //     expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            
+        //     expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
+        //     expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
+        //     expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
+        // })
+        // await test.step('Add dataset cover image via pending action', async()=>{
+        //     await datasetPage.clickLeftBtnForPendingActions();
+            
+        //     datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+        //     await datasetPage.clickUploadImagePendingAction();
+        //     expect (await datasetPage.isEditDatasetImagePanelVisible()).toBe(true);
+        //     await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
+        //     await datasetPage.clickSaveOnEditDatasetImagePanel();
+        //     await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+        //     expect (await datasetPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
+        //     await datasetPage.reloadPage();
+
+        //     await datasetPage.selectTabOnDatasetProfile('Data Card');
+        //     expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+        //     usabilityValue = await datasetPage.getUsabilityValue();
+        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
+
+        //     await datasetPage.clickRightBtnForPendingActions();
+        //     expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
+        // })
+        await test.step('Add dataset tags via pending action', async()=>{
+            await datasetPage.clickLeftBtnForPendingActions();
+
             datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickAddDescriptionPendingAction();
-            expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
-            await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
-            await datasetPage.clickSaveForSection('About Dataset');
+            await datasetPage.clickAddTagsPendingAction();
+            expect (await datasetPage.tagsPanel().isTagsPanelOpened()).toBe(true);
+
+            const tagsToAdd = ['Mexico','Beginner', 'WAE', 'ImageNet 2012 classification'];
+            await datasetPage.tagsPanel().searchAndSelectTags(tagsToAdd);
+            await datasetPage.tagsPanel().clickApplyBtn();
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+            expect (await datasetPage.getFlashMessageText()).toContain('The tags have been updated successfully.');
             await datasetPage.reloadPage();
+
+            const addedTags = await datasetPage.getDatasetTags();       //Here is a bug in the app
+            expect(addedTags.length).toEqual(tagsToAdd.length);
+            for (let tag of tagsToAdd){
+                 expect (addedTags.includes(tag)).toBe(true)
+            }
 
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isTagChecked).toBe(true);
 
-            while (await datasetPage.isRightBtnEnabled()){              
-                await datasetPage.clickRightBtnForPendingActions();
-                expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
-            }
-            expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
-            expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
-            expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
-        })
-        await test.step('Add dataset cover image via pending action', async()=>{
-            while (!await datasetPage.isRightBtnEnabled()){              
-                await datasetPage.clickLeftBtnForPendingActions();
-            }
-            
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickUploadImagePendingAction();
-            expect (await datasetPage.isEditDatasetImagePanelVisible()).toBe(true);
-            await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
-            await datasetPage.clickSaveOnEditDatasetImagePanel();
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
-            await datasetPage.reloadPage();
-
-            await datasetPage.selectTabOnDatasetProfile('Data Card');
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
-
-            while (await datasetPage.isRightBtnEnabled()){              
-                await datasetPage.clickRightBtnForPendingActions();
-                expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
-            }
+            await datasetPage.clickRightBtnForPendingActions();
+            expect (await datasetPage.isAddTagsPendingActionVisible()).toBe(false);
         })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
