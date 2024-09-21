@@ -89,7 +89,7 @@ test.describe('tests using POM', async()=>{
             await modelsPage.fillModelNameFieldOnCreate(modelName);
             await modelsPage.clickEditForURLOnCreate();
             await modelsPage.fillURLFieldOnCreate(urlEnding);
-            await modelsPage.selectVisibilityOnCreate(modelVisibility);
+            await modelsPage.selectVisibilityOnCreate(modelVisibility); 
             expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
             await modelsPage.selectFrameworkOnCreate('Keras'); //Rewrite this method to pick a random option from the list
             await modelsPage.selectLicenseOnVariationCreate('GPL 3');

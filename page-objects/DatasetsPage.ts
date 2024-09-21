@@ -9,6 +9,7 @@ export class Datasets extends BaseBusinessObjectPage{
     continueBtn: Locator
     createBtn: Locator
     datasetDescriptionField: Locator
+    datasetLicenseDropDown: Locator
     datasetSubtitleField: Locator
     datasetSubtitleOnView: Locator
     datasetTitleField: Locator
@@ -19,6 +20,7 @@ export class Datasets extends BaseBusinessObjectPage{
     resetBtn: Locator
     rightBtnForPendingActions: Locator
     saveChangesBtn: Locator
+    specifyLicensePendingAction: Locator
     trippleDotsBtn: Locator
     uploadImagePendingAction: Locator
     urlField: Locator
@@ -31,16 +33,18 @@ export class Datasets extends BaseBusinessObjectPage{
         this.addTagsPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add tags')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
-        this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
         this.datasetDescriptionField = page.getByTestId('markdownEditor').locator('textarea.MuiInputBase-inputMultiline').first()
+        this.datasetLicenseDropDown = page.locator('.MuiFormControl-root').locator('div[aria-label="Select License"]')
         this.datasetSubtitleField = page.locator('input.MuiInputBase-input[minlength="20"]')
         this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
+        this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.leftBtnForPendingActions = page.getByLabel('chevron_left')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
         this.rightBtnForPendingActions = page.getByLabel('chevron_right')
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
+        this.specifyLicensePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Specify a license')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
         this.uploadImagePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Upload an image')
         this.urlField = page.getByPlaceholder('Enter remote URL')
@@ -116,6 +120,10 @@ export class Datasets extends BaseBusinessObjectPage{
     public async clickSaveChangesBtn(){
         await this.page.waitForTimeout(2000);
         await this.saveChangesBtn.click()
+    }
+
+    public async clickSpecifyLicensePendingAction(){
+        await this.specifyLicensePendingAction.click()
     }
 
     public async clickSaveForSection(sectionName:string){
@@ -195,7 +203,7 @@ export class Datasets extends BaseBusinessObjectPage{
             const sourceProvenanceSign = await datasetUsabilityStatsTooltip.getByLabel('Source/Provenance List Item').locator('i').innerText();
 
         //get value for compatibility:
-        const compatibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
+        const compatibilityMatch = (await datasetUsabilityStatsTooltip.locator('p').last().innerText()).match(/\d+/);
         const compatibilityValue = (compatibilityMatch&&compatibilityMatch.length>0)?+compatibilityMatch[0]:0;
             //get license item sign:
             const licenseSign = await datasetUsabilityStatsTooltip.getByLabel('License List Item').locator('i').innerText();
@@ -227,13 +235,17 @@ export class Datasets extends BaseBusinessObjectPage{
         }
     }
 
+    public async getDatasetLicense(){
+        const license = await this.page.locator('//h2[contains(text(),"License")]/parent::div/parent::div/parent::div/parent::div/following-sibling::div//a').innerText()
+        return license
+    }
+
     public async getDatasetName(){
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
 
     public async getDatasetTags():Promise<string[]>{
         const tagsArray = await this.page.locator('#combo-tags-menu-chipset a span').allInnerTexts();
-        console.log(tagsArray)
         return tagsArray
     }
 
@@ -288,6 +300,11 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.page.locator('.drawer-outer-container').isVisible()
     }
 
+    public async isLicenseDropDownVisible(){
+        await this.page.waitForTimeout(200)
+        return await this.datasetLicenseDropDown.isVisible()
+    }
+
     public async isRightBtnEnabled(){
         await this.page.waitForTimeout(1000);
         return await this.rightBtnForPendingActions.getAttribute('disabled')===null
@@ -297,6 +314,16 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.saveChangesBtn.isEnabled()
     }
 
+    public async isSaveBtnForSectionVisible(sectionName:string){
+        const saveBtn = this.page.locator(`//h2[contains(text(),'${sectionName}')]/parent::div/parent::div/parent::div/parent::div`)
+                                       .getByRole('button').filter({hasText:'Save'});
+        return await saveBtn.isVisible()
+    }
+
+    public async isSpecifyLicensePendingActionVisible(){
+        return await this.specifyLicensePendingAction.isVisible()
+    }
+
     public async isTabWithNameSelected(tabName:string){
         const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
         return (isSelected==='true')
@@ -304,6 +331,12 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async isUploadImagePendingActionVisible(){
         return await this.uploadImagePendingAction.isVisible()
+    }
+
+    public async selectDatasetLicense(licenseName:string){
+        await this.datasetLicenseDropDown.click();
+        await this.page.getByRole('listbox').locator('li',{hasText:licenseName}).click()
+
     }
 
     public async selectTabOnDatasetProfile(tabName:string){

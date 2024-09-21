@@ -45,12 +45,12 @@ export class Models extends BaseBusinessObjectPage{
         this.modelNameFieldOnCreate = page.getByPlaceholder('Model Name')
         this.urlEditBtn = page.locator('.drawer-outer-container span[role="button"]').first()
         this.modelURLField = page.locator('input[placeholder=""]')
-        this.visibilityDropDown = page.locator('.drawer-outer-container').getByLabel('Private')
+        this.visibilityDropDown = page.locator('.drawer-outer-container').locator('div[aria-label="Select Visibility. Private currently selected."]')
         this.createModelBtn = page.locator('//button[.="Create model"]') 
-        this.frameworkListOnCreate = page.getByLabel('Select framework')
+        this.frameworkListOnCreate = page.locator('.drawer-outer-container').locator('div[aria-label="Select Framework. Select framework currently selected."]')
         this.addNewVariationOnCreateBtn = page.locator('button').getByText('addAdd new variation')
         this.variationNameInput = page.getByPlaceholder('Variation Name')
-        this.licenseListOnCreate = page.getByText(/Select a license/)
+        this.licenseListOnCreate = page.locator('.drawer-outer-container').locator('div[aria-label="Select License"]')
         this.addTagsBtn = page.getByRole('button').filter({hasText:'Add Tags'})
         this.editTagsBtn = page.getByLabel('Edit Tags')
         this.goToModelBtn = page.locator('.drawer-outer-container button').getByText('Go to Model')
@@ -60,7 +60,7 @@ export class Models extends BaseBusinessObjectPage{
         this.modelTitleFieldOnView = page.locator('#site-content h1')
         this.modelSubTitleOnView = page.locator('[wrap="hide"] span p').nth(1)
         this.modelDescriptionField = page.getByPlaceholder('Describe the source of the model.')
-        this.modelVisibilityDropDown = page.locator('.mdc-layout-grid').getByRole('combobox').locator('span')
+        this.modelVisibilityDropDown = page.locator('//div[contains(@aria-label,"Select Visibility.")]')
         this.addAuthorBtn = page.locator('//button/span[.="Add Author"]')
         this.authorNameField = page.getByLabel('textfield-Author Name-label').locator('input')
         this.autorWebsiteField = page.getByLabel('textfield-Website-label').locator('input')
@@ -99,7 +99,8 @@ export class Models extends BaseBusinessObjectPage{
     public async selectVisibilityOnCreate(visibility:string){
         const text = (visibility==='Private')?'visibility_off':'visibility';
         await this.visibilityDropDown.click();
-        await this.page.locator('li',{hasText:text+visibility}).click();
+        await this.page.locator(`li[aria-label=${visibility}]`).click();
+        //await this.page.locator('li',{hasText:text+visibility}).click();
     }
     
     public async isCreateButtonEnabled(){
@@ -177,7 +178,7 @@ export class Models extends BaseBusinessObjectPage{
 
     public async selectFrameworkOnCreate(frameworkName:string){
         await this.frameworkListOnCreate.click();
-        await this.page.locator('[role="menuitem"]').getByText(frameworkName).nth(1).click()
+        await this.page.locator('[role="option"]').getByText(frameworkName).click()
     }
     public async clickCreateAndGetIdAndSlug(){
         const responsePromise = this.page.waitForResponse('/api/i/models.ModelService/CreateModel', {
@@ -203,7 +204,7 @@ export class Models extends BaseBusinessObjectPage{
 
     public async selectLicenseOnVariationCreate(licenseName:string='Unknown'){
         await this.licenseListOnCreate.click();
-        await this.page.locator('[role="listbox"] [role="menuitem"]',{hasText:licenseName}).click()
+        await this.page.locator('[role="listbox"] [role="option"]',{hasText:licenseName}).click()
     }
 
     public async getModelTitleOnView(){
@@ -211,12 +212,14 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async getModelVisibilitySettingOnView(){
-        return this.modelVisibilityDropDown.innerText()
+        const innerText = (await this.modelVisibilityDropDown.innerText()).match(/(Private)|(Public)/);
+        const properInnerText = (innerText&&innerText.length>0)?innerText[0]:0;
+        return properInnerText
     }
 
     public async getModelVariationSlugVisibilityOnView(variationSlug){
         await this.page.waitForTimeout(2000);
-        return await this.page.getByLabel(variationSlug).isVisible()
+        return await this.page.locator('div[aria-label="Select Variation"]').getByText(variationSlug).isVisible()
     }
 
     public async getModelVariationAttachmentVisibilityOnView(){

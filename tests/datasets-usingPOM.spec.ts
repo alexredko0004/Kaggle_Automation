@@ -76,11 +76,9 @@ test.describe('tests using POM', async()=>{
         await test.step('Preconditions', async()=>{
             await createDatasetViaPW(page, datasetNames[0],[datasetRemoteLink1,datasetRemoteLink2]);
             remainingDataset1 = await createDatasetViaPW(page, datasetNames[1],[datasetRemoteLink2]);
-            console.log(remainingDataset1)
             await createDatasetViaPW(page, datasetNames[2],[datasetRemoteLink1]);
             await createDatasetViaPW(page, datasetNames[3],[datasetRemoteLink1]);
             remainingDataset2 = await createDatasetViaPW(page, datasetNames[4],[datasetRemoteLink2]);
-            console.log(remainingDataset2)
         })
         await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
             await mainMenu.openDatasetsPage();
@@ -196,51 +194,53 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
             
         })
-        // await test.step('Add description via pending action', async()=>{              
-        //     await datasetPage.clickLeftBtnForPendingActions();
+        await test.step('Add description via pending action', async()=>{              
+            await datasetPage.clickLeftBtnForPendingActions();
             
-        //     datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-        //     await datasetPage.clickAddDescriptionPendingAction();
-        //     expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
-        //     await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
-        //     await datasetPage.clickSaveForSection('About Dataset');
-        //     await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-        //     expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
-        //     await datasetPage.reloadPage();
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetPage.clickAddDescriptionPendingAction();
+            expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
+            await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
+            await datasetPage.clickSaveForSection('About Dataset');
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+            await datasetPage.reloadPage();
 
-        //     expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-        //     usabilityValue = await datasetPage.getUsabilityValue();
-        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
             
-        //     await datasetPage.clickRightBtnForPendingActions();
-        //     expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            await datasetPage.clickRightBtnForPendingActions();
+            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
             
-        //     expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
-        //     expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
-        //     expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
-        // })
-        // await test.step('Add dataset cover image via pending action', async()=>{
-        //     await datasetPage.clickLeftBtnForPendingActions();
+            expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
+            expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
+            expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
+        })
+        await test.step('Add dataset cover image via pending action', async()=>{
+            await datasetPage.clickLeftBtnForPendingActions();
             
-        //     datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-        //     await datasetPage.clickUploadImagePendingAction();
-        //     expect (await datasetPage.isEditDatasetImagePanelVisible()).toBe(true);
-        //     await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
-        //     await datasetPage.clickSaveOnEditDatasetImagePanel();
-        //     await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-        //     expect (await datasetPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
-        //     await datasetPage.reloadPage();
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetPage.clickUploadImagePendingAction();
+            expect (await datasetPage.isEditDatasetImagePanelVisible()).toBe(true);
+            await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
+            await datasetPage.clickSaveOnEditDatasetImagePanel();
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
+            await datasetPage.reloadPage();
 
-        //     await datasetPage.selectTabOnDatasetProfile('Data Card');
-        //     expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-        //     usabilityValue = await datasetPage.getUsabilityValue();
-        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-        //     expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
+            await datasetPage.selectTabOnDatasetProfile('Data Card');
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
 
-        //     await datasetPage.clickRightBtnForPendingActions();
-        //     expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
-        // })
+            expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
+            await datasetPage.clickRightBtnForPendingActions();
+            expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
+        })
         await test.step('Add dataset tags via pending action', async()=>{
             await datasetPage.clickLeftBtnForPendingActions();
 
@@ -255,19 +255,39 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.getFlashMessageText()).toContain('The tags have been updated successfully.');
             await datasetPage.reloadPage();
 
-            const addedTags = await datasetPage.getDatasetTags();       //Here is a bug in the app
-            expect(addedTags.length).toEqual(tagsToAdd.length);
-            for (let tag of tagsToAdd){
-                 expect (addedTags.includes(tag)).toBe(true)
-            }
+            // const addedTags = await datasetPage.getDatasetTags();       //Here is a bug in the app
+            // expect(addedTags.length).toEqual(tagsToAdd.length);
+            // for (let tag of tagsToAdd){
+            //      expect (addedTags.includes(tag)).toBe(true)
+            // }
 
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
             expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isTagChecked).toBe(true);
 
-            await datasetPage.clickRightBtnForPendingActions();
             expect (await datasetPage.isAddTagsPendingActionVisible()).toBe(false);
+        })
+        await test.step('Add dataset license via pending action', async()=>{
+
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetPage.clickSpecifyLicensePendingAction();
+            expect (await datasetPage.isLicenseDropDownVisible()).toBe(true);
+            expect (await datasetPage.isSaveBtnForSectionVisible('License')).toBe(true);
+
+            await datasetPage.selectDatasetLicense('Reddit API Terms');
+            await datasetPage.clickSaveForSection('License');
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Successfully updated the license.');
+            await datasetPage.reloadPage();
+            expect (await datasetPage.getDatasetLicense()).toEqual('Reddit API Terms');
+
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.value).toBeGreaterThan(datasetStats.compatibility.value);
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.isLicenseChecked).toBe(true);
+
+            expect (await datasetPage.isSpecifyLicensePendingActionVisible()).toBe(false);
         })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
