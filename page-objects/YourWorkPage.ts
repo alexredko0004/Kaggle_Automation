@@ -186,12 +186,13 @@ export class YourWork extends BaseBusinessObjectPage{
         return mode==='selected'
     }
     public async getUpvotesCountForListItem(listItem:Locator){
+        await this.page.waitForTimeout(500);
         const count = await listItem.locator('span[mode="default"]').innerText()
         return +count
     }
 
     public async searchYourWork(searchString:string){
-        await this.page.waitForTimeout(500)
+        await this.page.waitForTimeout(1500)
         await this.searchField.fill(searchString)
     }
 

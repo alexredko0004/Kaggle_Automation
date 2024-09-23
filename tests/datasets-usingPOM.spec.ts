@@ -17,7 +17,7 @@ test.describe('tests using POM', async()=>{
         await mainMenu.closeCreationMenu();
         await mainMenu.openDatasetsPage()
     })
-    test('Create new dataset with remote url', async({page})=>{
+    test('Create new dataset with remote url @smoke', async({page})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);

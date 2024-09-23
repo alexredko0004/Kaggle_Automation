@@ -72,7 +72,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Create new model with variation', async({page})=>{   //Rewrite with new panel for model creation
+    test('Create new model with variation @smoke', async({page})=>{   
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);

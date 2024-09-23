@@ -10,7 +10,7 @@ export abstract class BasePage{
         this.page = page
         this.confirmationDialog = page.getByRole('dialog')
         this.flashMessage = page.getByRole('presentation').getByRole('alert')
-        this.tooltip = page.locator('.rmwc-tooltip').getByRole('tooltip')
+        this.tooltip = page.getByRole('tooltip').locator('.MuiTooltip-tooltip')
     }
     
     public async clickBtnOnConfirmationDialog(btnName:string){
@@ -56,7 +56,7 @@ export abstract class BasePage{
 
     public async getTooltipText(){
         await this.tooltip.isVisible();
-        return this.tooltip.innerText()
+        return this.tooltip.locator('p').innerText()
     }
 
     public async isConfirmationPopupShown(){

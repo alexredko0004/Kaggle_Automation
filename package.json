@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "datasets-POM-chrome": "npx playwright test datasets-usingPOM.spec.ts --project=chromium",
-    "models-POM-chrome": "npx playwright test models-usingPOM.spec.ts --project=chromium"
+    "models-POM-chrome": "npx playwright test models-usingPOM.spec.ts --project=chromium",
+    "smoke": "npx playwright test -g '@smoke'"
   },
   "author": "",
   "license": "ISC",
