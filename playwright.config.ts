@@ -56,6 +56,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport:{width:1440,height:900},
         storageState: './auth/defaultStorageState.json',
+        headless:true
        },
     },
 
