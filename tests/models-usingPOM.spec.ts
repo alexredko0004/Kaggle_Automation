@@ -220,6 +220,7 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Verify that model is upvoted on "Your Work" page', async()=>{
             await mainMenu.openModelsPage();
+            await page.waitForTimeout(2000);
             await modelsPage.openYourWork();
             upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
             for (let name of upvotedItemsNames){
