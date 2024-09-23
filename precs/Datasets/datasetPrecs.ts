@@ -30,7 +30,6 @@ import { Dataset } from "./buildDataset";
 //         'Cookie':`CSRF-TOKEN=${loggedState.cookies[2].value}; CLIENT-TOKEN=${loggedState.cookies[8].value}; __Host-KAGGLEID=${loggedState.cookies[6].value}; ka_sessionid=${loggedState.cookies[1].value}`
 //     }})
 //     console.log(name+' is done!')
-//     console.log(response.data)
 // }
 
 export const createDatasetViaPW = async (page:Page,name:string,fileUrls:string[]):Promise<{datasetId:string,ownerSlug:string,datasetSlug:string}>=>{
