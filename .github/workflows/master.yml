@@ -9,6 +9,14 @@ jobs:
   tests_smoke:
     name: Run smoke tests
     runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ secrets.SITE_URL }}
+      EMAIL: ${{ secrets.EMAIL }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      CREATE_DATASET_ENDPOINT: ${{ secrets.CREATE_DATASET_ENDPOINT }}
+      DELETE_DATASET_ENDPOINT: ${{ secrets.DELETE_DATASET_ENDPOINT }}
+      CREATE_MODEL_ENDPOINT: ${{ secrets.CREATE_MODEL_ENDPOINT }}
+      DELETE_MODEL_ENDPOINT: ${{ secrets.DELETE_MODEL_ENDPOINT }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
