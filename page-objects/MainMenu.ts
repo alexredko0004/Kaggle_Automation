@@ -21,7 +21,8 @@ export class MainMenu extends BasePage{
 
     public async openCreationMenu(){
         await this.plusBtn.click();
-        await expect(this.page.locator('.mdc-menu[aria-hidden="false"]')).toBeVisible()
+        const creationMenu = this.page.locator('.mdc-menu[aria-hidden="false"]')
+        await expect(creationMenu).toBeVisible()
     }
 
     public async closeCreationMenu(){
