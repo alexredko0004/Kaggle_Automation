@@ -186,29 +186,29 @@ export class Datasets extends BaseBusinessObjectPage{
         const completenessMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').first().innerText()).match(/\d+/);
         const completenessValue = (completenessMatch&&completenessMatch.length>0)?+completenessMatch[0]:0;
             //get subtitle item sign:
-            const subtitleSign = await datasetUsabilityStatsTooltip.getByLabel('Subtitle List Item').locator('i').innerText();
+            const subtitleSign = await datasetUsabilityStatsTooltip.getByLabel('Subtitle List Item').locator('span').innerText();
             //get tag item sign:
-            const tagSign = await datasetUsabilityStatsTooltip.getByLabel('Tag List Item').locator('i').innerText();
+            const tagSign = await datasetUsabilityStatsTooltip.getByLabel('Tag List Item').locator('span').innerText();
             //get description item sign:
-            const descriptionSign = await datasetUsabilityStatsTooltip.getByLabel('Description List Item',{exact:true}).locator('i').innerText();
+            const descriptionSign = await datasetUsabilityStatsTooltip.getByLabel('Description List Item',{exact:true}).locator('span').innerText();
             //get cover image item sign:
-            const coverImageSign = await datasetUsabilityStatsTooltip.getByLabel('Cover Image List Item').locator('i').innerText();
+            const coverImageSign = await datasetUsabilityStatsTooltip.getByLabel('Cover Image List Item').locator('span').innerText();
 
         //get value for credibility:
         const credibilityMatch = (await datasetUsabilityStatsTooltip.locator('p[font-weight="bold"]').nth(1).innerText()).match(/\d+/);
         const credibilityValue = (credibilityMatch&&credibilityMatch.length>0)?+credibilityMatch[0]:0;
             //get update frequency sign:
-            const updateFrequencySign = await datasetUsabilityStatsTooltip.getByLabel('Update Frequency List Item').locator('i').innerText();
+            const updateFrequencySign = await datasetUsabilityStatsTooltip.getByLabel('Update Frequency List Item').locator('span').innerText();
             //get source/provenance sign:
-            const sourceProvenanceSign = await datasetUsabilityStatsTooltip.getByLabel('Source/Provenance List Item').locator('i').innerText();
+            const sourceProvenanceSign = await datasetUsabilityStatsTooltip.getByLabel('Source/Provenance List Item').locator('span').innerText();
 
         //get value for compatibility:
         const compatibilityMatch = (await datasetUsabilityStatsTooltip.locator('p').last().innerText()).match(/\d+/);
         const compatibilityValue = (compatibilityMatch&&compatibilityMatch.length>0)?+compatibilityMatch[0]:0;
             //get license item sign:
-            const licenseSign = await datasetUsabilityStatsTooltip.getByLabel('License List Item').locator('i').innerText();
+            const licenseSign = await datasetUsabilityStatsTooltip.getByLabel('License List Item').locator('span').innerText();
             //get file description item sign:
-            const fileDescriptionSign = await datasetUsabilityStatsTooltip.getByLabel('File Description List Item').locator('i').innerText();
+            const fileDescriptionSign = await datasetUsabilityStatsTooltip.getByLabel('File Description List Item').locator('span').innerText();
 
 
         await this.page.getByTestId('dataset-detail-render-tid').click({force:true});

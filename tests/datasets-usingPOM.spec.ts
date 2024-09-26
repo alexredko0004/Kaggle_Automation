@@ -8,14 +8,15 @@ import { Tags } from '../page-objects/Tags';
 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
-        await page.goto('/');
+        const mainMenu = new MainMenu(page);
+        await mainMenu.openHomePage();
     })
     test('open plus menu and datasets page @smoke', async({page})=>{
         const mainMenu = new MainMenu(page);
-        await mainMenu.openHomePage();
         await mainMenu.openCreationMenu();
         await mainMenu.closeCreationMenu();
-        await mainMenu.openDatasetsPage()
+        await mainMenu.openDatasetsPageViaMainMenu();
+        await expect(page).toHaveURL('/datasets');
     })
     test('Create new dataset with remote url @smoke', async({page})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
@@ -23,7 +24,7 @@ test.describe('tests using POM', async()=>{
         const datasetPage = new Datasets(page);
         let createdDataset
         await test.step('Preconditions', async()=>{
-            await mainMenu.openDatasetsPage();
+            await mainMenu.openDatasetsPageViaMainMenu();
             await datasetPage.clickNewDatasetBtn();
         })
         await test.step('Verify that "Create" button becomes enabled after providing dataset name', async()=>{
@@ -51,7 +52,7 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);
         await test.step('Add dataset', async()=>{
-            await mainMenu.openDatasetsPage();
+            await mainMenu.openDatasetsPageViaMainMenu();
             await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
             await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
             await expect(page.getByTestId('preview-image')).toBeVisible();
@@ -81,7 +82,7 @@ test.describe('tests using POM', async()=>{
             remainingDataset2 = await createDatasetViaPW(page, datasetNames[4],[datasetRemoteLink2]);
         })
         await test.step('Verify that checkboxes for needed datasets are checked', async()=>{
-            await mainMenu.openDatasetsPage();
+            await mainMenu.openDatasetsPageViaMainMenu();
             await datasetsPage.openYourWork();
             checkedItems = await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNames(initialCheckedItems);
             initialCount = await yourWorkPage.getCountOfItemsOnTab('Datasets');

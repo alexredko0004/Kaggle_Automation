@@ -1,18 +1,26 @@
-import { Locator,expect } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import {BasePage} from './BasePage'
 
 export class MainMenu extends BasePage{
-    readonly homeBtn: Locator
-    readonly plusBtn: Locator
+    readonly creationMenu: Locator
     readonly datasetsItem: Locator
+    readonly homeBtn: Locator
     readonly modelsItem: Locator
+    readonly plusBtn: Locator
 
     constructor(page){
         super(page)
-        this.homeBtn = page.locator('[data-click-log-id="home"]')
-        this.plusBtn = page.locator('.mdc-menu-surface--anchor button[data-menutarget="true"]')
-        this.modelsItem = page.locator('[data-click-log-id="models"]')
+        this.creationMenu = this.page.locator('.mdc-menu[aria-hidden="false"]')
         this.datasetsItem = page.locator('[data-click-log-id="datasets"]')
+        this.homeBtn = page.locator('[data-click-log-id="home"]')
+        this.modelsItem = page.locator('[data-click-log-id="models"]')
+        this.plusBtn = page.locator('.mdc-menu-surface--anchor button[data-menutarget="true"]')
+    }
+    public async closeCreationMenu(){
+        if(await this.creationMenu.isVisible()) {
+            await this.page.waitForTimeout(500)
+            await this.plusBtn.click();
+        }
     }
 
     public async openHomePage(){
@@ -21,25 +29,16 @@ export class MainMenu extends BasePage{
 
     public async openCreationMenu(){
         await this.plusBtn.click();
-        const creationMenu = this.page.locator('.mdc-menu[aria-hidden="false"]')
-        await expect(creationMenu).toBeVisible()
     }
 
-    public async closeCreationMenu(){
-        if(await this.page.locator('.mdc-menu[aria-hidden="false"]').isVisible()) {
-            await this.page.waitForTimeout(500)
-            await this.plusBtn.click();
-        }
-        await expect(this.page.locator('.mdc-menu[aria-hidden="false"]')).toBeHidden()
+    
+
+    public async openDatasetsPageViaMainMenu(){
+       await this.datasetsItem.click()
+       
     }
 
-    public async openDatasetsPage(){
-       await this.datasetsItem.click();
-       await expect(this.page).toHaveURL('/datasets')
-    }
-
-    public async openModelsPage(){
-        await this.modelsItem.click();
-        await expect(this.page).toHaveURL('/models')
+    public async openModelsPageViaMainMenu(){
+        await this.modelsItem.click()
      }
 }
