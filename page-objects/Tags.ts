@@ -47,7 +47,7 @@ export class Tags extends BasePage{
     }
 
     public async getArrayOfSelectedTags(){
-        const selectedTags = await this.selectedTagOnPanel.locator('span').allInnerTexts();
+        const selectedTags = await this.selectedTagOnPanel.locator('span:not([title="Close"])').allInnerTexts();
         return selectedTags
     }
 }

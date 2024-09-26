@@ -21,7 +21,7 @@ test.describe('tests using POM', async()=>{
         const yourWorkPage = new YourWork(page);
         const model = await createModelViaPW(page,modelName,'Private')
         await test.step('Preconditions', async()=>{
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
         })
         await test.step('Verify edited data is saved on model profile', async()=>{
@@ -38,7 +38,7 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Verify edited data is visible on the list with models', async()=>{
             await page.waitForTimeout(500);
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openYourWork();
             await yourWorkPage.searchYourWork(modelName);
             await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
@@ -55,7 +55,7 @@ test.describe('tests using POM', async()=>{
             await expect(modelsPage.getFlashMessageLocator()).toBeVisible();
             expect(await modelsPage.getFlashMessageText()).toEqual('Successfully updated the model.');
 
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openYourWork();
             await page.reload();
             await yourWorkPage.searchYourWork(modelNameEdited);
@@ -81,7 +81,7 @@ test.describe('tests using POM', async()=>{
         const yourWorkPage = new YourWork(page);
         const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
         await test.step('Preconditions', async()=>{
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.clickNewBtn();
         })
         await test.step('Verify that creation is forbidden till all required fields are filled in', async()=>{
@@ -108,7 +108,7 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual(modelVisibility)
         })
         await test.step('Verify that model is contains variation in the list of models', async()=>{
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openYourWork();
             await yourWorkPage.searchYourWork(modelName);
             expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
@@ -181,7 +181,7 @@ test.describe('tests using POM', async()=>{
             expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual('https://www.kaggle.com/models');
         })
         await test.step('Verify that removed model is not shown in the list of models', async()=>{
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openYourWork();
             await page.reload();
             await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeHidden();
@@ -219,8 +219,8 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.getUpvoteBtnMode()).toBe('selected');
         })
         await test.step('Verify that model is upvoted on "Your Work" page', async()=>{
-            await mainMenu.openModelsPage();
-            await page.waitForTimeout(2000);
+            await mainMenu.openModelsPageViaMainMenu();
+            await page.waitForTimeout(3000);
             await modelsPage.openYourWork();
             upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
             for (let name of upvotedItemsNames){
@@ -250,7 +250,7 @@ test.describe('tests using POM', async()=>{
 
         })
         await test.step('Verify that upvote made on "Your Work" page is applied to model profile', async()=>{
-            await mainMenu.openModelsPage();
+            await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.openYourWork();
             await yourWorkPage.clickUpvoteBtnForListItem(modelInTheList);
             upvotedItemsNames = await yourWorkPage.getNamesOfUpvotedItems();
