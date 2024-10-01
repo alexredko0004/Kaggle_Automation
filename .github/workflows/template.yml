@@ -1,0 +1,56 @@
+on:
+  workflow_call:
+    inputs:
+      os-system:
+        required: false
+        type: string
+        default: ubuntu-latest
+      suite-name:
+        required: true
+        type: string
+      environment-name:
+        required: true
+        type: string
+      branch-name:
+        required: false
+        type: string
+        default: master
+      timeout-before-force-stop:
+        required: false
+        type: number
+        default: 180
+
+jobs:
+  run:
+    name: ${{ inputs.environment-name }}
+    runs-on: ${{ inputs.os-system }}
+    environment: ${{ inputs.environment-name }}
+    timeout-minutes: ${{ inputs.timeout-before-force-stop }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch-name }}
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: npx playwright test -g "@${{ inputs.suite-name }}"
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          CREATE_DATASET_ENDPOINT: ${{ secrets.CREATE_DATASET_ENDPOINT }}
+          DELETE_DATASET_ENDPOINT: ${{ secrets.DELETE_DATASET_ENDPOINT }}
+          CREATE_MODEL_ENDPOINT: ${{ secrets.CREATE_MODEL_ENDPOINT }}
+          DELETE_MODEL_ENDPOINT: ${{ secrets.DELETE_MODEL_ENDPOINT }}
+      
+
+      

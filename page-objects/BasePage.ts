@@ -9,7 +9,7 @@ export abstract class BasePage{
     constructor(page){
         this.page = page
         this.confirmationDialog = page.getByRole('dialog')
-        this.flashMessage = page.getByRole('presentation').getByRole('alert')
+        this.flashMessage = page.locator('.notistack-SnackbarContainer').getByRole('alert')
         this.tooltip = page.getByRole('tooltip').locator('.MuiTooltip-tooltip')
     }
     
@@ -36,8 +36,13 @@ export abstract class BasePage{
     }
 
     public async getFlashMessageText(){
-        await this.flashMessage.isVisible();
-        return this.flashMessage.innerText()
+        await this.flashMessage.all();
+        await this.page.waitForTimeout(300)
+        if (await this.flashMessage.count()>1){
+            return await this.flashMessage.allTextContents()
+        }else{
+        return await this.flashMessage.innerText()
+        }
     }
 
     public getLocatorByText(text:string):Locator{

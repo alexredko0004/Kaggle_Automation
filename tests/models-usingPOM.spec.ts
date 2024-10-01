@@ -72,7 +72,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Create new model with variation @smoke', async({page})=>{   
+    test('Create new model with variation @smoke @smokeEnv2', async({page})=>{   
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
@@ -157,7 +157,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Delete model from its page', async({page})=>{
+    test('Delete model from its page @smokeEnv2', async({page})=>{
         const modelName = 'AutoModel'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
@@ -176,9 +176,10 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Verify that redirect happens once model is removed', async()=>{
             await modelsPage.clickBtnOnConfirmationDialog('Delete');
-            await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Deletion in progress');
-            await expect(yourWorkPage.getFlashMessageLocator()).toHaveText('Successfully deleted your model. This page will reload shortly.');
-            expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual('https://www.kaggle.com/models');
+            await expect(yourWorkPage.getFlashMessageLocator()).toBeVisible();
+            expect((await yourWorkPage.getFlashMessageText())[0]).toEqual('Deletion in progress');
+            expect((await yourWorkPage.getFlashMessageText())[1]).toEqual('Successfully deleted your model. This page will reload shortly.');
+            expect(await yourWorkPage.getPageURLAfterRedirect()).toEqual(`${process.env.SITE_URL}/models`);
         })
         await test.step('Verify that removed model is not shown in the list of models', async()=>{
             await mainMenu.openModelsPageViaMainMenu();

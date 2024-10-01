@@ -11,14 +11,14 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         await mainMenu.openHomePage();
     })
-    test('open plus menu and datasets page @smoke', async({page})=>{
+    test('open plus menu and datasets page @smoke @smokeEnv1', async({page})=>{
         const mainMenu = new MainMenu(page);
         await mainMenu.openCreationMenu();
         await mainMenu.closeCreationMenu();
         await mainMenu.openDatasetsPageViaMainMenu();
         await expect(page).toHaveURL('/datasets');
     })
-    test('Create new dataset with remote url @smoke', async({page})=>{
+    test('Create new dataset with remote url @smoke @smokeEnv1', async({page})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);
