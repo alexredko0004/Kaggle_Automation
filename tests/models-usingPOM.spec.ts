@@ -5,7 +5,6 @@ import { createModelViaPW, deleteModelViaPW } from '../precs/Models/modelPrecs';
 import { currentYear, currentMonth, currentDate } from '../helpers/dates';
 import {modelDeletionConfirmationPopupInnerText} from "../helpers/constants";
 import { YourWork } from '../page-objects/YourWorkPage';
-import { Tags } from '../page-objects/Tags';
 
 let createdModel
 test.describe('tests using POM', async()=>{
@@ -93,7 +92,7 @@ test.describe('tests using POM', async()=>{
             await modelsPage.fillURLFieldOnCreate(urlEnding);
             await modelsPage.selectVisibilityOnCreate(modelVisibility); 
             expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
-            selectedFramework = await modelsPage.selectRandomFrameworkOnCreate(); //Rewrite this method to pick a random option from the list
+            selectedFramework = await modelsPage.selectRandomFrameworkOnCreate();
             selectedLicense = await modelsPage.selectRandomLicenseOnVariationCreate();
             expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
         })
