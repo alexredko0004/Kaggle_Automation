@@ -72,7 +72,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Create new model with variation @smoke @smokeEnv2', async({page})=>{   
+    test('Create new model with variation @smoke @smokeModel', async({page})=>{   
         const modelName = 'AutoModel'+Math.floor(Math.random() * 100000);
         const variationSlug = 'slug'+Math.floor(Math.random() * 100000);
         const urlEnding = 'ending'+Math.floor(Math.random() * 100000);
@@ -157,7 +157,7 @@ test.describe('tests using POM', async()=>{
         
     })
 
-    test('Delete model from its page @smokeEnv2', async({page})=>{
+    test('Delete model from its page @smokeModel', async({page})=>{
         const modelName = 'AutoModel'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
