@@ -1,0 +1,53 @@
+name: Configurable Job Test Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      operatingSystem:
+        type: string
+        required: true
+        description: Type system on which you want to run
+      suite-name:
+        description: Type suite you want to run (smokeEnv1 or smokeEnv2)
+        default: test
+        required: true
+        type: string
+      environment-name:
+        description: Choose an environment
+        required: true
+        default: ENV1
+        type: choice
+        options:
+          - ENV1
+          - ENV2
+
+jobs:
+  run_tests:
+    name: Run smoke tests
+    runs-on: ${{ github.event.inputs.operatingSystem }}
+    environment: ${{ github.event.inputs.environment-name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch-name }}
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: npx playwright test -g "@${{ github.event.inputs.suite-name }}"
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          CREATE_DATASET_ENDPOINT: ${{ secrets.CREATE_DATASET_ENDPOINT }}
+          DELETE_DATASET_ENDPOINT: ${{ secrets.DELETE_DATASET_ENDPOINT }}
+          CREATE_MODEL_ENDPOINT: ${{ secrets.CREATE_MODEL_ENDPOINT }}
+          DELETE_MODEL_ENDPOINT: ${{ secrets.DELETE_MODEL_ENDPOINT }}          
