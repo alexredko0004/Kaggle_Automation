@@ -180,6 +180,15 @@ export class Models extends BaseBusinessObjectPage{
         await this.frameworkListOnCreate.click();
         await this.page.locator('[role="option"]').getByText(frameworkName).click()
     }
+
+    public async selectRandomFrameworkOnCreate(){
+        await this.frameworkListOnCreate.click();
+        const frameworkOptions = await this.page.locator('[role="option"]').allInnerTexts();
+        const selectedFramework = frameworkOptions[Math.floor(Math.random()*frameworkOptions.length)];
+        await this.page.locator('[role="option"]').getByText(selectedFramework).click();
+        return selectedFramework
+    }
+
     public async clickCreateAndGetIdAndSlug(){
         const responsePromise = this.page.waitForResponse('/api/i/models.ModelService/CreateModel', {
             timeout: 30000
@@ -207,6 +216,15 @@ export class Models extends BaseBusinessObjectPage{
         await this.page.locator('[role="listbox"] [role="option"]',{hasText:licenseName}).click()
     }
 
+    public async selectRandomLicenseOnVariationCreate(){
+        await this.licenseListOnCreate.click();
+        const optionsList = await this.page.locator('[role="listbox"] [role="option"]:not([aria-disabled="true"])').allInnerTexts();
+        let selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)];
+        selectedOption==='Gemma'?selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)]:selectedOption;
+        await this.page.locator('[role="listbox"] [role="option"]',{hasText:selectedOption}).click();
+        return selectedOption.replace('info','')
+    }
+
     public async getModelTitleOnView(){
         return this.modelTitleFieldOnView.innerText()
     }
@@ -224,6 +242,16 @@ export class Models extends BaseBusinessObjectPage{
 
     public async getModelVariationAttachmentVisibilityOnView(){
         return await this.page.getByTestId('preview-pdf').isVisible()
+    }
+
+    public async getModelVariationFrameworkOnView(){
+        const variatonTabText = await this.page.locator('.MuiTabs-scroller button[role="tab"]').first().innerText();
+        return variatonTabText.replace('\nedit','')
+    }
+
+    public async getModelVariationLicenseOnView(){
+        const licenseText = await this.page.locator('a[rel="noopener noreferrer"]').innerText();
+        return licenseText.replace(' open_in_new','')
     }
 
     public async clickPencilEditBtn(){
