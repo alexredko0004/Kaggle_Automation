@@ -180,6 +180,13 @@ export class Models extends BaseBusinessObjectPage{
         await this.frameworkListOnCreate.click();
         await this.page.locator('[role="option"]').getByText(frameworkName).click()
     }
+
+    public async selectRandomFrameworkOnCreate(){
+        await this.frameworkListOnCreate.click();
+        const frameworkOptions = await this.page.locator('[role="option"]').allInnerTexts();
+        return frameworkOptions[Math.floor(Math.random()*frameworkOptions.length)]
+    }
+
     public async clickCreateAndGetIdAndSlug(){
         const responsePromise = this.page.waitForResponse('/api/i/models.ModelService/CreateModel', {
             timeout: 30000
@@ -205,6 +212,12 @@ export class Models extends BaseBusinessObjectPage{
     public async selectLicenseOnVariationCreate(licenseName:string='Unknown'){
         await this.licenseListOnCreate.click();
         await this.page.locator('[role="listbox"] [role="option"]',{hasText:licenseName}).click()
+    }
+
+    public async selectRandomLicenseOnVariationCreate(){
+        await this.licenseListOnCreate.click();
+        const optionsList = await this.page.locator('[role="listbox"] [role="option"]').allInnerTexts()
+        return optionsList[Math.floor(Math.random()*optionsList.length)]
     }
 
     public async getModelTitleOnView(){

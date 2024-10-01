@@ -91,8 +91,8 @@ test.describe('tests using POM', async()=>{
             await modelsPage.fillURLFieldOnCreate(urlEnding);
             await modelsPage.selectVisibilityOnCreate(modelVisibility); 
             expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
-            await modelsPage.selectFrameworkOnCreate('Keras'); //Rewrite this method to pick a random option from the list
-            await modelsPage.selectLicenseOnVariationCreate('GPL 3');
+            const selectedFramework = await modelsPage.selectRandomFrameworkOnCreate(); //Rewrite this method to pick a random option from the list
+            const selectedLicense = await modelsPage.selectRandomLicenseOnVariationCreate();
             expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
         })
         await test.step('Verify that created model contains just added variation on model profile', async()=>{
