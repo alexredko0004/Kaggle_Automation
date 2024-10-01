@@ -80,6 +80,8 @@ test.describe('tests using POM', async()=>{
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
         const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        let selectedFramework
+        let selectedLicense
         await test.step('Preconditions', async()=>{
             await mainMenu.openModelsPageViaMainMenu();
             await modelsPage.clickNewBtn();
@@ -91,8 +93,8 @@ test.describe('tests using POM', async()=>{
             await modelsPage.fillURLFieldOnCreate(urlEnding);
             await modelsPage.selectVisibilityOnCreate(modelVisibility); 
             expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
-            const selectedFramework = await modelsPage.selectRandomFrameworkOnCreate(); //Rewrite this method to pick a random option from the list
-            const selectedLicense = await modelsPage.selectRandomLicenseOnVariationCreate();
+            selectedFramework = await modelsPage.selectRandomFrameworkOnCreate(); //Rewrite this method to pick a random option from the list
+            selectedLicense = await modelsPage.selectRandomLicenseOnVariationCreate();
             expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
         })
         await test.step('Verify that created model contains just added variation on model profile', async()=>{
@@ -102,6 +104,8 @@ test.describe('tests using POM', async()=>{
             expect(page.url()).toEqual(`${process.env.SITE_URL}/models/${createdModel.ownerSlug}/${urlEnding}`);
             expect(await modelsPage.getModelVariationSlugVisibilityOnView(variationSlug)).toBe(true);
             expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
+            expect(await modelsPage.getModelVariationFrameworkOnView()).toEqual(selectedFramework);
+            expect(await modelsPage.getModelVariationLicenseOnView()).toEqual(selectedLicense);
             expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
             await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
             await modelsPage.openTab('Settings');
