@@ -128,6 +128,12 @@ test.describe('tests using POM', async()=>{
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
         const tags = ['PIL','D3.Js','Text-To-Text Generation','Os','Brazil','Business'];
+        const tagsWithCategories = ['Architecture > Word2vec Skip-Gram', 
+                         'Architecture > MobileBert Uncased_L-24_H-128_B-512_A-4_F-4_OPT',
+                         'Task > Text Fill-Mask',
+                         'Packages > Weights & Biases',
+                         'Language > Luba-Katanga',
+                         'Architecture > 1x1 Convolution']
         const model = await createModelViaPW(page,modelName,'Private');
         await test.step('Preconditions',async()=>{
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
@@ -149,9 +155,18 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Open tags panel and verify that selected items are saved', async()=>{
             await modelsPage.clickEditTagsBtn();
+            const selectedTags = (await modelsPage.tagsPanel().getArrayOfSelectedTags()).map(val=>val.toLowerCase())
+            expect(selectedTags.length).toEqual(tags.length);
+            for (let e of tags){
+                expect(selectedTags.includes(e.toLowerCase())).toBe(true)
+            }
+        })
+        await test.step('Remove all previously selected tags and select new using categories', async()=>{
+            await modelsPage.tagsPanel().removeAllTags();
+            await modelsPage.tagsPanel().selectTagsFromCategory(tagsWithCategories);
             const selectedTags = await modelsPage.tagsPanel().getArrayOfSelectedTags();
             for (let i=0;i<selectedTags.length;i++){
-                expect(selectedTags[i].toLowerCase()).toContain(tags[i].toLowerCase())
+                expect(selectedTags[i].toLowerCase()).toContain(tagsWithCategories[i].replace(/.*>\s/,'').toLowerCase())
             }
         })
         await test.step('Post condition. Remove model',async()=>{
