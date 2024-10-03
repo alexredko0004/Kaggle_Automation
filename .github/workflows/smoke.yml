@@ -4,9 +4,10 @@ run-name: Smoke Test Run
 on:
   schedule:
     - cron: '*/5 * * * 1-6'
+  workflow_dispatch:
 
 jobs:
-  Datasets:
+  DATASETS:
     name: Dataset tests
     uses: ./.github/workflows/template.yml
     with:
@@ -17,9 +18,9 @@ jobs:
       branch-name: master
     secrets: inherit
 
-  Models:
+  MODELS:
     name: Model tests
-    needs: Datasets
+    needs: DATASETS
     uses: ./.github/workflows/template.yml
     with:
       os-system: ubuntu-latest
