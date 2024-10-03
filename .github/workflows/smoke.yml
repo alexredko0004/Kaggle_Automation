@@ -1,0 +1,32 @@
+name: Smoke Tests Run - General
+run-name: Smoke Test Run
+
+on:
+  schedule:
+    - cron: '*/5 * * * 1-6'
+  workflow_dispatch:
+
+jobs:
+  Datasets:
+    name: Dataset tests
+    uses: ./.github/workflows/template.yml
+    if: github.event.schedule == '*/5 * * * 1-6'
+    with:
+      os-system: ubuntu-latest
+      environment-name: ENV1
+      suite-name: Dataset
+      timeout-before-force-stop: 120
+      branch-name: master
+    secrets: inherit
+
+  Models:
+    name: Model tests
+    needs: Datasets
+    uses: ./.github/workflows/template.yml
+    with:
+      os-system: ubuntu-latest
+      environment-name: ENV2
+      suite-name: Model
+      timeout-before-force-stop: 150
+      branch-name: master
+    secrets: inherit

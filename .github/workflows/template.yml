@@ -42,7 +42,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run tests
-        run: npx playwright test -g "@${{ inputs.suite-name }}"
+        run: npx playwright test -g "@smoke${{ inputs.suite-name }}"
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           EMAIL: ${{ secrets.EMAIL }}
