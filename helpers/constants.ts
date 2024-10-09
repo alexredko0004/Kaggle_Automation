@@ -14,6 +14,8 @@ export const datasetDescriptionH2 = 'H2 Test header Lorem ipsum dolor sit amet, 
 export const datasetDescriptionParagraph = `Text for check. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
 Text for check2 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.`
-
+export const datasetFileInformation = `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
+Text for check2 Lorem ipsum dolor sit amet, conseAAAAAAAAActetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
+Lorem ipsum 7457457474dolor sit amet, 62 consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.`
 
 export const modelDeletionConfirmationPopupInnerText = 'Deletion is irreversible and any public or private Notebooks using this model will no longer be executable. Are you sure you want to permanently delete this model?'

@@ -4,6 +4,7 @@ import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 export class Datasets extends BaseBusinessObjectPage{
     
     addDescriptionPendingAction: Locator
+    addFileInformationPendingAction: Locator
     addSubtitlePendingAction:Locator
     addTagsPendingAction: Locator
     continueBtn: Locator
@@ -13,6 +14,7 @@ export class Datasets extends BaseBusinessObjectPage{
     datasetSubtitleField: Locator
     datasetSubtitleOnView: Locator
     datasetTitleField: Locator
+    editFileInformationBtn: Locator
     goToDatasetBtn: Locator
     leftBtnForPendingActions: Locator
     linkTab: Locator
@@ -29,6 +31,7 @@ export class Datasets extends BaseBusinessObjectPage{
     constructor(page){
         super(page)
         this.addDescriptionPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a description')
+        this.addFileInformationPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add file information')
         this.addSubtitlePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a subtitle')
         this.addTagsPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add tags')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
@@ -38,6 +41,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.datasetSubtitleField = page.locator('input.MuiInputBase-input[minlength="20"]')
         this.datasetSubtitleOnView = page.locator('[wrap="hide"] span')
         this.datasetTitleField = page.getByPlaceholder('Enter dataset title')
+        this.editFileInformationBtn = page.getByLabel('Edit',{exact:true})
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.leftBtnForPendingActions = page.getByLabel('chevron_left')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
@@ -62,6 +66,10 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.addDescriptionPendingAction.click()
     }
 
+    public async clickAddFileInformationPendingAction(){
+        await this.addFileInformationPendingAction.click()
+    }
+
     public async clickAddSubtitlePendingAction(){
         await this.addSubtitlePendingAction.click()
     }
@@ -77,7 +85,7 @@ export class Datasets extends BaseBusinessObjectPage{
     }
 
     public async clickCreateBtnAndGetDatasetProperties():Promise<{datasetID:string,ownerSlug:string,datasetSlug:string}>{
-        const responsePromise1 = this.page.waitForResponse('https://www.kaggle.com/api/i/datasets.DatasetService/CreateDataset',{timeout:30000});
+        const responsePromise1 = this.page.waitForResponse(`${process.env.CREATE_DATASET_ENDPOINT}`,{timeout:30000});
         await this.createBtn.click();
         const response = await (await responsePromise1).json();
         return {
@@ -85,6 +93,10 @@ export class Datasets extends BaseBusinessObjectPage{
             ownerSlug:response.datasetVersionReference.ownerSlug,
             datasetSlug:response.datasetVersionReference.slug
         }
+    }
+
+    public async clickEditFileInformationBtn(){
+        await this.editFileInformationBtn.click()
     }
 
     public async clickGoToDatasetBtn(){
@@ -122,6 +134,12 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.saveChangesBtn.click()
     }
 
+    public async clickSaveBtnForFileInformation(){
+        const saveBtn = this.page.getByRole('button').getByText('Save',{exact:true});
+        await saveBtn.click();
+        await this.page.waitForTimeout(1000)
+    }
+
     public async clickSpecifyLicensePendingAction(){
         await this.specifyLicensePendingAction.click()
     }
@@ -149,6 +167,11 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async fillDescriptionWhileEditingDataset(description:string){
         await this.datasetDescriptionField.fill(description);
+    }
+
+    public async fillFileInformationField(information:string){
+        const fileInformationField = this.page.getByPlaceholder('Add a description for this file');
+        await fileInformationField.fill(information);
     }
 
     public async fillURLFieldWhileCreatingDataset(url:string){
@@ -272,6 +295,10 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async isAddDescriptionPendingActionVisible(){
         return await this.addDescriptionPendingAction.isVisible()
+    }
+
+    public async isAddFileInformationPendingActionVisible(){
+        return await this.addFileInformationPendingAction.isVisible()
     }
 
     public async isAddSubtitlePendingActionVisible(){
