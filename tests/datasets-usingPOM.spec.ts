@@ -290,6 +290,30 @@ test.describe('tests using POM', async()=>{
 
             expect (await datasetPage.isSpecifyLicensePendingActionVisible()).toBe(false);
         })
+        await test.step('Add file description via pending action', async()=>{              
+            
+            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetPage.clickAddDescriptionPendingAction();
+            expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
+            await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
+            await datasetPage.clickSaveForSection('About Dataset');
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+            await datasetPage.reloadPage();
+
+            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetPage.getUsabilityValue();
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+            
+            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            await datasetPage.clickRightBtnForPendingActions();
+            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            
+            expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
+            expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
+            expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
+        })
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
