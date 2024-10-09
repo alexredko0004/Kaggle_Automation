@@ -1,4 +1,4 @@
-import {Page, Locator} from '@playwright/test'
+import {Page, expect, Locator} from '@playwright/test'
 
 export abstract class BasePage{
     page: Page
@@ -13,12 +13,31 @@ export abstract class BasePage{
         this.tooltip = page.getByRole('tooltip').locator('.MuiTooltip-tooltip')
     }
     
-    public async clickBtnOnConfirmationDialog(btnName:string){
-        await this.confirmationDialog.locator('button',{has:this.page.getByText(btnName)}).click()
-    }
     
     public async acceptCookies(){
         if (await this.page.getByText('OK, Got it.').isVisible()) await this.page.getByText('OK, Got it.').click()
+    }
+
+    public async clickBtnOnConfirmationDialog(btnName:string){
+        await this.confirmationDialog.locator('button',{has:this.page.getByText(btnName)}).click()
+    }
+
+    public async isLocatorInViewport(locator:Locator):Promise<boolean>{
+        const boundingBox = await locator.boundingBox();
+        let isLocatorInViewport;
+        if (boundingBox) {
+        const viewportSize = this.page.viewportSize();
+        
+        if (viewportSize) {
+        isLocatorInViewport = (
+        boundingBox.x >= 0 &&
+        boundingBox.y >= 0 &&
+        boundingBox.x + boundingBox.width <= viewportSize.width &&
+        boundingBox.y + boundingBox.height <= viewportSize.height
+        );
+        
+    }}
+    return isLocatorInViewport
     }
 
     public async getConfirmationPopupHeaderInnerText(){
