@@ -6,7 +6,9 @@ import { datasetRemoteLink1,
          datasetDescriptionH1,
          datasetDescriptionH2,
          datasetDescriptionParagraph,
-         datasetFileInformation } from '../helpers/constants';
+         datasetFileInformation,
+         datasetSourceText,
+         datasetCollectionMethodologyText} from '../helpers/constants';
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
@@ -53,18 +55,52 @@ test.describe('tests using POM', async()=>{
     })
 
 
-    test('Create new dataset with file upload', async({page})=>{   //REWRITE THIS TEST WITH MODULAR METHODS
-        const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
+    test('Create new dataset with file upload and edits its provenance @smokeDataset', async({page})=>{ 
+        const datasetName = 'AutoDataSet'+Date.now().toString();
         const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);
-        await test.step('Add dataset', async()=>{
+        let createdDataset
+        let usabilityValue
+        let usabilityStats
+        await test.step('Preconditions', async()=>{
             await mainMenu.openDatasetsPageViaMainMenu();
-            await datasetPage.addDatasetUsingFileUpload(datasetName+' upload');
-            await expect(page.getByTestId('dataset-detail-render-tid').locator('h1')).toHaveText(datasetName+' upload');
+            await datasetPage.clickNewDatasetBtn();
+        })
+        await test.step('Upload file and create dataset', async()=>{
+            await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
+            await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
+            createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
+            await datasetPage.clickGoToDatasetBtn();
             await expect(page.getByTestId('preview-image')).toBeVisible();
         })
+        await test.step('Verify that clicking specify provenance pending action opens new input fields', async()=>{
+            usabilityValue = await datasetPage.getUsabilityValue();
+            usabilityStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()
+            await datasetPage.clickRightBtnForPendingActions();
+            await datasetPage.clickSpecifyProvenancePendingAction();
+            expect(await datasetPage.isSourcesInputVisible()).toBe(true);
+            expect(await datasetPage.isCollectionMethodologyInputVisible()).toBe(true);
+        })
+        await test.step('Provide source and collection methodology and verify it can be saved', async()=>{
+            await datasetPage.fillCollectionMethodologyInput(datasetCollectionMethodologyText);
+            await datasetPage.fillSourcesInput(datasetSourceText);
+            await datasetPage.clickSaveForSection('License');
+            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
+            expect(await datasetPage.getFlashMessageText()).toContain('Successfully updated the provenance.');
+            await datasetPage.reloadPage();
+            expect((await datasetPage.getDatasetSourceAndCollectionMethodology()).source).toEqual(datasetSourceText.replace(/\n/g,' '));
+            expect((await datasetPage.getDatasetSourceAndCollectionMethodology()).collectionMethodology).toEqual(datasetCollectionMethodologyText.replace(/\n/g,' '));
+        })
+        await test.step('Verify that pending action for provenance is not shown and stats are updated', async()=>{
+            expect(await datasetPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
+            await datasetPage.clickRightBtnForPendingActions();
+            expect(await datasetPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
+            expect(await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            expect((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.value).toBeGreaterThan(usabilityStats.credibility.value);
+            expect((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.isSourceProvenanceChecked).toBe(true);
+        })
         await test.step('Postcondition. Remove created dataset', async()=>{
-            await datasetPage.deleteDatasetFromItsPage()
+            await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
     })
 
@@ -282,12 +318,12 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.isLicenseDropDownVisible()).toBe(true);
             expect (await datasetPage.isSaveBtnForSectionVisible('License')).toBe(true);
 
-            await datasetPage.selectDatasetLicense('Reddit API Terms');
+            const license = await datasetPage.selectRandomDatasetLicense();
             await datasetPage.clickSaveForSection('License');
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully updated the license.');
             await datasetPage.reloadPage();
-            expect (await datasetPage.getDatasetLicense()).toEqual('Reddit API Terms');
+            expect (await datasetPage.getDatasetLicense()).toEqual(license);
 
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
@@ -313,6 +349,7 @@ test.describe('tests using POM', async()=>{
             
             expect (await datasetPage.isAddFileInformationPendingActionVisible()).toBe(false);
         })
+        //Add provenance via pending action
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
