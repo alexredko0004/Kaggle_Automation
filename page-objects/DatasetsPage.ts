@@ -285,6 +285,12 @@ export class Datasets extends BaseBusinessObjectPage{
         return this.page.getByTestId('dataset-detail-render-tid').locator('h1').innerText()
     }
 
+    public async getDatasetSourceAndCollectionMethodology(){
+        const source = await this.page.locator('.sources p').innerText();
+        const collectionMethodology = await this.page.locator('.collection-methods p').innerText();
+        return {source:source,collectionMethodology:collectionMethodology}
+    }
+
     public async getDatasetTags():Promise<string[]>{
         const tagsArray = await this.page.locator('#combo-tags-menu-chipset a span').allInnerTexts();
         return tagsArray
