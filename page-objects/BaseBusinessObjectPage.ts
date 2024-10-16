@@ -10,7 +10,7 @@ export abstract class BaseBusinessObjectPage extends BasePage{
 
     constructor(page){
         super(page)
-        this.newBtn = page.getByRole('button', {name:'New'})
+        this.newBtn = page.locator('#site-content').getByRole('button', {name:'New'})
         this.yourWorkBtn = page.getByRole('button').getByText('Your Work')
     }
 

@@ -6,7 +6,9 @@ import { datasetRemoteLink1,
          datasetDescriptionH1,
          datasetDescriptionH2,
          datasetDescriptionParagraph,
-         datasetFileInformation } from '../helpers/constants';
+         datasetFileInformation,
+         datasetSourceText,
+         datasetCollectionMethodologyText} from '../helpers/constants';
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
@@ -282,12 +284,12 @@ test.describe('tests using POM', async()=>{
             expect (await datasetPage.isLicenseDropDownVisible()).toBe(true);
             expect (await datasetPage.isSaveBtnForSectionVisible('License')).toBe(true);
 
-            await datasetPage.selectDatasetLicense('Reddit API Terms');
+            const license = await datasetPage.selectRandomDatasetLicense();
             await datasetPage.clickSaveForSection('License');
             await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
             expect (await datasetPage.getFlashMessageText()).toContain('Successfully updated the license.');
             await datasetPage.reloadPage();
-            expect (await datasetPage.getDatasetLicense()).toEqual('Reddit API Terms');
+            expect (await datasetPage.getDatasetLicense()).toEqual(license);
 
             expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
             usabilityValue = await datasetPage.getUsabilityValue();
@@ -313,6 +315,7 @@ test.describe('tests using POM', async()=>{
             
             expect (await datasetPage.isAddFileInformationPendingActionVisible()).toBe(false);
         })
+        //Add provenance via pending action
         await test.step('Postcondition. Remove remaining dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })

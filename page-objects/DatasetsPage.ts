@@ -7,6 +7,7 @@ export class Datasets extends BaseBusinessObjectPage{
     addFileInformationPendingAction: Locator
     addSubtitlePendingAction:Locator
     addTagsPendingAction: Locator
+    collectionMethodologyInput: Locator
     continueBtn: Locator
     createBtn: Locator
     datasetDescriptionField: Locator
@@ -22,7 +23,9 @@ export class Datasets extends BaseBusinessObjectPage{
     resetBtn: Locator
     rightBtnForPendingActions: Locator
     saveChangesBtn: Locator
+    sourcesInput: Locator
     specifyLicensePendingAction: Locator
+    specifyProvenancePendingAction: Locator
     trippleDotsBtn: Locator
     uploadImagePendingAction: Locator
     urlField: Locator
@@ -34,6 +37,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.addFileInformationPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add file information')
         this.addSubtitlePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add a subtitle')
         this.addTagsPendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Add tags')
+        this.collectionMethodologyInput = page.locator('.collection-methods .MuiInputBase-multiline textarea[rows="4"]')
         this.continueBtn = page.locator('.drawer-outer-container button').getByText('Continue')
         this.createBtn = page.locator('.drawer-outer-container button').getByText('Create')
         this.datasetDescriptionField = page.getByTestId('markdownEditor').locator('textarea.MuiInputBase-inputMultiline').first()
@@ -48,7 +52,9 @@ export class Datasets extends BaseBusinessObjectPage{
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
         this.rightBtnForPendingActions = page.getByLabel('chevron_right')
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
+        this.sourcesInput = page.locator('.sources .MuiInputBase-multiline textarea[rows="4"]')
         this.specifyLicensePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Specify a license')
+        this.specifyProvenancePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Specify provenance')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
         this.uploadImagePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Upload an image')
         this.urlField = page.getByPlaceholder('Enter remote URL')
@@ -157,8 +163,16 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.page.waitForRequest('https://www.kaggle.com/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
     }
 
+    public async clickSpecifyProvenancePendingAction(){
+        await this.specifyProvenancePendingAction.click()
+    }
+
     public async clickUploadImagePendingAction(){
         await this.uploadImagePendingAction.click()
+    }
+
+    public async fillCollectionMethodologyInput(text:string){
+        await this.collectionMethodologyInput.fill(text)
     }
 
     public async fillDatasetNameWhileCreatingDataset(name:string){
@@ -180,6 +194,10 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async fillSubtitleWhileEditingDataset(subtitle:string){
         await this.datasetSubtitleField.fill(subtitle);
+    }
+
+    public async fillSourcesInput(text:string){
+        await this.sourcesInput.fill(text);
     }
 
     public async getDatasetCompletenessCredibilityCompatibilityStats():
@@ -318,6 +336,10 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.createBtn.isEnabled()
     }
 
+    public async isCollectionMethodologyInputVisible(){
+        return await this.collectionMethodologyInput.isVisible()
+    }
+
     public async isDatasetDescriptionFieldVisible(){
         return await this.datasetDescriptionField.isVisible()
     }
@@ -347,8 +369,16 @@ export class Datasets extends BaseBusinessObjectPage{
         return await saveBtn.isVisible()
     }
 
+    public async isSourcesInputVisible(){
+        return await this.sourcesInput.isVisible()
+    }
+
     public async isSpecifyLicensePendingActionVisible(){
         return await this.specifyLicensePendingAction.isVisible()
+    }
+
+    public async isSpecifyProvenancePendingActionVisible(){
+        return await this.specifyProvenancePendingAction.isVisible()
     }
 
     public async isTabWithNameSelected(tabName:string){
@@ -363,7 +393,15 @@ export class Datasets extends BaseBusinessObjectPage{
     public async selectDatasetLicense(licenseName:string){
         await this.datasetLicenseDropDown.click();
         await this.page.getByRole('listbox').locator('li',{hasText:licenseName}).click()
+    }
 
+    public async selectRandomDatasetLicense(){
+        await this.datasetLicenseDropDown.click();
+        const allOptions = await this.page.getByRole('listbox').locator('li:not([aria-disabled="true"])').allInnerTexts();
+        let selectedOption = allOptions[Math.floor(Math.random()*allOptions.length)];
+        selectedOption==='Unknown'?selectedOption = allOptions[Math.floor(Math.random()*allOptions.length)]:selectedOption;
+        await this.page.getByRole('listbox').locator('li',{hasText:selectedOption}).click();
+        return selectedOption.replace('info','')
     }
 
     public async selectTabOnDatasetProfile(tabName:string){
