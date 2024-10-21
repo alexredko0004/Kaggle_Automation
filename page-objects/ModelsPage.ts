@@ -220,7 +220,7 @@ export class Models extends BaseBusinessObjectPage{
         await this.licenseListOnCreate.click();
         const optionsList = await this.page.locator('[role="listbox"] [role="option"]:not([aria-disabled="true"])').allInnerTexts();
         let selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)];
-        selectedOption==='Gemma'?selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)]:selectedOption;
+        selectedOption==='Gemma'||selectedOption==='Other (specified in description)'?selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)]:selectedOption;
         await this.page.locator('[role="listbox"] [role="option"]',{hasText:selectedOption}).click();
         return selectedOption.replace('info','')
     }
