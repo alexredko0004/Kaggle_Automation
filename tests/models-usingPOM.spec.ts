@@ -306,7 +306,7 @@ test.describe('tests using POM', async()=>{
         await test.step('Prec. Open "Models" page', async()=>{
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
         })
-        await test.step('Verify that model can be added to collection from its profile', async()=>{
+        await test.step('Verify that model can be added to collection from its profile.', async()=>{
             await modelsPage.clickThreeDotsBtnOnProfile();
             await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
             availableCollections = await modelsPage.collectionsPanel().getAvailableCollections();
