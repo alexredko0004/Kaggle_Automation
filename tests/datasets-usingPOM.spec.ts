@@ -1,5 +1,6 @@
 import { test,expect,request } from '@playwright/test';
 import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
+import { deleteCollectionViaPW, createCollectionViaPW } from '../precs/Collections/collectionPrecs';
 import { datasetRemoteLink1,
          datasetRemoteLink2,
          datasetDescription1,
@@ -12,7 +13,6 @@ import { datasetRemoteLink1,
 import { Datasets } from '../page-objects/DatasetsPage';
 import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
-import { Tags } from '../page-objects/Tags';
 
 test.describe('tests using POM', async()=>{
     test.beforeEach(async({page})=>{
@@ -25,6 +25,11 @@ test.describe('tests using POM', async()=>{
         await mainMenu.closeCreationMenu();
         await mainMenu.openDatasetsPageViaMainMenu();
         await expect(page).toHaveURL('/datasets');
+    })
+    test('Create and remove collection via PW @smoke @smokeDataset', async({page})=>{
+        const collName = 'COLL'+ Date.now().toString()
+        const coll = await createCollectionViaPW(page,collName)
+        await deleteCollectionViaPW(page,coll.collectionId)
     })
     test('Create new dataset with remote url @smoke @smokeDataset', async({page})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
