@@ -17,8 +17,9 @@ on:
           - ENV2
 
 jobs:
-  run_tests:
+  run_tests_dataset:
     name: Run smoke tests on ${{ github.event.inputs.environment-name }}
+    uses: ./.github/workflows/template.yml
     if: ${{ github.event.inputs.environment-name == 'ENV1' }}
     with:
       os-system: ubuntu-latest
@@ -27,7 +28,10 @@ jobs:
       timeout-before-force-stop: 120
       branch-name: master
     secrets: inherit
-
+  
+  run_tests_model:
+    name: Run smoke tests on ${{ github.event.inputs.environment-name }}
+    uses: ./.github/workflows/template.yml
     if: ${{ github.event.inputs.environment-name == 'ENV2' }}
     with:
       os-system: ubuntu-latest
