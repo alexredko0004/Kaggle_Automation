@@ -315,7 +315,7 @@ test.describe('tests using POM', async()=>{
             await expect(yourWorkPage.getFlashMessageLocator()).toBeVisible();
             expect(await yourWorkPage.getFlashMessageText()).toEqual('Item was added successfully');
         })
-        await test.step('Verify that model cannot be added to one collection twice', async()=>{
+        await test.step('Verify that model cannot be added to one collection twice.', async()=>{
             await modelsPage.reloadPage();
             await modelsPage.clickThreeDotsBtnOnProfile();
             await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
