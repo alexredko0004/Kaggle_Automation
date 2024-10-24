@@ -17,51 +17,26 @@ on:
           - ENV2
 
 jobs:
-  run_tests:
-    name: Run smoke tests
-    runs-on: ${{ github.event.inputs.operatingSystem }}
-    environment: ${{ github.event.inputs.environment-name }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ inputs.branch-name }}
-
-      - name: Setup node
-        uses: actions/setup-node@v3
-        
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install playwright browsers
-        run: npx playwright install --with-deps
-
-      - name: Run tests on ${{ github.event.inputs.environment-name }}
-        if: ${{ github.event.inputs.environment-name == 'ENV1' }}
-        run: npx playwright test -g "@smokeDataset"
-        env:
-          SITE_URL: ${{ vars.SITE_URL }}
-          EMAIL: ${{ secrets.EMAIL }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          CREATE_DATASET_ENDPOINT: ${{ secrets.CREATE_DATASET_ENDPOINT }}
-          DELETE_DATASET_ENDPOINT: ${{ secrets.DELETE_DATASET_ENDPOINT }}
-          CREATE_MODEL_ENDPOINT: ${{ secrets.CREATE_MODEL_ENDPOINT }}
-          DELETE_MODEL_ENDPOINT: ${{ secrets.DELETE_MODEL_ENDPOINT }}  
-          CREATE_COLLECTION_ENDPOINT: ${{ secrets.CREATE_COLLECTION_ENDPOINT }}
-          DELETE_COLLECTION_ENDPOINT: ${{ secrets.DELETE_COLLECTION_ENDPOINT }}
-          LIST_COLLECTIONS_ENDPOINT: ${{ secrets.LIST_COLLECTIONS_ENDPOINT }}
-
-      - name: Run tests on ${{ github.event.inputs.environment-name }}
-        if: ${{ github.event.inputs.environment-name == 'ENV2' }}
-        run: npx playwright test -g "@smokeModel"
-        env:
-          SITE_URL: ${{ vars.SITE_URL }}
-          EMAIL: ${{ secrets.EMAIL }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-          CREATE_DATASET_ENDPOINT: ${{ secrets.CREATE_DATASET_ENDPOINT }}
-          DELETE_DATASET_ENDPOINT: ${{ secrets.DELETE_DATASET_ENDPOINT }}
-          CREATE_MODEL_ENDPOINT: ${{ secrets.CREATE_MODEL_ENDPOINT }}
-          DELETE_MODEL_ENDPOINT: ${{ secrets.DELETE_MODEL_ENDPOINT }}   
-          CREATE_COLLECTION_ENDPOINT: ${{ secrets.CREATE_COLLECTION_ENDPOINT }}
-          DELETE_COLLECTION_ENDPOINT: ${{ secrets.DELETE_COLLECTION_ENDPOINT }}
-          LIST_COLLECTIONS_ENDPOINT: ${{ secrets.LIST_COLLECTIONS_ENDPOINT }}     
+  run_tests_dataset:
+    name: Run smoke tests on ${{ github.event.inputs.environment-name }}
+    uses: ./.github/workflows/template.yml
+    if: ${{ github.event.inputs.environment-name == 'ENV1' }}
+    with:
+      os-system: ubuntu-latest
+      environment-name: ENV1
+      suite-name: Dataset
+      timeout-before-force-stop: 120
+      branch-name: master
+    secrets: inherit
+  
+  run_tests_model:
+    name: Run smoke tests on ${{ github.event.inputs.environment-name }}
+    uses: ./.github/workflows/template.yml
+    if: ${{ github.event.inputs.environment-name == 'ENV2' }}
+    with:
+      os-system: ubuntu-latest
+      environment-name: ENV2
+      suite-name: Model
+      timeout-before-force-stop: 150
+      branch-name: master
+    secrets: inherit     
