@@ -5,6 +5,7 @@ import { createModelViaPW, deleteModelViaPW } from '../precs/Models/modelPrecs';
 import { currentYear, currentMonth, currentDate } from '../helpers/dates';
 import {modelDeletionConfirmationPopupInnerText} from "../helpers/constants";
 import { YourWork } from '../page-objects/YourWorkPage';
+import { createCollectionViaPW, deleteCollectionViaPW } from '../precs/Collections/collectionPrecs';
 
 let createdModel
 test.describe('tests using POM', async()=>{
@@ -288,6 +289,42 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Post condition. Remove model',async()=>{
             await deleteModelViaPW(page,model.id)
+        })
+        
+    })
+
+    test('Add model to collection', async({page})=>{
+        const modelName = 'AutoModel'+Date.now().toString();
+        const collectionName = 'Collection'+Date.now().toString();
+        const mainMenu = new MainMenu(page);
+        const modelsPage = new Models(page);
+        const yourWorkPage = new YourWork(page);
+        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        const model = await createModelViaPW(page,modelName,modelVisibility);
+        const collection = await createCollectionViaPW(page,collectionName);
+        let availableCollections
+        await test.step('Prec. Open "Models" page', async()=>{
+            await modelsPage.openModelProfile(model.owner.slug,model.slug);
+        })
+        await test.step('Verify that model can be added to collection from its profile', async()=>{
+            await modelsPage.clickThreeDotsBtnOnProfile();
+            await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
+            availableCollections = await modelsPage.collectionsPanel().getAvailableCollections();
+            await modelsPage.collectionsPanel().selectCollectionsWithNames([collectionName]);
+            await modelsPage.collectionsPanel().clickAddBtn();
+            await expect(yourWorkPage.getFlashMessageLocator()).toBeVisible();
+            expect(await yourWorkPage.getFlashMessageText()).toEqual('Item was added successfully');
+        })
+        await test.step('Verify that model cannot be added to one collection twice', async()=>{
+            await modelsPage.reloadPage();
+            await modelsPage.clickThreeDotsBtnOnProfile();
+            await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
+            expect((await modelsPage.collectionsPanel().getAvailableCollections()).length).toEqual(availableCollections.length-1);
+            expect((await modelsPage.collectionsPanel().getAvailableCollections()).includes(collectionName)).toBe(false)
+        })
+        await test.step('Post condition. Remove model',async()=>{
+            await deleteModelViaPW(page,model.id);
+            await deleteCollectionViaPW(page,collection.collectionId)
         })
         
     })

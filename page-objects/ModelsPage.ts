@@ -100,7 +100,6 @@ export class Models extends BaseBusinessObjectPage{
         const text = (visibility==='Private')?'visibility_off':'visibility';
         await this.visibilityDropDown.click();
         await this.page.locator(`li[aria-label=${visibility}]`).click();
-        //await this.page.locator('li',{hasText:text+visibility}).click();
     }
     
     public async isCreateButtonEnabled(){
