@@ -13,7 +13,6 @@ async function setHeaders(page: Page) {
 }
 
 export async function post(page: Page, url: string, payload?: JSON | string) {
-    console.log(url)
     return page.request.post(url, {
         headers: await setHeaders(page),
         data: payload

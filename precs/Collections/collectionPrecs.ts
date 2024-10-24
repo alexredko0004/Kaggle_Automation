@@ -5,6 +5,7 @@ import {post} from "../apiRequestsFunctions";
 export const createCollectionViaPW = async(page:Page,collectionName: string):Promise<{collectionId:string}>=>{
     const response = await post(page,`${process.env.CREATE_COLLECTION_ENDPOINT}`,JSON.stringify({name:collectionName}))
     expect(response.ok()).toBe(true);
+    console.log(await response.text())
     const createdCollectionId = JSON.parse(await response.text());
     console.log(collectionName+' collection is created');
     return {
