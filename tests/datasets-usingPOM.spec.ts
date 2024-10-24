@@ -26,7 +26,7 @@ test.describe('tests using POM', async()=>{
         await mainMenu.openDatasetsPageViaMainMenu();
         await expect(page).toHaveURL('/datasets');
     })
-    test('Create and remove collection via PW @smoke @smokeDataset', async({page})=>{
+    test('Create and remove collection via PW @smoke @smokeDataset', async({page})=>{             //MOVE THIS TEST TO SEPARATE COLLECTIONS.SPEC FILE
         const collName = 'COLL'+ Date.now().toString()
         const coll = await createCollectionViaPW(page,collName)
         await deleteCollectionViaPW(page,coll.collectionId)
