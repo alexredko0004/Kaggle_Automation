@@ -1,5 +1,6 @@
 import { Locator} from "@playwright/test";
-import { BasePage } from './BasePage'
+import { BasePage } from './BasePage';
+import {post} from "../precs/apiRequestsFunctions";
 
 export class Collections extends BasePage{
     private readonly addBtn: Locator
@@ -19,6 +20,14 @@ export class Collections extends BasePage{
         await this.page.waitForTimeout(500)
         const collectionNamesOnPanel = await this.listItem.locator('.MuiTypography-root').allInnerTexts()
         return collectionNamesOnPanel
+    }
+
+    public async getListOfCollectionsForUser(){
+        const collectionsResponse = await post(this.page,`${process.env.LIST_COLLECTIONS_ENDPOINT}`,JSON.stringify({orderBy
+            : 
+            "LIST_COLLECTIONS_ORDER_BY_RECENTLY_CREATED_COLLECTION"}));
+        const collections = JSON.parse(await collectionsResponse.text());
+        return collections.collections
     }
 
     public async selectCollectionsWithNames(collections:string[]){
