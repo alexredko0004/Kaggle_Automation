@@ -200,6 +200,12 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.sourcesInput.fill(text);
     }
 
+    public async getDatasetAttachmentSizeNumber(){
+        const attSizeNumber = (await this.page.locator('//*[contains(text(),"Version")]/parent::p').innerText()).match(/\d{1,3}\.\d{1,3}/)
+        const sizeNumber = (attSizeNumber&&attSizeNumber.length>0)?+attSizeNumber[0]:0;
+        return sizeNumber
+    }
+
     public async getDatasetCompletenessCredibilityCompatibilityStats():
     Promise<{completeness:{
             value:number,

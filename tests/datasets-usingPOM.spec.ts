@@ -51,7 +51,7 @@ test.describe('tests using POM', async()=>{
             createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
             await datasetPage.clickGoToDatasetBtn();
             expect(await datasetPage.getDatasetName()).toEqual(datasetName);
-            await expect(page.getByText('Remote source:')).toBeVisible();
+            expect(await datasetPage.getDatasetAttachmentSizeNumber()).toBeGreaterThan(0);
             await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Postcondition. Remove created dataset', async()=>{

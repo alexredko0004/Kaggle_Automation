@@ -5,7 +5,7 @@ import { Collections } from './Collections'
 
 export abstract class BaseBusinessObjectPage extends BasePage{
     private collections: Collections
-    private newBtn: Locator
+    public newBtn: Locator
     private searchField: Locator
     private tags:Tags
     private yourWorkBtn: Locator
