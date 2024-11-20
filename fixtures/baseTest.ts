@@ -1,20 +1,16 @@
 import {test as base, expect, Page} from '@playwright/test'
 import { MainMenu } from '../page-objects/MainMenu'
+import { Datasets } from '../page-objects/DatasetsPage'
 
 export type BaseTest = {
-   page: Page,
+   datasetsPage: Datasets
    mainMenu: MainMenu
 }
 
 export const test = base.extend<BaseTest>({
-   page: async ({page},use,testInfo)=>{
-       console.log(`${testInfo.title} started at ${Date.now().toLocaleString()}`)
-       await use(page)
-       if (testInfo.status==='passed'){
-        console.log(`Total duration: ${testInfo.duration}`)
-       } else {
-        console.log(`${testInfo.title} finished at ${Date.now().toLocaleString()}`)
-    }
+   datasetsPage: async ({page},use)=>{
+      const datsetsPage = new Datasets(page);
+      await use(datsetsPage)
    },
    mainMenu: async ({page},use)=>{
     const mainMenu = new MainMenu(page);
