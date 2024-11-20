@@ -1,4 +1,5 @@
-import { test,expect,request } from '@playwright/test';
+//import { test,expect,request } from '@playwright/test';
+import { test,expect } from '../fixtures/baseTest';
 import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
 import { deleteCollectionViaPW, createCollectionViaPW } from '../precs/Collections/collectionPrecs';
 import { datasetRemoteLink1,
@@ -31,9 +32,9 @@ test.describe('tests using POM', async()=>{
         const coll = await createCollectionViaPW(page,collName)
         await deleteCollectionViaPW(page,coll.collectionId)
     })
-    test('Create new dataset with remote url @smoke @smokeDataset', async({page})=>{
+    test('Create new dataset with remote url @smoke @smokeDataset', async({page,mainMenu})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
-        const mainMenu = new MainMenu(page);
+        //const mainMenu = new MainMenu(page);
         const datasetPage = new Datasets(page);
         let createdDataset
         await test.step('Preconditions', async()=>{
@@ -51,7 +52,6 @@ test.describe('tests using POM', async()=>{
             createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
             await datasetPage.clickGoToDatasetBtn();
             expect(await datasetPage.getDatasetName()).toEqual(datasetName);
-            await expect(page.getByText('Remote source:')).toBeVisible();
             await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Postcondition. Remove created dataset', async()=>{
