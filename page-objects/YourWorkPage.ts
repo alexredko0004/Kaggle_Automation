@@ -1,10 +1,12 @@
 import { Locator, expect} from "@playwright/test";
 import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
+import { strict } from "assert";
 
 export class YourWork extends BaseBusinessObjectPage{
     agreementCheckbox: Locator
     cancelBtnOnPanel: Locator
     continueBtnOnPanel: Locator
+    createBtn: Locator
     deleteBtn: Locator
     deleteBtnOnConfirmDialog: Locator
     itemOnConfirmationDialog: Locator
@@ -18,6 +20,7 @@ export class YourWork extends BaseBusinessObjectPage{
         this.agreementCheckbox = page.locator('.drawer-outer-container input')
         this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Cancel')
         this.continueBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Continue')
+        this.createBtn = page.locator('#site-content').getByRole('button').getByText('Create',{ exact: true })
         this.deleteBtn = page.getByTitle('Delete selected items')
         this.deleteBtnOnConfirmDialog = page.getByRole('dialog').getByRole('button').getByText('Delete')
         this.listItem = page.locator('#site-content ul li')
@@ -194,6 +197,12 @@ export class YourWork extends BaseBusinessObjectPage{
     public async searchYourWork(searchString:string){
         await this.page.waitForTimeout(1500)
         await this.searchField.fill(searchString)
+    }
+
+    public async selectItemFromCreateMenu(item:"New Collection" | "New Notebook" | "New Dataset" | "New Model" | "New Competition"){
+        const itemToSelect = this.page.locator('div[aria-hidden="false"]>[role="menu"]>[role="menuitem"]').filter({hasText:item});
+        await this.createBtn.click();
+        await itemToSelect.click()
     }
 
     public async uncheckItemsWithProvidedNamesAndReturnTheirNames(names:string[]){
