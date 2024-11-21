@@ -34,11 +34,12 @@ export class MainMenu extends BasePage{
     
 
     public async openDatasetsPageViaMainMenu(){
-       await this.datasetsItem.click()
-       
+       await this.datasetsItem.waitFor();
+       await this.datasetsItem.click() 
     }
 
     public async openModelsPageViaMainMenu(){
+        await this.modelsItem.waitFor();
         await this.modelsItem.click()
      }
 }
