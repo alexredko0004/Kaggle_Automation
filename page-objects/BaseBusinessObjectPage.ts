@@ -33,7 +33,8 @@ export abstract class BaseBusinessObjectPage extends BasePage{
     }
 
     public async openTab(tabName:string){
-        await this.page.getByRole('tab',{name:tabName}).click()
+        await this.page.getByRole('tab',{name:tabName}).click();
+        await this.page.waitForTimeout(500)
     }
 
     public async openYourWork(){

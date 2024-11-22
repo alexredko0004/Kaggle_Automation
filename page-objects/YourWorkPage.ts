@@ -25,7 +25,7 @@ export class YourWork extends BaseBusinessObjectPage{
         this.deleteBtnOnConfirmDialog = page.getByRole('dialog').getByRole('button').getByText('Delete')
         this.listItem = page.locator('#site-content ul li')
         this.itemOnConfirmationDialog = page.locator('.drawer-outer-container ul li a')
-        this.searchField = page.getByPlaceholder('Search Your Work')
+        this.searchField = page.getByPlaceholder(/Search Your .*/)
         //this.upvoteBtn = page.getByTestId('upvotebutton__upvote')
     }
     
@@ -101,6 +101,7 @@ export class YourWork extends BaseBusinessObjectPage{
      * @param itemName - can be model title or subtitle
      */
     public async clickListItem(itemName:string){
+        await this.page.waitForTimeout(200)
         await this.listItem.filter({hasText:itemName}).click()
     }
 
@@ -117,6 +118,18 @@ export class YourWork extends BaseBusinessObjectPage{
         return checkedItemsNames
     }
 
+    public async getCollectionsOnOverviewTab():Promise<{name:string|undefined;itemsCount:number}[]>{
+        let resultingArray:{name:string|undefined;itemsCount:number}[]=[]
+        const collectionBlock = this.page.locator('#site-content a[role="checkbox"]')/*.getByRole('checkbox');*/
+        const listOfLocators = await collectionBlock.all();
+        for (let locator of listOfLocators){
+            const collName = await locator.locator('div span').innerText();
+            const countNumber = Number((await locator.locator('div p').innerText())?.replace(/(\d+)\sitems/,"$1"));
+            resultingArray.push({name:collName,itemsCount:countNumber})
+        }
+        return resultingArray
+    }
+
     public async getConfirmationPopUpText(){
         const text = await this.page.getByRole('dialog').locator('p').innerText();
         return text
@@ -128,12 +141,6 @@ export class YourWork extends BaseBusinessObjectPage{
         const label:string = element ?? 'not found';
         const match = label.match(/\d+/);
         if (match) return +match[0]
-        //     {
-        // const number = match[0];
-        // return +number; // to convert string to number
-        // } else {
-        //  throw new Error(`No number found in label: ${label}`);
-        // }
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){
@@ -197,6 +204,7 @@ export class YourWork extends BaseBusinessObjectPage{
     public async searchYourWork(searchString:string){
         await this.page.waitForTimeout(1500)
         await this.searchField.fill(searchString)
+        await this.page.waitForTimeout(500)
     }
 
     public async selectItemFromCreateMenu(item:"New Collection" | "New Notebook" | "New Dataset" | "New Model" | "New Competition"){
