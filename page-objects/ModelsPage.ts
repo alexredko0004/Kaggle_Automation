@@ -183,6 +183,8 @@ export class Models extends BaseBusinessObjectPage{
     public async selectRandomFrameworkOnCreate(){
         await this.frameworkListOnCreate.click();
         const frameworkOptions = await this.page.locator('[role="option"]').allInnerTexts();
+        const indexToRemove = frameworkOptions.indexOf('Select framework');
+        indexToRemove>-1?frameworkOptions.splice(indexToRemove,1):frameworkOptions;
         const selectedFramework = frameworkOptions[Math.floor(Math.random()*frameworkOptions.length)];
         await this.page.locator('[role="option"]').getByText(selectedFramework).click();
         return selectedFramework

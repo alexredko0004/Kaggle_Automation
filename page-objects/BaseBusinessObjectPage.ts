@@ -16,6 +16,10 @@ export abstract class BaseBusinessObjectPage extends BasePage{
         this.yourWorkBtn = page.getByRole('button').getByText('Your Work')
     }
 
+    public async clickNewBtn(){
+        await this.newBtn.click()
+    }
+
     public collectionsPanel(){
         if (!this.collections){
            this.collections = new Collections(this.page)
@@ -23,23 +27,26 @@ export abstract class BaseBusinessObjectPage extends BasePage{
         return this.collections
     }
 
-    public tagsPanel(){
-        if (!this.tags){
-           this.tags = new Tags(this.page)
-        }
-        return this.tags
+    public async getSelectedTabName(){
+        const selectedTab = this.page.getByRole('tablist').locator('[aria-selected="true"]');
+        const selectedTabName = await selectedTab.locator('span:not(.MuiTouchRipple-root)').innerText();
+        return selectedTabName
     }
 
-    public async clickNewBtn(){
-        await this.newBtn.click()
+    public async openTab(tabName:string){
+        await this.page.getByRole('tab',{name:tabName}).click();
+        await this.page.waitForTimeout(500)
     }
 
     public async openYourWork(){
         await this.yourWorkBtn.click()
     }
 
-    public async openTab(tabName:string){
-        await this.page.getByRole('tab',{name:tabName}).click()
+    public tagsPanel(){
+        if (!this.tags){
+           this.tags = new Tags(this.page)
+        }
+        return this.tags
     }
 
 }

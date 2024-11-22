@@ -1,4 +1,4 @@
-import { test,expect,request } from '@playwright/test';
+import { test,expect } from '../fixtures/baseTest';
 import { deleteDatasetViaPW, createDatasetViaPW } from '../precs/Datasets/datasetPrecs';
 import { deleteCollectionViaPW, createCollectionViaPW } from '../precs/Collections/collectionPrecs';
 import { datasetRemoteLink1,
@@ -10,48 +10,37 @@ import { datasetRemoteLink1,
          datasetFileInformation,
          datasetSourceText,
          datasetCollectionMethodologyText} from '../helpers/constants';
-import { Datasets } from '../page-objects/DatasetsPage';
-import { MainMenu } from '../page-objects/MainMenu';
 import { YourWork } from '../page-objects/YourWorkPage';
 
 test.describe('tests using POM', async()=>{
-    test.beforeEach(async({page})=>{
-        const mainMenu = new MainMenu(page);
+    test.beforeEach(async({page,mainMenu})=>{
         await mainMenu.openHomePage();
     })
-    test('open plus menu and datasets page @smoke @smokeDataset', async({page})=>{
-        const mainMenu = new MainMenu(page);
+    test('open plus menu and datasets page @smoke @smokeDataset', async({page,mainMenu})=>{
         await mainMenu.openCreationMenu();
         await mainMenu.closeCreationMenu();
         await mainMenu.openDatasetsPageViaMainMenu();
         await expect(page).toHaveURL('/datasets');
     })
-    test('Create and remove collection via PW @smoke @smokeDataset', async({page})=>{             //MOVE THIS TEST TO SEPARATE COLLECTIONS.SPEC FILE
-        const collName = 'COLL'+ Date.now().toString()
-        const coll = await createCollectionViaPW(page,collName)
-        await deleteCollectionViaPW(page,coll.collectionId)
-    })
-    test('Create new dataset with remote url @smoke @smokeDataset', async({page})=>{
+    test('Create new dataset with remote url @smoke @smokeDataset', async({page,mainMenu,datasetsPage})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
-        const mainMenu = new MainMenu(page);
-        const datasetPage = new Datasets(page);
         let createdDataset
         await test.step('Preconditions', async()=>{
             await mainMenu.openDatasetsPageViaMainMenu();
-            await datasetPage.clickNewDatasetBtn();
+            await datasetsPage.clickNewDatasetBtn();
         })
         await test.step('Verify that "Create" button becomes enabled after providing dataset name', async()=>{
-            await datasetPage.clickLinkTabWhileCreatingDataset();
-            await datasetPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
-            await datasetPage.clickContinueBtnWhileCreatingDataset();
-            await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
-            expect(await datasetPage.isCreateBtnEnabled()).toBe(true)
+            await datasetsPage.clickLinkTabWhileCreatingDataset();
+            await datasetsPage.fillURLFieldWhileCreatingDataset(datasetRemoteLink1);
+            await datasetsPage.clickContinueBtnWhileCreatingDataset();
+            await datasetsPage.fillDatasetNameWhileCreatingDataset(datasetName);
+            expect(await datasetsPage.isCreateBtnEnabled()).toBe(true)
         })
         await test.step('Verify that dataset is created and contains resource from the remote link', async()=>{
-            createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
-            await datasetPage.clickGoToDatasetBtn();
-            expect(await datasetPage.getDatasetName()).toEqual(datasetName);
-            expect(await datasetPage.getDatasetAttachmentSizeNumber()).toBeGreaterThan(0);
+            createdDataset = await datasetsPage.clickCreateBtnAndGetDatasetProperties();
+            await datasetsPage.clickGoToDatasetBtn();
+            expect(await datasetsPage.getDatasetName()).toEqual(datasetName);
+            expect(await datasetsPage.getDatasetAttachmentSizeNumber()).toBeGreaterThan(0);
             await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Postcondition. Remove created dataset', async()=>{
@@ -60,59 +49,55 @@ test.describe('tests using POM', async()=>{
     })
 
 
-    test('Create new dataset with file upload and edits its provenance @smokeDataset', async({page})=>{ 
+    test('Create new dataset with file upload and edits its provenance @smokeDataset', async({page,mainMenu,datasetsPage})=>{ 
         const datasetName = 'AutoDataSet'+Date.now().toString();
-        const mainMenu = new MainMenu(page);
-        const datasetPage = new Datasets(page);
         let createdDataset
         let usabilityValue
         let usabilityStats
         await test.step('Preconditions', async()=>{
             await mainMenu.openDatasetsPageViaMainMenu();
-            await datasetPage.clickNewDatasetBtn();
+            await datasetsPage.clickNewDatasetBtn();
         })
         await test.step('Upload file and create dataset', async()=>{
-            await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
-            await datasetPage.fillDatasetNameWhileCreatingDataset(datasetName);
-            createdDataset = await datasetPage.clickCreateBtnAndGetDatasetProperties();
-            await datasetPage.clickGoToDatasetBtn();
+            await datasetsPage.selectFilesForUpload(['./resources/123.jpg']);
+            await datasetsPage.fillDatasetNameWhileCreatingDataset(datasetName);
+            createdDataset = await datasetsPage.clickCreateBtnAndGetDatasetProperties();
+            await datasetsPage.clickGoToDatasetBtn();
             await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Verify that clicking specify provenance pending action opens new input fields', async()=>{
-            usabilityValue = await datasetPage.getUsabilityValue();
-            usabilityStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()
-            await datasetPage.clickRightBtnForPendingActions();
-            await datasetPage.clickSpecifyProvenancePendingAction();
-            expect(await datasetPage.isSourcesInputVisible()).toBe(true);
-            expect(await datasetPage.isCollectionMethodologyInputVisible()).toBe(true);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            usabilityStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()
+            await datasetsPage.clickRightBtnForPendingActions();
+            await datasetsPage.clickSpecifyProvenancePendingAction();
+            expect(await datasetsPage.isSourcesInputVisible()).toBe(true);
+            expect(await datasetsPage.isCollectionMethodologyInputVisible()).toBe(true);
         })
         await test.step('Provide source and collection methodology and verify it can be saved', async()=>{
-            await datasetPage.fillCollectionMethodologyInput(datasetCollectionMethodologyText);
-            await datasetPage.fillSourcesInput(datasetSourceText);
-            await datasetPage.clickSaveForSection('License');
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect(await datasetPage.getFlashMessageText()).toContain('Successfully updated the provenance.');
-            await datasetPage.reloadPage();
-            expect((await datasetPage.getDatasetSourceAndCollectionMethodology()).source).toEqual(datasetSourceText.replace(/\n/g,' '));
-            expect((await datasetPage.getDatasetSourceAndCollectionMethodology()).collectionMethodology).toEqual(datasetCollectionMethodologyText.replace(/\n/g,' '));
+            await datasetsPage.fillCollectionMethodologyInput(datasetCollectionMethodologyText);
+            await datasetsPage.fillSourcesInput(datasetSourceText);
+            await datasetsPage.clickSaveForSection('License');
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect(await datasetsPage.getFlashMessageText()).toContain('Successfully updated the provenance.');
+            await datasetsPage.reloadPage();
+            expect((await datasetsPage.getDatasetSourceAndCollectionMethodology()).source).toEqual(datasetSourceText.replace(/\n/g,' '));
+            expect((await datasetsPage.getDatasetSourceAndCollectionMethodology()).collectionMethodology).toEqual(datasetCollectionMethodologyText.replace(/\n/g,' '));
         })
         await test.step('Verify that pending action for provenance is not shown and stats are updated', async()=>{
-            expect(await datasetPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
-            await datasetPage.clickRightBtnForPendingActions();
-            expect(await datasetPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
-            expect(await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            expect((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.value).toBeGreaterThan(usabilityStats.credibility.value);
-            expect((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.isSourceProvenanceChecked).toBe(true);
+            expect(await datasetsPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
+            await datasetsPage.clickRightBtnForPendingActions();
+            expect(await datasetsPage.isSpecifyProvenancePendingActionVisible()).toBe(false);
+            expect(await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            expect((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.value).toBeGreaterThan(usabilityStats.credibility.value);
+            expect((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).credibility.isSourceProvenanceChecked).toBe(true);
         })
         await test.step('Postcondition. Remove created dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
     })
 
-    test('Remove several datasets', async({page})=>{
+    test('Remove several datasets', async({page,mainMenu,datasetsPage})=>{
         const datasetName = 'AutoDataSet'+Math.floor(Math.random() * 100000);
-        const mainMenu = new MainMenu(page);
-        const datasetsPage = new Datasets(page);
         const yourWorkPage = new YourWork(page);
         const datasetNames = ['1'+datasetName,'2'+datasetName,'3'+datasetName,'4'+datasetName,'5'+datasetName];
         const initialCheckedItems = [datasetNames[0],datasetNames[1],datasetNames[2],'kjwewekjrkjwekjrwe',datasetNames[4]];
@@ -200,9 +185,8 @@ test.describe('tests using POM', async()=>{
         })
     })
 
-    test('Edit dataset via pending actions', async({page})=>{   
+    test('Edit dataset via pending actions', async({page,mainMenu,datasetsPage})=>{   
         const datasetName = 'AutoDataSet'+Date.now().toString();
-        const datasetPage = new Datasets(page);
         let createdDataset
         let usabilityValue = 0;
         let datasetStats;
@@ -210,149 +194,149 @@ test.describe('tests using POM', async()=>{
         let datasetCompatibility = 0;
         await test.step('Preconditions', async()=>{
             createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
-            await datasetPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
-            await datasetPage.reloadPage();
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
+            await datasetsPage.reloadPage();
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
         })
         await test.step('Add subtitle via pending action', async()=>{
-            usabilityValue = await datasetPage.getUsabilityValue();
-            await datasetPage.clickAddSubtitlePendingAction();
-            expect (await datasetPage.isTabWithNameSelected('Settings')).toBe(true);
-            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
-            await datasetPage.fillSubtitleWhileEditingDataset(`NEW SUBTITLE 123123123123123 EDIT`);
-            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(true);
-            await datasetPage.acceptCookies();
-            await datasetPage.clickSaveChangesBtn();
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset.');
-            expect(await datasetPage.isSaveChangesBtnEnabled()).toBe(false);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            await datasetsPage.clickAddSubtitlePendingAction();
+            expect (await datasetsPage.isTabWithNameSelected('Settings')).toBe(true);
+            expect(await datasetsPage.isSaveChangesBtnEnabled()).toBe(false);
+            await datasetsPage.fillSubtitleWhileEditingDataset(`NEW SUBTITLE 123123123123123 EDIT`);
+            expect(await datasetsPage.isSaveChangesBtnEnabled()).toBe(true);
+            await datasetsPage.acceptCookies();
+            await datasetsPage.clickSaveChangesBtn();
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('Successfully saved your dataset.');
+            expect(await datasetsPage.isSaveChangesBtnEnabled()).toBe(false);
 
-            await datasetPage.reloadPage();
-            expect (await datasetPage.getSubtitleInputValue()).toEqual(`NEW SUBTITLE 123123123123123 EDIT`);
-            expect (await datasetPage.getSubtitleOnView()).toEqual('NEW SUBTITLE 123123123123123 EDIT');
+            await datasetsPage.reloadPage();
+            expect (await datasetsPage.getSubtitleInputValue()).toEqual(`NEW SUBTITLE 123123123123123 EDIT`);
+            expect (await datasetsPage.getSubtitleOnView()).toEqual('NEW SUBTITLE 123123123123123 EDIT');
 
-            await datasetPage.selectTabOnDatasetProfile('Data Card');
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isSubtitleChecked).toBe(true);
+            await datasetsPage.selectTabOnDatasetProfile('Data Card');
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isSubtitleChecked).toBe(true);
             
-            expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);             
-            await datasetPage.clickRightBtnForPendingActions();
-            expect (await datasetPage.isAddSubtitlePendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isAddSubtitlePendingActionVisible()).toBe(false);             
+            await datasetsPage.clickRightBtnForPendingActions();
+            expect (await datasetsPage.isAddSubtitlePendingActionVisible()).toBe(false);
             
         })
         await test.step('Add description via pending action', async()=>{              
-            await datasetPage.clickLeftBtnForPendingActions();
+            await datasetsPage.clickLeftBtnForPendingActions();
             
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickAddDescriptionPendingAction();
-            expect (await datasetPage.isDatasetDescriptionFieldVisible()).toBe(true);
-            await datasetPage.fillDescriptionWhileEditingDataset(datasetDescription1);
-            await datasetPage.clickSaveForSection('About Dataset');
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
-            await datasetPage.reloadPage();
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.clickAddDescriptionPendingAction();
+            expect (await datasetsPage.isDatasetDescriptionFieldVisible()).toBe(true);
+            await datasetsPage.fillDescriptionWhileEditingDataset(datasetDescription1);
+            await datasetsPage.clickSaveForSection('About Dataset');
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('Successfully saved your dataset description.');
+            await datasetsPage.reloadPage();
 
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isDescriptionChecked).toBe(true);
             
-            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
-            await datasetPage.clickRightBtnForPendingActions();
-            expect (await datasetPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isAddDescriptionPendingActionVisible()).toBe(false);
+            await datasetsPage.clickRightBtnForPendingActions();
+            expect (await datasetsPage.isAddDescriptionPendingActionVisible()).toBe(false);
             
-            expect ((await datasetPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
-            expect ((await datasetPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
-            expect ((await datasetPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
+            expect ((await datasetsPage.getDescriptionOnView()).h1).toEqual(datasetDescriptionH1);
+            expect ((await datasetsPage.getDescriptionOnView()).h2).toEqual(datasetDescriptionH2);
+            expect ((await datasetsPage.getDescriptionOnView()).p).toEqual(datasetDescriptionParagraph);
         })
         await test.step('Add dataset cover image via pending action', async()=>{
-            await datasetPage.clickLeftBtnForPendingActions();
+            await datasetsPage.clickLeftBtnForPendingActions();
             
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickUploadImagePendingAction();
-            expect (await datasetPage.isEditDatasetImagePanelVisible()).toBe(true);
-            await datasetPage.selectFilesForUpload(['./resources/123.jpg']);
-            await datasetPage.clickSaveOnEditDatasetImagePanel();
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
-            await datasetPage.reloadPage();
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.clickUploadImagePendingAction();
+            expect (await datasetsPage.isEditDatasetImagePanelVisible()).toBe(true);
+            await datasetsPage.selectFilesForUpload(['./resources/123.jpg']);
+            await datasetsPage.clickSaveOnEditDatasetImagePanel();
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('Your image was uploaded successfully.');
+            await datasetsPage.reloadPage();
 
-            await datasetPage.selectTabOnDatasetProfile('Data Card');
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
+            await datasetsPage.selectTabOnDatasetProfile('Data Card');
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isCoverImageChecked).toBe(true);
 
-            expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
-            await datasetPage.clickRightBtnForPendingActions();
-            expect (await datasetPage.isUploadImagePendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isUploadImagePendingActionVisible()).toBe(false);
+            await datasetsPage.clickRightBtnForPendingActions();
+            expect (await datasetsPage.isUploadImagePendingActionVisible()).toBe(false);
         })
         await test.step('Add dataset tags via pending action', async()=>{
-            await datasetPage.clickLeftBtnForPendingActions();
+            await datasetsPage.clickLeftBtnForPendingActions();
 
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickAddTagsPendingAction();
-            expect (await datasetPage.tagsPanel().isTagsPanelOpened()).toBe(true);
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.clickAddTagsPendingAction();
+            expect (await datasetsPage.tagsPanel().isTagsPanelOpened()).toBe(true);
 
             const tagsToAdd = ['Mexico','Beginner', 'WAE', 'ImageNet 2012 classification'];
-            await datasetPage.tagsPanel().searchAndSelectTags(tagsToAdd);
-            await datasetPage.tagsPanel().clickApplyBtn();
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('The tags have been updated successfully.');
-            await datasetPage.reloadPage();
+            await datasetsPage.tagsPanel().searchAndSelectTags(tagsToAdd);
+            await datasetsPage.tagsPanel().clickApplyBtn();
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('The tags have been updated successfully.');
+            await datasetsPage.reloadPage();
 
-            // const addedTags = await datasetPage.getDatasetTags();       //Here is a bug in the app
+            // const addedTags = await datasetsPage.getDatasetTags();       //Here is a bug in the app
             // expect(addedTags.length).toEqual(tagsToAdd.length);
             // for (let tag of tagsToAdd){
             //      expect (addedTags.includes(tag)).toBe(true)
             // }
 
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isTagChecked).toBe(true);
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.value).toBeGreaterThan(datasetStats.completeness.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).completeness.isTagChecked).toBe(true);
 
-            expect (await datasetPage.isAddTagsPendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isAddTagsPendingActionVisible()).toBe(false);
         })
         await test.step('Add dataset license via pending action', async()=>{
 
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickSpecifyLicensePendingAction();
-            expect (await datasetPage.isLicenseDropDownVisible()).toBe(true);
-            expect (await datasetPage.isSaveBtnForSectionVisible('License')).toBe(true);
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.clickSpecifyLicensePendingAction();
+            expect (await datasetsPage.isLicenseDropDownVisible()).toBe(true);
+            expect (await datasetsPage.isSaveBtnForSectionVisible('License')).toBe(true);
 
-            const license = await datasetPage.selectRandomDatasetLicense();
-            await datasetPage.clickSaveForSection('License');
-            await expect (datasetPage.getFlashMessageLocator()).toBeVisible();
-            expect (await datasetPage.getFlashMessageText()).toContain('Successfully updated the license.');
-            await datasetPage.reloadPage();
-            expect (await datasetPage.getDatasetLicense()).toEqual(license);
+            const license = await datasetsPage.selectRandomDatasetLicense();
+            await datasetsPage.clickSaveForSection('License');
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('Successfully updated the license.');
+            await datasetsPage.reloadPage();
+            expect (await datasetsPage.getDatasetLicense()).toEqual(license);
 
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.value).toBeGreaterThan(datasetStats.compatibility.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.isLicenseChecked).toBe(true);
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.value).toBeGreaterThan(datasetStats.compatibility.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.isLicenseChecked).toBe(true);
 
-            expect (await datasetPage.isSpecifyLicensePendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isSpecifyLicensePendingActionVisible()).toBe(false);
         })
         await test.step('Add file information via pending action', async()=>{              
             
-            datasetStats = await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats();
-            await datasetPage.clickAddFileInformationPendingAction();
-            expect (await datasetPage.isLocatorInViewport(datasetPage.editFileInformationBtn)).toBe(true);
-            await datasetPage.clickEditFileInformationBtn();
-            await datasetPage.fillFileInformationField(datasetFileInformation);
-            await datasetPage.clickSaveBtnForFileInformation();
-            await datasetPage.reloadPage();
+            datasetStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats();
+            await datasetsPage.clickAddFileInformationPendingAction();
+            expect (await datasetsPage.isLocatorInViewport(datasetsPage.editFileInformationBtn)).toBe(true);
+            await datasetsPage.clickEditFileInformationBtn();
+            await datasetsPage.fillFileInformationField(datasetFileInformation);
+            await datasetsPage.clickSaveBtnForFileInformation();
+            await datasetsPage.reloadPage();
 
-            expect (await datasetPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
-            usabilityValue = await datasetPage.getUsabilityValue();
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.value).toBeGreaterThan(datasetStats.compatibility.value);
-            expect ((await datasetPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.isFileDescriptionChecked).toBe(true);
+            expect (await datasetsPage.getUsabilityValue()).toBeGreaterThan(usabilityValue);
+            usabilityValue = await datasetsPage.getUsabilityValue();
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.value).toBeGreaterThan(datasetStats.compatibility.value);
+            expect ((await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()).compatibility.isFileDescriptionChecked).toBe(true);
             
-            expect (await datasetPage.isAddFileInformationPendingActionVisible()).toBe(false);
+            expect (await datasetsPage.isAddFileInformationPendingActionVisible()).toBe(false);
         })
         //Add provenance via pending action
         await test.step('Postcondition. Remove remaining dataset', async()=>{

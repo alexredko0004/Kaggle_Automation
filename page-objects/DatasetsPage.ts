@@ -19,6 +19,7 @@ export class Datasets extends BaseBusinessObjectPage{
     goToDatasetBtn: Locator
     leftBtnForPendingActions: Locator
     linkTab: Locator
+    listItemUnderThreeDots: Locator
     newDatasetBtn: Locator
     resetBtn: Locator
     rightBtnForPendingActions: Locator
@@ -27,6 +28,7 @@ export class Datasets extends BaseBusinessObjectPage{
     specifyLicensePendingAction: Locator
     specifyProvenancePendingAction: Locator
     trippleDotsBtn: Locator
+    threeDotsBtnOnDatasetProfile: Locator
     uploadImagePendingAction: Locator
     urlField: Locator
     usabilityValue: Locator
@@ -49,6 +51,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.goToDatasetBtn = page.locator('.drawer-outer-container button').getByText('Go to Dataset')
         this.leftBtnForPendingActions = page.getByLabel('chevron_left')
         this.linkTab = page.locator('.drawer-outer-container button').getByText('Link')
+        this.listItemUnderThreeDots = page.getByRole('menuitem')
         this.resetBtn = page.locator('.drawer-outer-container button').getByText('Reset')
         this.rightBtnForPendingActions = page.getByLabel('chevron_right')
         this.saveChangesBtn = page.locator('[data-testid="dataset-detail-render-tid"] button').getByText('Save Changes')
@@ -56,6 +59,7 @@ export class Datasets extends BaseBusinessObjectPage{
         this.specifyLicensePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Specify a license')
         this.specifyProvenancePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Specify provenance')
         this.trippleDotsBtn = page.locator('[aria-label="more_vert"]').first()
+        this.threeDotsBtnOnDatasetProfile = page.getByLabel("More options for this dataset")
         this.uploadImagePendingAction = page.getByTestId('dataset-detail-render-tid').getByTitle('Upload an image')
         this.urlField = page.getByPlaceholder('Enter remote URL')
         this.usabilityValue = page.getByTestId('usability-value')
@@ -165,6 +169,10 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async clickSpecifyProvenancePendingAction(){
         await this.specifyProvenancePendingAction.click()
+    }
+
+    public async clickThreeDotsBtnOnProfile(){
+        await this.threeDotsBtnOnDatasetProfile.click()
     }
 
     public async clickUploadImagePendingAction(){
@@ -475,5 +483,9 @@ export class Datasets extends BaseBusinessObjectPage{
         await this.page.locator('.drawer-outer-container input').check();
         await this.page.locator('.drawer-outer-container button').getByText('Continue').click();
         await this.page.getByRole('dialog').getByRole('button').getByText('Delete').click();
+    }
+
+    public async selectOptionFromThreeDotsMenu(option:string){
+        await this.listItemUnderThreeDots.getByText(option,{exact:true}).click()
     }
 }
