@@ -97,12 +97,28 @@ export class Datasets extends BaseBusinessObjectPage{
     public async clickCreateBtnAndGetDatasetProperties():Promise<{datasetID:string,ownerSlug:string,datasetSlug:string}>{
         const responsePromise1 = this.page.waitForResponse(`${process.env.CREATE_DATASET_ENDPOINT}`,{timeout:30000});
         await this.createBtn.click();
-        const response = await (await responsePromise1).json();
-        return {
-            datasetID:response.datasetVersionReference.datasetId,
-            ownerSlug:response.datasetVersionReference.ownerSlug,
-            datasetSlug:response.datasetVersionReference.slug
-        }
+        const responseToReturn = await (await responsePromise1).json();
+        // return {
+        //     datasetID:response.datasetVersionReference.datasetId,
+        //     ownerSlug:response.datasetVersionReference.ownerSlug,
+        //     datasetSlug:response.datasetVersionReference.slug
+        // }
+        return new Promise ((resolve)=>{
+            const responseHandler = async (response)=>{
+                if(response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')){
+                    const responseBody = await response.json();
+                    if (responseBody.creationPercentComplete === 1){
+                        this.page.off('response',responseHandler)
+                        resolve({
+                                datasetID:responseToReturn.datasetVersionReference.datasetId,
+                                ownerSlug:responseToReturn.datasetVersionReference.ownerSlug,
+                                datasetSlug:responseToReturn.datasetVersionReference.slug
+                            })
+                    }
+                }
+            }
+            this.page.on('response',responseHandler)
+        })
     }
 
     public async clickEditFileInformationBtn(){
@@ -110,16 +126,27 @@ export class Datasets extends BaseBusinessObjectPage{
     }
 
     public async clickGoToDatasetBtn(){
-        const waitPromise = this.page.waitForResponse(async response => {
-            if (response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')) {
-              const responseBody = await response.json();
-              return responseBody.creationPercentComplete === 1;
-            }
-            return false;
-          });
-          
-        await waitPromise
+        // this.page.on('response', async response => {
+        //     if (response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')) {
+        //             const responseBody = await response.json();
+        //             if (responseBody.creationPercentComplete === 1) return
+        //     }
+        // });
         await this.goToDatasetBtn.click()
+        
+
+
+
+        // const waitPromise = this.page.waitForResponse(async response => {
+        //     if (response.url().includes('api/i/datasets.DatasetService/GetDatabundleVersionCreationStatus')) {
+        //       const responseBody = await response.json();
+        //       return responseBody.creationPercentComplete === 1;
+        //     }
+        //     return false;
+        //   });
+          
+        // await waitPromise
+        // await this.goToDatasetBtn.click()
     }
 
     public async clickLeftBtnForPendingActions(){

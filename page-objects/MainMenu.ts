@@ -31,8 +31,6 @@ export class MainMenu extends BasePage{
         await this.plusBtn.click();
     }
 
-    
-
     public async openDatasetsPageViaMainMenu(){
        await this.datasetsItem.waitFor();
        await this.datasetsItem.click() 

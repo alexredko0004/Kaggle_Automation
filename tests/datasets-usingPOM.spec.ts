@@ -59,7 +59,7 @@ test.describe('tests using POM', async()=>{
             await datasetsPage.clickNewDatasetBtn();
         })
         await test.step('Upload file and create dataset', async()=>{
-            await datasetsPage.selectFilesForUpload(['./resources/123.jpg']);
+            await datasetsPage.selectFilesForUpload(['./resources/123.jpg','./resources/kaner_testing.pdf']);
             await datasetsPage.fillDatasetNameWhileCreatingDataset(datasetName);
             createdDataset = await datasetsPage.clickCreateBtnAndGetDatasetProperties();
             await datasetsPage.clickGoToDatasetBtn();
