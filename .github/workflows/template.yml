@@ -67,7 +67,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           to: ${{ secrets.MAIL_TO }}
-          from: Gitea <gitea@hostname>
+          from: F F <messagestest12@ukr.net>
           subject: Automatic Message on Job Failure
           priority: high
           convert_markdown: true
