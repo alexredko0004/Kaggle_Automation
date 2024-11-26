@@ -13,7 +13,7 @@ test.describe('tests using POM for Collections', async()=>{
     test('Create and remove collection via PW @smoke @smokeDataset', async({page,collections})=>{
         const collName = 'COLL'+ Date.now().toString();
         const coll = await createCollectionViaPW(page,collName);
-        expect((await collections.getListOfCollectionsForUser())[0].name).toEqual(collName)
+        expect((await collections.getListOfCollectionsForUser())[0].name).toEqual(collName+'1')
         await deleteCollectionViaPW(page,coll.collectionId)
     })
 
