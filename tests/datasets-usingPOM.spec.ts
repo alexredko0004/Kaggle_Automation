@@ -190,8 +190,6 @@ test.describe('tests using POM', async()=>{
         let createdDataset
         let usabilityValue = 0;
         let datasetStats;
-        let datasetCredibility = 0;
-        let datasetCompatibility = 0;
         await test.step('Preconditions', async()=>{
             createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
             await datasetsPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
