@@ -116,7 +116,7 @@ test.describe('tests using POM', async()=>{
             await modelsPage.openYourWork();
             await yourWorkPage.searchYourWork(modelName);
             expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).visibility).toEqual(modelVisibility);
-            expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1111 Variation');
+            expect((await yourWorkPage.getListItemDetailsModel(yourWorkPage.listItem)).countVariations).toEqual('1 Variation');
         })
         await test.step('Post condition. Remove model', async()=>{
             await deleteModelViaPW(page,createdModel.id)
