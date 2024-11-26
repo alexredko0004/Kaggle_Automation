@@ -1,4 +1,4 @@
-name: Smoke Tests Run - General
+name: Smoke Tests Run - General(and Scheduled)
 run-name: Smoke Test Run
 
 on:

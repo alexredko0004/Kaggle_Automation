@@ -72,7 +72,7 @@ jobs:
           priority: high
           convert_markdown: true
           html_body: |
-            <h1> $GITHUB_JOB in this workflow has failed </h1>
+            <h1> ${{ github.job }} job in ${{ github.workflow }} has failed </h1>
       
 
       
