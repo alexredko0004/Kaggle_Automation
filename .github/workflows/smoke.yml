@@ -42,3 +42,4 @@ jobs:
         convert_markdown: true
         html_body: |
             ### Some job in this workflow has failed
+    secrets: inherit

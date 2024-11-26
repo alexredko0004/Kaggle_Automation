@@ -46,7 +46,7 @@ export abstract class BasePage{
     }
 
     public async getConfirmationPopupInnerText(){
-        const innerText = await this.confirmationDialog.locator('//h2/following-sibling::div/p').innerText();
+        const innerText = await this.confirmationDialog.locator('//h2/following-sibling::div/div/p').innerText();
         return innerText
     }
 
