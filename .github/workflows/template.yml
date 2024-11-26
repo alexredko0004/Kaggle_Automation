@@ -59,7 +59,7 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
 
       - name: Send mail
-        if: success()
+        if: failure()
         uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.ukr.net
@@ -67,7 +67,7 @@ jobs:
           username: ${{secrets.MAIL_USERNAME}}
           password: ${{secrets.MAIL_PASSWORD}}
           to: ${{ secrets.MAIL_TO }}
-          from: F F <messagestest12@ukr.net>
+          from: ${{ secrets.MAIL_SENDER_NAME }} <${{ secrets.MAIL_FROM }}>
           subject: Automatic Message on Job Failure
           priority: high
           convert_markdown: true
