@@ -56,6 +56,19 @@ jobs:
           CREATE_COLLECTION_ENDPOINT: ${{ secrets.CREATE_COLLECTION_ENDPOINT }}
           DELETE_COLLECTION_ENDPOINT: ${{ secrets.DELETE_COLLECTION_ENDPOINT }}
           LIST_COLLECTIONS_ENDPOINT: ${{ secrets.LIST_COLLECTIONS_ENDPOINT }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+
+      - name: Send mail
+        if: success()
+        uses: dawidd6/action-send-mail@v4
+        with:
+          to: ${{ secrets.MAIL_TO }}
+          from: Gitea <gitea@hostname>
+          subject: Automatic Message on Job Failure
+          priority: high
+          convert_markdown: true
+          html_body: |
+            ### Some job in this workflow has failed
       
 
       

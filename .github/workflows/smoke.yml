@@ -29,17 +29,3 @@ jobs:
       timeout-before-force-stop: 150
       branch-name: master
     secrets: inherit
-  
-  MAIL:
-    name: Send mail
-    if: failure()
-    uses: dawidd6/action-send-mail@v4
-    with:
-        to: ${{ secrets.MAIL_TO }}
-        from: Gitea <gitea@hostname>
-        subject: Automatic Message on Job Failure
-        priority: high
-        convert_markdown: true
-        html_body: |
-            ### Some job in this workflow has failed
-    secrets: inherit
