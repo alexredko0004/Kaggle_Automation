@@ -72,7 +72,7 @@ jobs:
           priority: high
           convert_markdown: true
           html_body: |
-            ### Some job in this workflow has failed
+            <h1> $GITHUB_JOB in this workflow has failed </h1>
       
 
       
