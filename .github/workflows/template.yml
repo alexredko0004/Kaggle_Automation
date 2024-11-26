@@ -62,6 +62,8 @@ jobs:
         if: success()
         uses: dawidd6/action-send-mail@v4
         with:
+          server_address: smtp.gmail.com
+          server_port: 465
           to: ${{ secrets.MAIL_TO }}
           from: Gitea <gitea@hostname>
           subject: Automatic Message on Job Failure
