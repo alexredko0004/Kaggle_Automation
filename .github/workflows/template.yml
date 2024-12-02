@@ -87,7 +87,7 @@ jobs:
             <h1> ${{ inputs.suite-name }} tests job in ${{ github.workflow }} has failed </h1>
 
       - name: Collect artifacts
-        if: env.total_time > 100
+        if: env.total_time > 45
         uses: actions/upload-artifact@v4
         with:
           name: test-results
