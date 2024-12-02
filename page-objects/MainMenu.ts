@@ -25,6 +25,7 @@ export class MainMenu extends BasePage{
 
     public async openHomePage(){
         await this.page.goto('/');
+        await this.page.waitForTimeout(500)
     }
 
     public async openCreationMenu(){
