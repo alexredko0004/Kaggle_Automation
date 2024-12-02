@@ -32,7 +32,7 @@ export class MainMenu extends BasePage{
     }
 
     public async openDatasetsPageViaMainMenu(){
-       await this.datasetsItem.waitFor();
+       await this.page.reload();
        await this.datasetsItem.click() 
     }
 
