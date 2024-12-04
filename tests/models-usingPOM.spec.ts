@@ -95,7 +95,7 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
             selectedFramework = await modelsPage.selectRandomFrameworkOnCreate();
             selectedLicense = await modelsPage.selectRandomLicenseOnVariationCreate();
-            expect(await modelsPage.isCreateButtonEnabled()).toBe(false);
+            expect(await modelsPage.isCreateButtonEnabled()).toBe(true);
         })
         await test.step('Verify that created model contains just added variation on model profile', async()=>{
             await modelsPage.fillVariationNameInput(variationSlug);
