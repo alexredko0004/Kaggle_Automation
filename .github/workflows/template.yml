@@ -47,7 +47,8 @@ jobs:
         id: record_start
         run: echo "start_time=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Run_tests
+      - name: Run tests
+        id: main_step
         run: npx playwright test -g "@smoke${{ inputs.suite-name }}"
         env:
           SITE_URL: ${{ vars.SITE_URL }}
@@ -79,7 +80,7 @@ jobs:
           retention-days: 2
 
       - name: Send mail
-        if: steps.Run_tests.outcome == 'failure'
+        if: steps.main_step.outcome == 'failure'
         uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.ukr.net
