@@ -64,6 +64,7 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
 
       - name: Calculate Execution Time
+        if: always()
         id: calc_time
         run: |
           end_time=$(date +%s)
