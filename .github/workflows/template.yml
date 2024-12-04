@@ -47,7 +47,7 @@ jobs:
         id: record_start
         run: echo "start_time=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Run tests
+      - name: Run_tests
         run: npx playwright test -g "@smoke${{ inputs.suite-name }}"
         env:
           SITE_URL: ${{ vars.SITE_URL }}
@@ -70,8 +70,16 @@ jobs:
           echo "Execution Time: $total_time seconds"
           echo "total_time=$total_time" >> $GITHUB_ENV
 
+      - name: Collect artifacts
+        if: env.total_time > 45
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 2
+
       - name: Send mail
-        if: failure()
+        if: steps.Run_tests.outcome == 'failure'
         uses: dawidd6/action-send-mail@v4
         with:
           server_address: smtp.ukr.net
@@ -85,14 +93,6 @@ jobs:
           convert_markdown: true
           html_body: |
             <h1> ${{ inputs.suite-name }} tests job in ${{ github.workflow }} has failed </h1>
-
-      - name: Collect artifacts
-        if: env.total_time > 45
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results/
-          retention-days: 2
       
 
       
