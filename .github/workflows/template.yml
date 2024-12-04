@@ -62,6 +62,7 @@ jobs:
           DELETE_COLLECTION_ENDPOINT: ${{ secrets.DELETE_COLLECTION_ENDPOINT }}
           LIST_COLLECTIONS_ENDPOINT: ${{ secrets.LIST_COLLECTIONS_ENDPOINT }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
+        continue-on-error: true
 
       - name: Calculate Execution Time
         if: always()
