@@ -24,11 +24,11 @@ import {expect, test as setup} from '@playwright/test'
 
 setup ('Autn via UI', async({page,context})=>{
     await page.goto('/');
-    await page.getByRole('button',{name:'Sign in'}).click();
+    await page.getByRole('button').filter({hasText:'Sign In'}).click();
     await page.getByRole('button',{name:'Sign in with Email'}).click();
     await page.locator('input[name="email"]').fill(`${process.env.EMAIL}`);
     await page.locator('input[name="password"]').fill(`${process.env.PASSWORD}`);
-    await page.getByRole('button',{name:'Sign In'}).click();
+    await page.getByRole('button').filter({hasText:'Sign In'}).click({force:true});
     const response = await page.waitForResponse(`${process.env.SITE_URL}/api/i/users.UsersService/GetCurrentUser`);
     const responseJson = await response.json();
     await expect(page.getByTestId('home-page-logged-in-render-tid')).toBeVisible();
