@@ -132,7 +132,7 @@ export class Datasets extends BaseBusinessObjectPage{
         //             if (responseBody.creationPercentComplete === 1) return
         //     }
         // });
-        await this.goToDatasetBtn.click()
+        await this.goToDatasetBtn.click({force:true})
         
 
 

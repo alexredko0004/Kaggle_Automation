@@ -39,7 +39,7 @@ export abstract class BaseBusinessObjectPage extends BasePage{
     }
 
     public async openYourWork(){
-        await this.yourWorkBtn.click()
+        await this.yourWorkBtn.click({force:true})
     }
 
     public tagsPanel(){

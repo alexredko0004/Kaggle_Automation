@@ -43,7 +43,7 @@ export class Models extends BaseBusinessObjectPage{
     constructor(page){
         super(page)
         this.modelNameFieldOnCreate = page.getByPlaceholder('Model Name')
-        this.urlEditBtn = page.locator('.drawer-outer-container span[role="button"]').first()
+        this.urlEditBtn = page.locator('.drawer-outer-container button').nth(1)
         this.modelURLField = page.locator('input[placeholder=""]')
         this.visibilityDropDown = page.locator('.drawer-outer-container').locator('div[aria-label="Select Visibility. Private currently selected."]')
         this.createModelBtn = page.locator('//button[.="Create model"]') 
@@ -171,7 +171,7 @@ export class Models extends BaseBusinessObjectPage{
           });
           
         await waitPromise
-        await this.goToModelBtn.click();
+        await this.goToModelBtn.click({force:true});
         await this.page.waitForTimeout(500)
     }
 
