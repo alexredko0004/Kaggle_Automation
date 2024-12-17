@@ -51,7 +51,7 @@ export abstract class BasePage{
     }
 
     public getFlashMessageLocator():Locator{   
-        return this.flashMessage
+        return this.flashMessage.first()
     }
 
     public async getFlashMessageText(){
