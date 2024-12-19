@@ -309,7 +309,7 @@ test.describe('tests using POM', async()=>{
         await test.step('Verify that model can be added to collection from its profile.', async()=>{
             await modelsPage.clickThreeDotsBtnOnProfile();
             await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
-            availableCollections = await modelsPage.collectionsPanel().getAvailableCollections();
+            availableCollections = await modelsPage.collectionsPanel().getAvailableCollectionsOnPanel();
             await modelsPage.collectionsPanel().selectCollectionsWithNames([collectionName]);
             await modelsPage.collectionsPanel().clickAddBtn();
             await expect(yourWorkPage.getFlashMessageLocator()).toBeVisible();
@@ -319,8 +319,8 @@ test.describe('tests using POM', async()=>{
             await modelsPage.reloadPage();
             await modelsPage.clickThreeDotsBtnOnProfile();
             await modelsPage.selectOptionFromThreeDotsMenu('Add to Collection');
-            expect((await modelsPage.collectionsPanel().getAvailableCollections()).length).toEqual(availableCollections.length-1);
-            expect((await modelsPage.collectionsPanel().getAvailableCollections()).includes(collectionName)).toBe(false)
+            expect((await modelsPage.collectionsPanel().getAvailableCollectionsOnPanel()).length).toEqual(availableCollections.length-1);
+            expect((await modelsPage.collectionsPanel().getAvailableCollectionsOnPanel()).includes(collectionName)).toBe(false)
         })
         await test.step('Post condition. Remove model',async()=>{
             await deleteModelViaPW(page,model.id);

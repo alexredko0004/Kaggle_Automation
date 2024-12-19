@@ -4,14 +4,16 @@ import {post} from "../precs/apiRequestsFunctions";
 
 export class Collections extends BasePage{
     private readonly addBtn: Locator
-    private readonly createButtonOnModal: Locator
+    private readonly collectionModal: Locator
+    private readonly mainButtonOnModal: Locator
     private readonly listItemOnPanel: Locator
     private readonly listItemOnTab: Locator
 
     constructor(page){
         super(page)
         this.addBtn = page.locator('.drawer-outer-container button').filter({hasText:/^Add$/})
-        this.createButtonOnModal = page.getByRole('dialog').getByRole('button').nth(1)
+        this.collectionModal = page.getByRole('dialog')
+        this.mainButtonOnModal = page.getByRole('dialog').getByRole('button').nth(1)
         this.listItemOnPanel = page.locator('.drawer-outer-container ul label')
         this.listItemOnTab = page.locator('#site-content .km-list li:not([role="menuitem"])')
     }
@@ -20,23 +22,36 @@ export class Collections extends BasePage{
         await this.addBtn.click()
     }
 
-    public async clickCreateBtnAndGetCreatedCollectionID(force?:"force"){
+    public async clickMainBtnOnPopUpAndGetCollectionID(force?:"force"){
         if(force==="force"){
-            await this.createButtonOnModal.click({force:true});
+            await this.mainButtonOnModal.click({force:true});
         }else{
         const createdCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.CREATE_COLLECTION_ENDPOINT}`)&&response.status()===200);
-        await this.createButtonOnModal.click();
-        const response = await createdCollectionResponsePromise;
+        const updatedCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`/UpdateCollection`)&&response.status()===200);
+        await this.mainButtonOnModal.click();
+        const response = await Promise.race([createdCollectionResponsePromise,updatedCollectionResponsePromise]);
         const responseJson = await response.json();
         return responseJson
         }
     }
 
-    public async fillCollectionNameOnModal(name:string){
-        await this.page.getByPlaceholder('Untitled Collection').fill(name)
+    public async clickThreeDotsButtonForCollectionWithName(name:string){
+        let reg = new RegExp(String.raw`${name}\s.*List\sItem`);
+        const threeDotsButtonForCollection = this.page.locator('.MuiList-root').getByLabel(reg).getByLabel('Actions for this collection');
+        await threeDotsButtonForCollection.click()
     }
 
-    public async getAvailableCollections(){
+    public async fillCollectionNameOnModal(name:string){
+        const modalType = await this.collectionModal.locator('h2').innerText();
+        if(modalType==='New Collection') {
+           await this.page.getByPlaceholder('Untitled Collection').fill(name)
+        }
+        if(modalType==='Rename Collection'){
+            await this.page.getByPlaceholder('New Collection Name').fill(name)
+         }
+    }
+
+    public async getAvailableCollectionsOnPanel(){
         await this.page.waitForTimeout(500)
         const collectionNamesOnPanel = await this.listItemOnPanel.locator('.MuiTypography-root').allInnerTexts()
         return collectionNamesOnPanel
@@ -61,20 +76,27 @@ export class Collections extends BasePage{
         return collections.collections
     }
 
+    public async getNameFromRemoveCollectionModal(){
+        const inputLocator = this.collectionModal.locator('input');
+        const value = inputLocator.getAttribute('value');
+        return value
+    }
+
     public async getSelectedCollectionName(){
         const name = await this.page.locator('#site-content div h2').first().innerText()
         return name.replace(/folder(.*)\s/,"$1")
     }
 
-    public async isNewCollectionModalVisible(){
-        const modal = this.page.getByRole('dialog').filter({has:this.page.getByText('New Collection')});
+    public async isCollectionModalWithProvidedNameVisible(name:string){
+        const modal = this.collectionModal.filter({has:this.page.getByText(name)});
+        await this.page.waitForTimeout(1000);
         const isVisible = await modal.isVisible();
         return isVisible
     }
 
-    public async isCreateButtonEnabledOnNewCollectionModal(){
-        const classValue = await this.createButtonOnModal.getAttribute('class');
-        return classValue?.includes('disabled')
+    public async isMainButtonEnabledOnModal(){
+        const classValue = await this.mainButtonOnModal.getAttribute('class');
+        return !classValue?.includes('disabled')
     }
 
     public async isSelectedCollectionEmpty(){
@@ -87,6 +109,11 @@ export class Collections extends BasePage{
         for (let item of collections){
             await this.listItemOnPanel.filter({hasText:item}).click({force:true})
         }
+    }
+
+    public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Remove'|'Rename'){
+        const optionLocator = this.page.locator('.mdc-menu-surface--anchor').getByRole('menuitem').getByText(optionToSelect);
+        await optionLocator.click()
     }
 
 }
