@@ -65,7 +65,7 @@ export class Models extends BaseBusinessObjectPage{
         this.authorNameField = page.getByLabel('textfield-Author Name-label').locator('input')
         this.autorWebsiteField = page.getByLabel('textfield-Website-label').locator('input')
         this.modelAuthors = page.locator('#site-content p a').all()
-        this.threeDotsBtnOnModelProfile = page.getByLabel("more_vert")
+        this.threeDotsBtnOnModelProfile = page.getByLabel("More options for this model")
         this.listItemUnderThreeDots = page.getByRole('menuitem')
         this.addSubtitlePendingAction = page.getByTitle('Add a subtitle')
         this.addTagsPendingAction = page.getByTitle('Add tags')
