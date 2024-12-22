@@ -14,7 +14,7 @@ export class MainMenu extends BasePage{
         this.datasetsItem = page.locator('[data-click-log-id="datasets"]')
         this.homeBtn = page.locator('[data-click-log-id="home"]')
         this.modelsItem = page.locator('[data-click-log-id="models"]')
-        this.plusBtn = page.locator('.mdc-menu-surface--anchor button[data-menutarget="true"]')
+        this.plusBtn = page.locator('button').getByText('Create')
     }
     public async closeCreationMenu(){
         if(await this.creationMenu.isVisible()) {

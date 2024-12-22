@@ -96,7 +96,7 @@ test.describe('tests using POM for Collections', async()=>{
      })
      await test.step('Verify that collection cannot be edited and saved with empty name', async()=>{
           await collections.fillCollectionNameOnModal('');
-          await collections.clickMainBtnOnPopUpAndGetCollectionID("force");
+          await collections.clickMainBtnOnPopUpAndGetCollectionID('force');
           expect(await collections.isCollectionModalWithProvidedNameVisible('Rename Collection')).toBe(true);
           expect(await collections.getNameFromRemoveCollectionModal()).toEqual('');
           expect(await collections.isMainButtonEnabledOnModal()).toBe(false);
@@ -104,7 +104,7 @@ test.describe('tests using POM for Collections', async()=>{
      await test.step('Verify that collection can be saved with new name', async()=>{
           await collections.fillCollectionNameOnModal(collNewName);
           expect(await collections.isMainButtonEnabledOnModal()).toBe(true);
-          await collections.clickMainBtnOnPopUpAndGetCollectionID("force");
+          await collections.clickMainBtnOnPopUpAndGetCollectionID();
           expect(await collections.isCollectionModalWithProvidedNameVisible('Rename Collection')).toBe(false);
           expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount);
           const activeCollections = await collections.getCollectionNamesAndNumberOFTheirContents();
