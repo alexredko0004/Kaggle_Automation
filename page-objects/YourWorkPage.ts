@@ -140,7 +140,9 @@ export class YourWork extends BaseBusinessObjectPage{
         const element = await this.page.getByText(regexPattern).innerText();
         const label:string = element ?? 'not found';
         const match = label.match(/\d+/);
-        if (match) return +match[0]
+        if (match) {
+            return +match[0]
+        } else {return 0}
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){

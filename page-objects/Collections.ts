@@ -28,8 +28,9 @@ export class Collections extends BasePage{
         }else{
         const createdCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.CREATE_COLLECTION_ENDPOINT}`)&&response.status()===200);
         const updatedCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`/UpdateCollection`)&&response.status()===200);
+        const deleteCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.DELETE_COLLECTION_ENDPOINT}`)&&response.status()===200);
         await this.mainButtonOnModal.click();
-        const response = await Promise.race([createdCollectionResponsePromise,updatedCollectionResponsePromise]);
+        const response = await Promise.race([createdCollectionResponsePromise,updatedCollectionResponsePromise,deleteCollectionResponsePromise]);
         const responseJson = await response.json();
         return responseJson
         }
@@ -76,7 +77,7 @@ export class Collections extends BasePage{
         return collections.collections
     }
 
-    public async getNameFromRemoveCollectionModal(){
+    public async getNameFromRenameCollectionModal(){
         const inputLocator = this.collectionModal.locator('input');
         const value = inputLocator.getAttribute('value');
         return value
@@ -111,7 +112,7 @@ export class Collections extends BasePage{
         }
     }
 
-    public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Remove'|'Rename'){
+    public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Delete'|'Rename'){
         const optionLocator = this.page.locator('.mdc-menu-surface--anchor').getByRole('menuitem').getByText(optionToSelect);
         await optionLocator.click()
     }
