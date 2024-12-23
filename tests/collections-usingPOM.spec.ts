@@ -133,7 +133,7 @@ test.describe('tests using POM for Collections', async()=>{
          await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
     })
   })
-  test('Delete collection', async({page,collections, datasetsPage})=>{
+  test('Delete collection via UI', async({page,collections, datasetsPage})=>{
      let collectionsCount:number;
      const collName = 'COLL'+ Date.now().toString();
      const datasetName = 'DSFoColl'+ Date.now().toString();
@@ -163,22 +163,34 @@ test.describe('tests using POM for Collections', async()=>{
           const activeCollections = await collections.getCollectionNamesAndNumberOFTheirContents();
           expect(activeCollections.filter(item=>item.name===collName).length).toEqual(0);
      }) 
-     // await test.step('Verify edited collection name is shown on "Overview" tab', async()=>{
-     //      await yourWorkPage.openTab('Overview');
-     //      const activeCollectionsOnOverview = await yourWorkPage.getCollectionsOnOverviewTab();
-     //      expect(activeCollectionsOnOverview.filter(item=>item.name===collName).length).toEqual(0);
-     //      expect(activeCollectionsOnOverview.filter(item=>item.name===collNewName).length).toEqual(1);
-     // })  
-     // await test.step('Verify edited collection name is shown when trying to add dataset to collection', async()=>{
-     //      await yourWorkPage.openTab('Datasets');
-     //      await yourWorkPage.reloadPage();
-     //      await yourWorkPage.clickListItem(datasetName);
-     //      await datasetsPage.clickThreeDotsBtnOnProfile();
-     //      await datasetsPage.selectOptionFromThreeDotsMenu('Add to Collection');
-     //      let availableCollections = await datasetsPage.collectionsPanel().getAvailableCollectionsOnPanel();
-     //      expect(availableCollections.includes(collName)).toBe(false);
-     //      expect(availableCollections.includes(collNewName)).toBe(true)
-     //})
+     await test.step('Verify removed collection is not shown on "Overview" tab', async()=>{
+          await yourWorkPage.openTab('Overview');
+          const activeCollectionsOnOverview = await yourWorkPage.getCollectionsOnOverviewTab();
+          expect(activeCollectionsOnOverview.filter(item=>item.name===collName).length).toEqual(0);
+     })  
+     await test.step('Verify that datasets and models are not removed after removing of their collection', async()=>{
+          await yourWorkPage.openTab('Datasets');
+          await yourWorkPage.reloadPage();
+          await expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetName)).toBeVisible();
+          await yourWorkPage.openTab('Models');
+          await yourWorkPage.reloadPage();
+          await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeVisible();
+     })
+     await test.step('Verify that removed collection is not shown on the panel with available collections', async()=>{
+          await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout([modelName]);
+          await yourWorkPage.clickAddToCollectionBtn();
+          let availableCollectionsForModel = await yourWorkPage.collectionsPanel().getAvailableCollectionsOnPanel();
+          expect(availableCollectionsForModel.length).toEqual(collectionsCount-1);
+          expect(availableCollectionsForModel.includes(collName)).toBe(false);
+          await yourWorkPage.collectionsPanel().clickCancelBtnOnPanel();
+          await yourWorkPage.openTab('Datasets');
+          await yourWorkPage.clickListItem(datasetName);
+          await datasetsPage.clickThreeDotsBtnOnProfile();
+          await datasetsPage.selectOptionFromThreeDotsMenu('Add to Collection');
+          let availableCollectionsForDataset = await datasetsPage.collectionsPanel().getAvailableCollectionsOnPanel();
+          expect(availableCollectionsForDataset.length).toEqual(collectionsCount-1);
+          expect(availableCollectionsForDataset.includes(collName)).toBe(false);
+     })
     await test.step('Post condition. Remove collection and model', async()=>{
          await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug);
          await deleteModelViaPW(page,createdModel.id)

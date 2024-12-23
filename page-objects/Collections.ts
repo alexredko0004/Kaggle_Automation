@@ -4,6 +4,7 @@ import {post} from "../precs/apiRequestsFunctions";
 
 export class Collections extends BasePage{
     private readonly addBtn: Locator
+    private readonly cancelBtnOnPanel: Locator
     private readonly collectionModal: Locator
     private readonly mainButtonOnModal: Locator
     private readonly listItemOnPanel: Locator
@@ -12,6 +13,7 @@ export class Collections extends BasePage{
     constructor(page){
         super(page)
         this.addBtn = page.locator('.drawer-outer-container button').filter({hasText:/^Add$/})
+        this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').filter({hasText:/^Cancel$/})
         this.collectionModal = page.getByRole('dialog')
         this.mainButtonOnModal = page.getByRole('dialog').getByRole('button').nth(1)
         this.listItemOnPanel = page.locator('.drawer-outer-container ul label')
@@ -20,6 +22,10 @@ export class Collections extends BasePage{
 
     public async clickAddBtn(){
         await this.addBtn.click()
+    }
+
+    public async clickCancelBtnOnPanel(){
+        await this.cancelBtnOnPanel.click()
     }
 
     public async clickMainBtnOnPopUpAndGetCollectionID(force?:"force"){
