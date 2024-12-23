@@ -4,6 +4,7 @@ import {post} from "../precs/apiRequestsFunctions";
 
 export class Collections extends BasePage{
     private readonly addBtn: Locator
+    private readonly cancelBtnOnPanel: Locator
     private readonly collectionModal: Locator
     private readonly mainButtonOnModal: Locator
     private readonly listItemOnPanel: Locator
@@ -12,6 +13,7 @@ export class Collections extends BasePage{
     constructor(page){
         super(page)
         this.addBtn = page.locator('.drawer-outer-container button').filter({hasText:/^Add$/})
+        this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').filter({hasText:/^Cancel$/})
         this.collectionModal = page.getByRole('dialog')
         this.mainButtonOnModal = page.getByRole('dialog').getByRole('button').nth(1)
         this.listItemOnPanel = page.locator('.drawer-outer-container ul label')
@@ -22,14 +24,19 @@ export class Collections extends BasePage{
         await this.addBtn.click()
     }
 
+    public async clickCancelBtnOnPanel(){
+        await this.cancelBtnOnPanel.click()
+    }
+
     public async clickMainBtnOnPopUpAndGetCollectionID(force?:"force"){
         if(force==="force"){
             await this.mainButtonOnModal.click({force:true});
         }else{
         const createdCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.CREATE_COLLECTION_ENDPOINT}`)&&response.status()===200);
         const updatedCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`/UpdateCollection`)&&response.status()===200);
+        const deleteCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.DELETE_COLLECTION_ENDPOINT}`)&&response.status()===200);
         await this.mainButtonOnModal.click();
-        const response = await Promise.race([createdCollectionResponsePromise,updatedCollectionResponsePromise]);
+        const response = await Promise.race([createdCollectionResponsePromise,updatedCollectionResponsePromise,deleteCollectionResponsePromise]);
         const responseJson = await response.json();
         return responseJson
         }
@@ -76,7 +83,7 @@ export class Collections extends BasePage{
         return collections.collections
     }
 
-    public async getNameFromRemoveCollectionModal(){
+    public async getNameFromRenameCollectionModal(){
         const inputLocator = this.collectionModal.locator('input');
         const value = inputLocator.getAttribute('value');
         return value
@@ -111,7 +118,7 @@ export class Collections extends BasePage{
         }
     }
 
-    public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Remove'|'Rename'){
+    public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Delete'|'Rename'){
         const optionLocator = this.page.locator('.mdc-menu-surface--anchor').getByRole('menuitem').getByText(optionToSelect);
         await optionLocator.click()
     }

@@ -3,6 +3,7 @@ import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 import { strict } from "assert";
 
 export class YourWork extends BaseBusinessObjectPage{
+    addToCollectionBtn: Locator
     agreementCheckbox: Locator
     cancelBtnOnPanel: Locator
     continueBtnOnPanel: Locator
@@ -17,6 +18,7 @@ export class YourWork extends BaseBusinessObjectPage{
 
     constructor(page){
         super(page)
+        this.addToCollectionBtn = page.getByTitle('Add selected items to collections')
         this.agreementCheckbox = page.locator('.drawer-outer-container input')
         this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Cancel')
         this.continueBtnOnPanel = page.locator('.drawer-outer-container button').getByText('Continue')
@@ -53,8 +55,8 @@ export class YourWork extends BaseBusinessObjectPage{
         await this.page.waitForTimeout(1000);
         let itemsToCheck:Array<Locator> = []
         for(let name of names){
-            if (await this.listItem.filter({hasText:`${name}`}).isVisible()){
-            itemsToCheck.push(this.listItem.filter({hasText:`${name}`}));
+            if (await this.listItem.filter({hasText:name}).isVisible()){
+            itemsToCheck.push(this.listItem.filter({hasText:name}));
             } else itemsToCheck
         }
         let checkedItemsNames:Array<string|null> = []
@@ -68,8 +70,8 @@ export class YourWork extends BaseBusinessObjectPage{
     public async checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout(names:string[]){
         let itemsToCheck:Array<Locator> = []
         for(let name of names){
-            if (await this.listItem.filter({hasText:`${name}`}).isVisible()){
-            itemsToCheck.push(this.listItem.filter({hasText:`${name}`}));
+            if (await this.listItem.filter({hasText:name}).isVisible()){
+            itemsToCheck.push(this.listItem.filter({hasText:name}));
             } else itemsToCheck
         }
         let checkedItemsNames:Array<string|null> = []
@@ -78,6 +80,10 @@ export class YourWork extends BaseBusinessObjectPage{
             checkedItemsNames.push(await item.locator('a').first().getAttribute('aria-label'))
         }
         return checkedItemsNames
+    }
+
+    public async clickAddToCollectionBtn(){
+        await this.addToCollectionBtn.click()
     }
 
     public async clickContinueBtnOnPanel(){
@@ -140,7 +146,9 @@ export class YourWork extends BaseBusinessObjectPage{
         const element = await this.page.getByText(regexPattern).innerText();
         const label:string = element ?? 'not found';
         const match = label.match(/\d+/);
-        if (match) return +match[0]
+        if (match) {
+            return +match[0]
+        } else {return 0}
     }
 
     public async getCountOfItemsOnDeleteWarningPanel(){

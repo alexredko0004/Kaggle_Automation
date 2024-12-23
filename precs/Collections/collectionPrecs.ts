@@ -28,3 +28,32 @@ export const deleteCollectionViaPW = async(page:Page,collectionId: string)=>{
     expect(response.ok()).toBe(true);
     console.log(collectionName+' collection is deleted');
 }
+
+export const linkDatasetsAndModelsWithCollectionViaPW = async(page:Page,collectionId: string,arrayOfModelIDs:string[],arrayOfDatasetIDs:string[])=>{
+    type ModelObject = {
+        modelId: string
+    }
+    type DatasetObject = {
+        datasetId: string
+      }
+    const modelsPayload:ModelObject[]=[];
+    const datasetsPayload:DatasetObject[] = [];
+    
+    for (let model of arrayOfModelIDs){
+        modelsPayload.push({modelId:model})
+    }
+
+    for (let dataset of arrayOfDatasetIDs){
+        datasetsPayload.push({datasetId:dataset})
+    }
+
+    const response = await post(page,`${process.env.ADD_ITEMS_TO_COLLECTION_ENDPOINT}`,JSON.stringify({
+        collectionId:parseInt(collectionId,10),
+        items:[
+            ...modelsPayload,
+            ...datasetsPayload
+        ]
+    }));
+    expect(response.ok()).toBe(true);
+    console.log(`modelIDs:${{...arrayOfModelIDs}} and datasetIDs:${{...arrayOfDatasetIDs}} were added to collectionID ${collectionId}`);
+}
