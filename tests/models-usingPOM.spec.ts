@@ -312,6 +312,7 @@ test.describe('tests using POM', async()=>{
             availableCollections = await modelsPage.collectionsPanel().getAvailableCollectionsOnPanel();
             await modelsPage.collectionsPanel().selectCollectionsWithNames([collectionName]);
             await modelsPage.collectionsPanel().clickAddBtn();
+            expect (await modelsPage.collectionsPanel().isCollectionsPanelOpened()).toBe(false);
             await expect(yourWorkPage.getFlashMessageLocator()).toBeVisible();
             expect(await yourWorkPage.getFlashMessageText()).toEqual('Item was added successfully');
         })
