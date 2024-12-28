@@ -9,7 +9,7 @@ export abstract class BasePage{
     constructor(page){
         this.page = page
         this.confirmationDialog = page.getByRole('dialog')
-        this.flashMessage = page.locator('.notistack-SnackbarContainer').getByRole('alert')
+        this.flashMessage = page.locator('.notistack-SnackbarContainer [role="alert"]')/*.getByRole('alert')*/
         this.tooltip = page.getByRole('tooltip').locator('.MuiTooltip-tooltip')
     }
     
@@ -56,7 +56,7 @@ export abstract class BasePage{
 
     public async getFlashMessageText(){
         await this.flashMessage.all();
-        await this.page.waitForTimeout(300)
+        await this.page.waitForTimeout(300);
         if (await this.flashMessage.count()>1){
             return await this.flashMessage.allTextContents()
         }else{

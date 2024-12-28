@@ -142,7 +142,7 @@ test.describe('tests using POM for Collections', async()=>{
      const coll = await createCollectionViaPW(page,collName);
      const createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
      const createdModel = await createModelViaPW(page, modelName, 'Private');
-     await linkDatasetsAndModelsWithCollectionViaPW(page, coll.collectionId,[createdModel.id],[createdDataset.datasetId])
+     await linkDatasetsAndModelsWithCollectionViaPW(page, coll.collectionId,[createdModel.id],[createdDataset.datasetId]);
      await test.step('Preconditions', async()=>{
           await datasetsPage.openDatasetsPage();
           await yourWorkPage.openYourWork();
@@ -191,8 +191,68 @@ test.describe('tests using POM for Collections', async()=>{
           expect(availableCollectionsForDataset.length).toEqual(collectionsCount-1);
           expect(availableCollectionsForDataset.includes(collName)).toBe(false);
      })
-    await test.step('Post condition. Remove collection and model', async()=>{
+    await test.step('Post condition. Remove dataset and model', async()=>{
          await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug);
+         await deleteModelViaPW(page,createdModel.id)
+    })
+ })
+ test('Save collection with existing name', async({page,collections, datasetsPage})=>{
+     let collectionsCount:number;
+     const collName = 'COLL'+ Date.now().toString();
+     const collNameForEdit = collName+'E';
+     const modelName = 'ModForColl'+ Date.now().toString();
+     const yourWorkPage = new YourWork(page);
+     const coll = await createCollectionViaPW(page,collName);
+     const collForEdit = await createCollectionViaPW(page,collNameForEdit);
+     const createdModel = await createModelViaPW(page, modelName, 'Private');
+     await test.step('Preconditions', async()=>{
+          await datasetsPage.openDatasetsPage();
+          await yourWorkPage.openYourWork();
+          await yourWorkPage.openTab('Collections');
+          collectionsCount = await yourWorkPage.getCountOfItemsOnTab('Collections');
+     })
+     await test.step('Verify that new collection cannot be created with name that belongs to existing collection', async()=>{
+          await yourWorkPage.selectItemFromCreateMenu('New Collection');
+          await collections.fillCollectionNameOnModal(collName);
+          expect(await collections.isMainButtonEnabledOnModal()).toBe(true);
+          await collections.clickMainBtnOnPopUpAndGetCollectionID("force");
+          expect(await collections.isCollectionModalWithProvidedNameVisible('New Collection'),'"New Collection" pop-up should close').toBe(false);
+          await expect (collections.getFlashMessageLocator()).toBeVisible();
+          expect(await collections.getFlashMessageText()).toMatch(/.*A\scollection\swith\sthis\sname\salready\sexists\./);
+          expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount);
+     })
+     await test.step('Verify that collection cannot be renamed with name that belongs to existing collection', async()=>{
+          await collections.clickThreeDotsButtonForCollectionWithName(collNameForEdit);
+          await collections.selectOptionFromThreeDotsMenuForCollection("Rename");
+          await collections.fillCollectionNameOnModal(collName);
+          await collections.clickMainBtnOnPopUpAndGetCollectionID("force");
+          expect(await collections.isCollectionModalWithProvidedNameVisible('Rename Collection'),'"Rename Collection" pop-up should close').toBe(false);
+          await expect (collections.getFlashMessageLocator()).toBeVisible();
+          expect((await collections.getFlashMessageText())[0]).toMatch(/.*A\scollection\swith\sthis\sname\salready\sexists\./);
+          expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount);
+          const activeCollections = await collections.getCollectionNamesAndNumberOFTheirContents();
+          expect(activeCollections.filter(item=>item.name===collName).length).toEqual(1);
+          expect(activeCollections.filter(item=>item.name===collNameForEdit).length).toEqual(1);
+     }) 
+     await test.step('Verify that new collection cannot be created with name that belongs to existing collection(while creating via panel)', async()=>{
+          await yourWorkPage.openTab('Models');
+          await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout([modelName]);
+          await yourWorkPage.clickAddToCollectionBtn();
+          await yourWorkPage.collectionsPanel().clickCreateNewCollectionBtnOnPanel();
+          await yourWorkPage.collectionsPanel().fillCollectionNameOnPanel(collName);
+          //await page.waitForTimeout(4000);
+          await yourWorkPage.collectionsPanel().clickCreateCollectionBtnOnPanel();
+          expect (await yourWorkPage.collectionsPanel().isCollectionsPanelOpened()).toBe(true);
+          await expect (yourWorkPage.getFlashMessageLocator()).toBeVisible();
+          expect((await yourWorkPage.getFlashMessageText())[0]).toMatch(/.*A\scollection\swith\sthis\sname\salready\sexists\./);
+          await yourWorkPage.collectionsPanel().clickBackBtnOnPanel()
+          let availableCollectionsForModel = await yourWorkPage.collectionsPanel().getAvailableCollectionsOnPanel();
+          expect(availableCollectionsForModel.length).toEqual(collectionsCount);
+          expect(availableCollectionsForModel.filter(item=>item===collName).length).toEqual(1);
+     })  
+    await test.step('Post condition. Remove collections and model', async()=>{
+         await deleteCollectionViaPW(page,coll.collectionId);
+         await deleteCollectionViaPW(page,collForEdit.collectionId);
          await deleteModelViaPW(page,createdModel.id)
     })
  })

@@ -6,6 +6,8 @@ export class Collections extends BasePage{
     private readonly addBtn: Locator
     private readonly cancelBtnOnPanel: Locator
     private readonly collectionModal: Locator
+    private readonly createCollectionBtnOnPanel: Locator
+    private readonly createNewCollectionBtnOnPanel: Locator
     private readonly mainButtonOnModal: Locator
     private readonly listItemOnPanel: Locator
     private readonly listItemOnTab: Locator
@@ -15,6 +17,8 @@ export class Collections extends BasePage{
         this.addBtn = page.locator('.drawer-outer-container button').filter({hasText:/^Add$/})
         this.cancelBtnOnPanel = page.locator('.drawer-outer-container button').filter({hasText:/^Cancel$/})
         this.collectionModal = page.getByRole('dialog')
+        this.createCollectionBtnOnPanel = page.locator('.drawer-outer-container button').filter({hasText:/^Create\scollection$/})
+        this.createNewCollectionBtnOnPanel = page.locator('.drawer-outer-container').getByText('Create New Collection')
         this.mainButtonOnModal = page.getByRole('dialog').getByRole('button').nth(1)
         this.listItemOnPanel = page.locator('.drawer-outer-container ul label')
         this.listItemOnTab = page.locator('#site-content .km-list li:not([role="menuitem"])')
@@ -26,6 +30,19 @@ export class Collections extends BasePage{
 
     public async clickCancelBtnOnPanel(){
         await this.cancelBtnOnPanel.click()
+    }
+
+    public async clickBackBtnOnPanel(){
+        const backBtn = this.page.locator('.drawer-outer-container button').filter({hasText:/^.*Back$/})
+        await backBtn.click()
+    }
+
+    public async clickCreateCollectionBtnOnPanel(){
+        await this.createCollectionBtnOnPanel.click()
+    }
+
+    public async clickCreateNewCollectionBtnOnPanel(){
+        await this.createNewCollectionBtnOnPanel.click()
     }
 
     public async clickMainBtnOnPopUpAndGetCollectionID(force?:"force"){
@@ -56,6 +73,11 @@ export class Collections extends BasePage{
         if(modalType==='Rename Collection'){
             await this.page.getByPlaceholder('New Collection Name').fill(name)
          }
+    }
+
+    public async fillCollectionNameOnPanel(name:string){
+        const collectionNameField = this.page.locator('.drawer-outer-container input');
+        await collectionNameField.fill(name)
     }
 
     public async getAvailableCollectionsOnPanel(){
@@ -104,6 +126,12 @@ export class Collections extends BasePage{
     public async isMainButtonEnabledOnModal(){
         const classValue = await this.mainButtonOnModal.getAttribute('class');
         return !classValue?.includes('disabled')
+    }
+
+    public async isCollectionsPanelOpened(){
+        await this.page.waitForTimeout(500);
+        const panelState = await this.page.locator('.drawer-outer-container').isVisible();
+        return panelState
     }
 
     public async isSelectedCollectionEmpty(){
