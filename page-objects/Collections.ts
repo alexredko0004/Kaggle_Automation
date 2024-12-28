@@ -106,6 +106,12 @@ export class Collections extends BasePage{
         return !classValue?.includes('disabled')
     }
 
+    public async isCollectionsPanelOpened(){
+        await this.page.waitForTimeout(500);
+        const panelState = await this.page.locator('.drawer-outer-container').isVisible();
+        return panelState
+    }
+
     public async isSelectedCollectionEmpty(){
         await this.page.waitForTimeout(500);
         const emptyStateText = await this.page.locator('#site-content div h2').nth(1).isVisible();

@@ -142,7 +142,7 @@ test.describe('tests using POM for Collections', async()=>{
      const coll = await createCollectionViaPW(page,collName);
      const createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
      const createdModel = await createModelViaPW(page, modelName, 'Private');
-     await linkDatasetsAndModelsWithCollectionViaPW(page, coll.collectionId,[createdModel.id],[createdDataset.datasetId])
+     await linkDatasetsAndModelsWithCollectionViaPW(page, coll.collectionId,[createdModel.id],[createdDataset.datasetId]);
      await test.step('Preconditions', async()=>{
           await datasetsPage.openDatasetsPage();
           await yourWorkPage.openYourWork();
@@ -162,6 +162,79 @@ test.describe('tests using POM for Collections', async()=>{
           expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount-1);
           const activeCollections = await collections.getCollectionNamesAndNumberOFTheirContents();
           expect(activeCollections.filter(item=>item.name===collName).length).toEqual(0);
+     }) 
+     await test.step('Verify removed collection is not shown on "Overview" tab', async()=>{
+          await yourWorkPage.openTab('Overview');
+          const activeCollectionsOnOverview = await yourWorkPage.getCollectionsOnOverviewTab();
+          expect(activeCollectionsOnOverview.filter(item=>item.name===collName).length).toEqual(0);
+     })  
+     await test.step('Verify that datasets and models are not removed after removing of their collection', async()=>{
+          await yourWorkPage.openTab('Datasets');
+          await yourWorkPage.reloadPage();
+          await expect(await yourWorkPage.getListItemByNameOrSubtitle(datasetName)).toBeVisible();
+          await yourWorkPage.openTab('Models');
+          await yourWorkPage.reloadPage();
+          await expect(await yourWorkPage.getListItemByNameOrSubtitle(modelName)).toBeVisible();
+     })
+     await test.step('Verify that removed collection is not shown on the panel with available collections', async()=>{
+          await yourWorkPage.checkItemsWithProvidedNamesAndReturnTheirNamesWithoutTimeout([modelName]);
+          await yourWorkPage.clickAddToCollectionBtn();
+          let availableCollectionsForModel = await yourWorkPage.collectionsPanel().getAvailableCollectionsOnPanel();
+          expect(availableCollectionsForModel.length).toEqual(collectionsCount-1);
+          expect(availableCollectionsForModel.includes(collName)).toBe(false);
+          await yourWorkPage.collectionsPanel().clickCancelBtnOnPanel();
+          await yourWorkPage.openTab('Datasets');
+          await yourWorkPage.clickListItem(datasetName);
+          await datasetsPage.clickThreeDotsBtnOnProfile();
+          await datasetsPage.selectOptionFromThreeDotsMenu('Add to Collection');
+          let availableCollectionsForDataset = await datasetsPage.collectionsPanel().getAvailableCollectionsOnPanel();
+          expect(availableCollectionsForDataset.length).toEqual(collectionsCount-1);
+          expect(availableCollectionsForDataset.includes(collName)).toBe(false);
+     })
+    await test.step('Post condition. Remove collection and model', async()=>{
+         await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug);
+         await deleteModelViaPW(page,createdModel.id)
+    })
+ })
+ test('Save collection with existing name', async({page,collections, datasetsPage})=>{
+     let collectionsCount:number;
+     const collName = 'COLL'+ Date.now().toString();
+     const collNameForEdit = collName+'E';
+     const datasetName = 'DSFoColl'+ Date.now().toString();
+     const modelName = 'ModForColl'+ Date.now().toString();
+     const yourWorkPage = new YourWork(page);
+     const coll = await createCollectionViaPW(page,collName);
+     const collForEdit = await createCollectionViaPW(page,collNameForEdit);
+     const createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
+     const createdModel = await createModelViaPW(page, modelName, 'Private');
+     await test.step('Preconditions', async()=>{
+          await datasetsPage.openDatasetsPage();
+          await yourWorkPage.openYourWork();
+          await yourWorkPage.openTab('Collections');
+          collectionsCount = await yourWorkPage.getCountOfItemsOnTab('Collections');
+     })
+     await test.step('Verify that new collection cannot be created with name that belongs to existing collection', async()=>{
+          await yourWorkPage.selectItemFromCreateMenu('New Collection');
+          await collections.fillCollectionNameOnModal(collName);
+          expect(await collections.isMainButtonEnabledOnModal()).toBe(true);
+          await collections.clickMainBtnOnPopUpAndGetCollectionID();
+          expect(await collections.isCollectionModalWithProvidedNameVisible('New Collection'),'"New Collection" pop-up should close').toBe(false);
+          await expect (collections.getFlashMessageLocator()).toBeVisible();
+          expect(await collections.getFlashMessageText()).toEqual('A collection with this name already exists.');
+          expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount);
+     })
+     await test.step('Verify that collection cannot be renamed with name that belongs to existing collection', async()=>{
+          await collections.clickThreeDotsButtonForCollectionWithName(collNameForEdit);
+          await collections.selectOptionFromThreeDotsMenuForCollection("Rename");
+          await collections.fillCollectionNameOnModal(collName);
+          await collections.clickMainBtnOnPopUpAndGetCollectionID();
+          expect(await collections.isCollectionModalWithProvidedNameVisible('Rename Collection'),'"Rename Collection" pop-up should close').toBe(false);
+          await expect (collections.getFlashMessageLocator()).toBeVisible();
+          expect(await collections.getFlashMessageText()).toEqual('A collection with this name already exists.');
+          expect(await yourWorkPage.getCountOfItemsOnTab('Collections')).toEqual(collectionsCount);
+          const activeCollections = await collections.getCollectionNamesAndNumberOFTheirContents();
+          expect(activeCollections.filter(item=>item.name===collName).length).toEqual(1);
+          expect(activeCollections.filter(item=>item.name===collNameForEdit).length).toEqual(1);
      }) 
      await test.step('Verify removed collection is not shown on "Overview" tab', async()=>{
           await yourWorkPage.openTab('Overview');
