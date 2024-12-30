@@ -54,7 +54,7 @@ export class Models extends BaseBusinessObjectPage{
         this.addTagsBtn = page.getByRole('button').filter({hasText:'Add Tags'})
         this.editTagsBtn = page.getByLabel('Edit Tags')
         this.goToModelBtn = page.locator('.drawer-outer-container button').getByText('Go to Model')
-        this.pencilEdit = page.getByLabel('edit',{exact:true})
+        this.pencilEdit = page.getByLabel('Edit Title',{exact:true})
         this.modelTitleFieldOnEdit = page.getByPlaceholder('Enter a title')
         this.modelSubtitleFieldOnEdit = page.locator('#site-content [maxlength="255"]')
         this.modelTitleFieldOnView = page.locator('#site-content h1')

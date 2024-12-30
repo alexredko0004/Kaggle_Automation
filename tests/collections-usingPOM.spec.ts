@@ -240,7 +240,6 @@ test.describe('tests using POM for Collections', async()=>{
           await yourWorkPage.clickAddToCollectionBtn();
           await yourWorkPage.collectionsPanel().clickCreateNewCollectionBtnOnPanel();
           await yourWorkPage.collectionsPanel().fillCollectionNameOnPanel(collName);
-          //await page.waitForTimeout(4000);
           await yourWorkPage.collectionsPanel().clickCreateCollectionBtnOnPanel();
           expect (await yourWorkPage.collectionsPanel().isCollectionsPanelOpened()).toBe(true);
           await expect (yourWorkPage.getFlashMessageLocator()).toBeVisible();

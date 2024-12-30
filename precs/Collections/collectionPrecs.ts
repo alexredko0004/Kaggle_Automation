@@ -55,5 +55,5 @@ export const linkDatasetsAndModelsWithCollectionViaPW = async(page:Page,collecti
         ]
     }));
     expect(response.ok()).toBe(true);
-    console.log(`modelIDs:${{...arrayOfModelIDs}} and datasetIDs:${{...arrayOfDatasetIDs}} were added to collectionID ${collectionId}`);
+    console.log(`modelIDs:${arrayOfModelIDs} and datasetIDs:${arrayOfDatasetIDs} were added to collectionID ${collectionId}`);
 }
