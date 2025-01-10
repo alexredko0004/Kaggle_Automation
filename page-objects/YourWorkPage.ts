@@ -216,7 +216,7 @@ export class YourWork extends BaseBusinessObjectPage{
     }
 
     public async selectItemFromCreateMenu(item:"New Collection" | "New Notebook" | "New Dataset" | "New Model" | "New Competition"){
-        const itemToSelect = this.page.locator('div[aria-hidden="false"]>[role="menu"]>[role="menuitem"]').filter({hasText:item});
+        const itemToSelect = this.page.locator('[role="menu"]>[role="menuitem"]').filter({hasText:item});
         await this.createBtn.click();
         await itemToSelect.click()
     }

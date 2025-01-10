@@ -47,6 +47,7 @@ export class Collections extends BasePage{
 
     public async clickMainBtnOnPopUpAndGetCollectionID(force?:"force"){
         if(force==="force"){
+            await this.page.waitForTimeout(500)
             await this.mainButtonOnModal.click({force:true});
         }else{
         const createdCollectionResponsePromise = this.page.waitForResponse(response=>response.url().includes(`${process.env.CREATE_COLLECTION_ENDPOINT}`)&&response.status()===200);
@@ -147,7 +148,7 @@ export class Collections extends BasePage{
     }
 
     public async selectOptionFromThreeDotsMenuForCollection(optionToSelect:'Delete'|'Rename'){
-        const optionLocator = this.page.locator('.mdc-menu-surface--anchor').getByRole('menuitem').getByText(optionToSelect);
+        const optionLocator = this.page.locator('.MuiList-root').getByRole('menuitem').getByText(optionToSelect);
         await optionLocator.click()
     }
 

@@ -22,7 +22,7 @@ test.describe('tests using POM', async()=>{
         await mainMenu.openDatasetsPageViaMainMenu();
         await expect(page).toHaveURL('/datasets');
     })
-    test('Create new dataset with remote url @smoke @smokeDataset', async({page,mainMenu,datasetsPage})=>{
+    test('Create new dataset with remote url @smoke @smokeDataset', async({page,browser,mainMenu,datasetsPage})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         let createdDataset
         await test.step('Preconditions', async()=>{
