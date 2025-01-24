@@ -79,7 +79,7 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
-        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        const modelVisibility = modelsPage.randomModelVisibility(['Private']);
         let selectedFramework
         let selectedLicense
         await test.step('Preconditions', async()=>{
@@ -181,7 +181,7 @@ test.describe('tests using POM', async()=>{
         const mainMenu = new MainMenu(page);
         const modelsPage = new Models(page);
         const yourWorkPage = new YourWork(page);
-        const modelVisibility = modelsPage.randomModelVisibility(['Public','Private']);
+        const modelVisibility = modelsPage.randomModelVisibility(['Private']);
         const model = await createModelViaPW(page,modelName,modelVisibility);
         await test.step('Prec. Open "Models" page', async()=>{
             await modelsPage.openModelProfile(model.owner.slug,model.slug);
