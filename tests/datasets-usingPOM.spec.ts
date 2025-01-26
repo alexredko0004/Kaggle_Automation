@@ -341,4 +341,37 @@ test.describe('tests using POM', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
         })
     })
+
+    test('Edit dataset coverage', async({page,mainMenu,datasetsPage})=>{
+        const datasetName = 'AutoDataSet'+Date.now().toString();
+        let createdDataset
+        await test.step('Preconditions', async()=>{
+            createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
+            await datasetsPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
+            await datasetsPage.reloadPage();
+        })
+        await test.step('Verify that "Create" button becomes enabled after providing dataset name', async()=>{
+            await datasetsPage.clickEditForDatasetSectionWithName("Coverage");
+            expect(await datasetsPage.isStartEndDateFieldVisible("Start Date")).toBe(true);
+            expect(await datasetsPage.isStartEndDateFieldVisible("End Date")).toBe(true);
+            expect(await datasetsPage.isGeospatialCoverageFieldVisible()).toBe(true);
+            await datasetsPage.clickStartOrEndDateField('Start Date');
+            await datasetsPage.selectDateInDatepicker('19 nov 1957');
+            await datasetsPage.clickStartOrEndDateField('End Date');
+            await datasetsPage.selectDateInDatepicker('19 nov 2081');
+            // await datasetsPage.clickContinueBtnWhileCreatingDataset();
+            // await datasetsPage.fillDatasetNameWhileCreatingDataset(datasetName);
+            // expect(await datasetsPage.isCreateBtnEnabled()).toBe(true)
+        })
+        // await test.step('Verify that dataset is created and contains resource from the remote link', async()=>{
+        //     createdDataset = await datasetsPage.clickCreateBtnAndGetDatasetProperties();
+        //     await datasetsPage.clickGoToDatasetBtn();
+        //     expect(await datasetsPage.getDatasetName()).toEqual(datasetName);
+        //     expect(await datasetsPage.getDatasetAttachmentSizeNumber()).toBeGreaterThan(0);
+        //     await expect(page.getByTestId('preview-image')).toBeVisible();
+        // })
+        await test.step('Postcondition. Remove created dataset', async()=>{
+            await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
+        })
+    })
 })

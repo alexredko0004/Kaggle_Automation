@@ -121,6 +121,11 @@ export class Datasets extends BaseBusinessObjectPage{
         })
     }
 
+    public async clickEditForDatasetSectionWithName(name:"Author"|"Coverage"|"DOI Citation"|"Provenance"|"License"|"Expected Update Frequency"){
+        const editBtnForSection = this.page.getByLabel(`Edit ${name}`);
+        await editBtnForSection.click()
+    }
+
     public async clickEditFileInformationBtn(){
         await this.editFileInformationBtn.click()
     }
@@ -196,6 +201,13 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async clickSpecifyProvenancePendingAction(){
         await this.specifyProvenancePendingAction.click()
+    }
+
+    public async clickStartOrEndDateField(fieldName:"Start Date"|"End Date"){
+        let classToSelect;
+        (fieldName==='Start Date')?classToSelect='.coverage-start':classToSelect='.coverage-end';
+        const field = this.page.locator(classToSelect).locator('button');
+        await field.click()
     }
 
     public async clickThreeDotsBtnOnProfile(){
@@ -391,6 +403,11 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.datasetDescriptionField.isVisible()
     }
 
+    public async isGeospatialCoverageFieldVisible(){
+        const geospatialCoverageField = this.page.getByPlaceholder("City, Country or Worldwide")
+        return await geospatialCoverageField.isVisible()
+    }
+
     public async isEditDatasetImagePanelVisible(){
         await this.page.waitForTimeout(500);
         return await this.page.locator('.drawer-outer-container').isVisible()
@@ -428,6 +445,12 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.specifyProvenancePendingAction.isVisible()
     }
 
+    public async isStartEndDateFieldVisible(fieldName:"Start Date"|"End Date"){
+        const field = this.page.getByLabel(fieldName);
+        const visibility = await field.isVisible()
+        return visibility
+    }
+
     public async isTabWithNameSelected(tabName:string){
         const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
         return (isSelected==='true')
@@ -435,6 +458,30 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async isUploadImagePendingActionVisible(){
         return await this.uploadImagePendingAction.isVisible()
+    }
+
+    
+    /**
+ * 
+ * @param date - date to select in "DD Mon YYYY" format
+ */
+    public async selectDateInDatepicker(date:string){
+        const yearToSelectMatch = date.match(/\d{4}/);
+        const yearToSelect = (yearToSelectMatch&&yearToSelectMatch.length>0)?yearToSelectMatch[0]:'not found';
+
+        const monthToSelectMatch = date.match(/[jJ]an|[fF]eb|[mM]ar|[aA]pr|[mM]ay|[jJ]u[nl]|[sS]ep|[oO]ct|[nN]ov|[dD]ec/);
+        const monthToSelect = (monthToSelectMatch&&monthToSelectMatch.length>0)?monthToSelectMatch[0]:'not found';
+
+        const dayToSelectMatch = date.match(/^\d{1,2}/);
+        const dayToSelect = (dayToSelectMatch&&dayToSelectMatch.length>0)?dayToSelectMatch[0]:'not found';
+
+        const shevronBtn = this.page.getByTestId('ExpandMoreIcon');
+        let currentDate = new Date();
+        if (yearToSelect!==currentDate.getFullYear().toString()){
+             await this.page.waitForTimeout(800);
+             await shevronBtn.click();
+             await this.page.getByRole('radio').filter({hasText:yearToSelect}).click()
+        }
     }
 
     public async selectDatasetLicense(licenseName:string){
