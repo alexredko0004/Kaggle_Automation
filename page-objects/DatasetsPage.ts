@@ -356,6 +356,14 @@ export class Datasets extends BaseBusinessObjectPage{
         return {h1:h1, h2:h2, p:paragraph}
     }
 
+    public async getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit(){;
+        const coverageStartField = this.page.locator('.coverage-start input');
+        const coverageEndField = this.page.locator('.coverage-end input');
+        const startDate = await coverageStartField.getAttribute('value');
+        const endDate = await coverageEndField.getAttribute('value');
+        return {startDate: startDate, endDate: endDate}
+    }
+
     public async getSubtitleInputValue(){
         return await this.datasetSubtitleField.getAttribute('value')
     }
@@ -473,8 +481,15 @@ export class Datasets extends BaseBusinessObjectPage{
         const monthToSelect = (monthToSelectMatch&&monthToSelectMatch.length>0)?monthToSelectMatch[0]:'not found';
 
         const dayToSelectMatch = date.match(/^\d{1,2}/);
-        const dayToSelect = (dayToSelectMatch&&dayToSelectMatch.length>0)?dayToSelectMatch[0]:'not found';
+        let dayToSelect = (dayToSelectMatch&&dayToSelectMatch.length>0)?dayToSelectMatch[0]:'not found';
+        dayToSelect = dayToSelect[0]=='0'?dayToSelect.replace('0',''):dayToSelect;
+        
+        //function below is needed for proper month selection in datepicker
+        const monthToNumber = function (month:string){
+            return new Date(Date.parse(month +" 1, 2000")).getMonth()+1
+         }
 
+        //selecting a year
         const shevronBtn = this.page.getByTestId('ExpandMoreIcon');
         let currentDate = new Date();
         if (yearToSelect!==currentDate.getFullYear().toString()){
@@ -482,6 +497,25 @@ export class Datasets extends BaseBusinessObjectPage{
              await shevronBtn.click();
              await this.page.getByRole('radio').filter({hasText:yearToSelect}).click()
         }
+
+        //selecting a month
+        const monthToSelectNumber = monthToNumber(monthToSelect);
+        let selectedMonth = (await this.page.locator('.MuiPickersCalendarHeader-label').innerText()).replace(/\s\d{4}/,'');
+        for (let i=1;i<=11;i++){
+            if (monthToSelectNumber<monthToNumber(selectedMonth)){
+                const leftShevronBth = this.page.getByTestId('ArrowLeftIcon');
+                await leftShevronBth.click();
+            } else if(monthToSelectNumber>monthToNumber(selectedMonth)){
+                const rightShevronBth = this.page.getByTestId('ArrowRightIcon');
+                await rightShevronBth.click();
+            }
+            selectedMonth = (await this.page.locator('.MuiPickersCalendarHeader-label').innerText()).replace(/\s\d{4}/,'');
+        }
+
+        //selecting a date
+        const dayToSelectLocator = this.page.getByRole('rowgroup').getByRole('gridcell', { name: dayToSelect, exact: true });
+        await this.page.waitForTimeout(500);
+        await dayToSelectLocator.click()
     }
 
     public async selectDatasetLicense(licenseName:string){
