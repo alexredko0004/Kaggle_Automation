@@ -121,6 +121,11 @@ export class Datasets extends BaseBusinessObjectPage{
         })
     }
 
+    public async clickEditForDatasetSectionWithName(name:"Author"|"Coverage"|"DOI Citation"|"Provenance"|"License"|"Expected Update Frequency"){
+        const editBtnForSection = this.page.getByLabel(`Edit ${name}`);
+        await editBtnForSection.click()
+    }
+
     public async clickEditFileInformationBtn(){
         await this.editFileInformationBtn.click()
     }
@@ -191,11 +196,18 @@ export class Datasets extends BaseBusinessObjectPage{
     public async clickSaveOnEditDatasetImagePanel(){
         const saveBtn = this.page.locator('.drawer-outer-container button').nth(2);
         await saveBtn.click();
-        await this.page.waitForRequest('https://www.kaggle.com/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
+        await this.page.waitForRequest('/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
     }
 
     public async clickSpecifyProvenancePendingAction(){
         await this.specifyProvenancePendingAction.click()
+    }
+
+    public async clickStartOrEndDateField(fieldName:"Start Date"|"End Date"){
+        let classToSelect;
+        (fieldName==='Start Date')?classToSelect='.coverage-start':classToSelect='.coverage-end';
+        const field = this.page.locator(classToSelect).locator('button');
+        await field.click()
     }
 
     public async clickThreeDotsBtnOnProfile(){
@@ -216,6 +228,12 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async fillDescriptionWhileEditingDataset(description:string){
         await this.datasetDescriptionField.fill(description);
+    }
+
+    public async fillGeospatialCoverageField(stringToFill:string){
+        const geospatialCoverageField = this.page.getByPlaceholder('City, Country or Worldwide')
+        await geospatialCoverageField.fill(stringToFill);
+
     }
 
     public async fillFileInformationField(information:string){
@@ -317,6 +335,11 @@ export class Datasets extends BaseBusinessObjectPage{
         }
     }
 
+    public async getDatasetGeospatialCoverageOnView(){
+        const fieldText = await this.page.locator('p[aria-labelledby="GeospatialCoverage-label"]').innerText()
+        return fieldText
+    }
+
     public async getDatasetLicense(){
         const license = await this.page.locator('//h2[contains(text(),"License")]/parent::div/parent::div/parent::div/parent::div/following-sibling::div//a').innerText()
         return license
@@ -342,6 +365,20 @@ export class Datasets extends BaseBusinessObjectPage{
         const h2 = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//h2`).innerText();
         const paragraph = await this.page.locator(`//h2[contains(text(),'About Dataset')]/parent::div/parent::div/parent::div/following-sibling::div//p`).innerText();
         return {h1:h1, h2:h2, p:paragraph}
+    }
+
+    public async getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit(){;
+        const coverageStartField = this.page.locator('.coverage-start input');
+        const coverageEndField = this.page.locator('.coverage-end input');
+        const startDate = await coverageStartField.getAttribute('value');
+        const endDate = await coverageEndField.getAttribute('value');
+        return {startDate: startDate, endDate: endDate}
+    }
+
+    public async getSelectedDateInStartAndEndCoverageDatepickerOnSectionView(){;
+        const coverageStartDate = await this.page.locator('p[aria-labelledby="TemporalCoverageStartDate-label"]').innerText();
+        const coverageEndDate = await this.page.locator('p[aria-labelledby="TemporalCoverageEndDate-label"]').innerText();
+        return {startDate: coverageStartDate, endDate: coverageEndDate}
     }
 
     public async getSubtitleInputValue(){
@@ -391,6 +428,11 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.datasetDescriptionField.isVisible()
     }
 
+    public async isGeospatialCoverageFieldVisible(){
+        const geospatialCoverageField = this.page.getByPlaceholder("City, Country or Worldwide")
+        return await geospatialCoverageField.isVisible()
+    }
+
     public async isEditDatasetImagePanelVisible(){
         await this.page.waitForTimeout(500);
         return await this.page.locator('.drawer-outer-container').isVisible()
@@ -428,6 +470,12 @@ export class Datasets extends BaseBusinessObjectPage{
         return await this.specifyProvenancePendingAction.isVisible()
     }
 
+    public async isStartEndDateFieldVisible(fieldName:"Start Date"|"End Date"){
+        const field = this.page.getByLabel(fieldName);
+        const visibility = await field.isVisible()
+        return visibility
+    }
+
     public async isTabWithNameSelected(tabName:string){
         const isSelected = await this.page.getByLabel(`${tabName}`).getAttribute('aria-selected');  
         return (isSelected==='true')
@@ -435,6 +483,56 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async isUploadImagePendingActionVisible(){
         return await this.uploadImagePendingAction.isVisible()
+    }
+
+    
+    /**
+ * 
+ * @param date - date to select in "DD Mon YYYY" format
+ */
+    public async selectDateInDatepicker(date:string){
+        const yearToSelectMatch = date.match(/\d{4}/);
+        const yearToSelect = (yearToSelectMatch&&yearToSelectMatch.length>0)?yearToSelectMatch[0]:'not found';
+
+        const monthToSelectMatch = date.match(/[jJ]an|[fF]eb|[mM]ar|[aA]pr|[mM]ay|[jJ]u[nl]|[sS]ep|[oO]ct|[nN]ov|[dD]ec/);
+        const monthToSelect = (monthToSelectMatch&&monthToSelectMatch.length>0)?monthToSelectMatch[0]:'not found';
+
+        const dayToSelectMatch = date.match(/^\d{1,2}/);
+        let dayToSelect = (dayToSelectMatch&&dayToSelectMatch.length>0)?dayToSelectMatch[0]:'not found';
+        dayToSelect = dayToSelect[0]=='0'?dayToSelect.replace('0',''):dayToSelect;
+        
+        //function below is needed for proper month selection in datepicker
+        const monthToNumber = function (month:string){
+            return new Date(Date.parse(month +" 1, 2000")).getMonth()+1
+         }
+
+        //selecting a year
+        const shevronBtn = this.page.getByTestId('ExpandMoreIcon');
+        let currentDate = new Date();
+        if (yearToSelect!==currentDate.getFullYear().toString()){
+             await this.page.waitForTimeout(800);
+             await shevronBtn.click();
+             await this.page.getByRole('radio').filter({hasText:yearToSelect}).click()
+        }
+
+        //selecting a month
+        const monthToSelectNumber = monthToNumber(monthToSelect);
+        let selectedMonth = (await this.page.locator('.MuiPickersCalendarHeader-label').innerText()).replace(/\s\d{4}/,'');
+        for (let i=1;i<=11;i++){
+            if (monthToSelectNumber<monthToNumber(selectedMonth)){
+                const leftShevronBth = this.page.getByTestId('ArrowLeftIcon');
+                await leftShevronBth.click();
+            } else if(monthToSelectNumber>monthToNumber(selectedMonth)){
+                const rightShevronBth = this.page.getByTestId('ArrowRightIcon');
+                await rightShevronBth.click();
+            }
+            selectedMonth = (await this.page.locator('.MuiPickersCalendarHeader-label').innerText()).replace(/\s\d{4}/,'');
+        }
+
+        //selecting a date
+        const dayToSelectLocator = this.page.getByRole('rowgroup').getByRole('gridcell', { name: dayToSelect, exact: true });
+        await this.page.waitForTimeout(500);
+        await dayToSelectLocator.click()
     }
 
     public async selectDatasetLicense(licenseName:string){
