@@ -196,7 +196,7 @@ export class Datasets extends BaseBusinessObjectPage{
     public async clickSaveOnEditDatasetImagePanel(){
         const saveBtn = this.page.locator('.drawer-outer-container button').nth(2);
         await saveBtn.click();
-        await this.page.waitForRequest('https://www.kaggle.com/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
+        await this.page.waitForRequest('/api/i/datasets.DatasetDetailService/GetDatasetImageInfo');
     }
 
     public async clickSpecifyProvenancePendingAction(){
@@ -228,6 +228,12 @@ export class Datasets extends BaseBusinessObjectPage{
 
     public async fillDescriptionWhileEditingDataset(description:string){
         await this.datasetDescriptionField.fill(description);
+    }
+
+    public async fillGeospatialCoverageField(stringToFill:string){
+        const geospatialCoverageField = this.page.getByPlaceholder('City, Country or Worldwide')
+        await geospatialCoverageField.fill(stringToFill);
+
     }
 
     public async fillFileInformationField(information:string){
@@ -329,6 +335,11 @@ export class Datasets extends BaseBusinessObjectPage{
         }
     }
 
+    public async getDatasetGeospatialCoverageOnView(){
+        const fieldText = await this.page.locator('p[aria-labelledby="GeospatialCoverage-label"]').innerText()
+        return fieldText
+    }
+
     public async getDatasetLicense(){
         const license = await this.page.locator('//h2[contains(text(),"License")]/parent::div/parent::div/parent::div/parent::div/following-sibling::div//a').innerText()
         return license
@@ -362,6 +373,12 @@ export class Datasets extends BaseBusinessObjectPage{
         const startDate = await coverageStartField.getAttribute('value');
         const endDate = await coverageEndField.getAttribute('value');
         return {startDate: startDate, endDate: endDate}
+    }
+
+    public async getSelectedDateInStartAndEndCoverageDatepickerOnSectionView(){;
+        const coverageStartDate = await this.page.locator('p[aria-labelledby="TemporalCoverageStartDate-label"]').innerText();
+        const coverageEndDate = await this.page.locator('p[aria-labelledby="TemporalCoverageEndDate-label"]').innerText();
+        return {startDate: coverageStartDate, endDate: coverageEndDate}
     }
 
     public async getSubtitleInputValue(){

@@ -10,6 +10,7 @@ import { datasetRemoteLink1,
          datasetFileInformation,
          datasetSourceText,
          datasetCollectionMethodologyText} from '../helpers/constants';
+import { getRandomFutureDate, getRandomPastDate } from '../helpers/dates';
 import { YourWork } from '../page-objects/YourWorkPage';
 
 test.describe('tests using POM', async()=>{
@@ -345,6 +346,8 @@ test.describe('tests using POM', async()=>{
     test('Edit dataset coverage', async({page,mainMenu,datasetsPage})=>{
         const datasetName = 'AutoDataSet'+Date.now().toString();
         let createdDataset
+        const pastDate = getRandomPastDate();
+        const futureDate = getRandomFutureDate();
         await test.step('Preconditions', async()=>{
             createdDataset = await createDatasetViaPW(page, datasetName, [datasetRemoteLink2]);
             await datasetsPage.openDatasetProfile(createdDataset.datasetSlug,createdDataset.ownerSlug);
@@ -358,11 +361,24 @@ test.describe('tests using POM', async()=>{
         })
         await test.step('Verify that selected dates are shown in datepickers', async()=>{
             await datasetsPage.clickStartOrEndDateField('Start Date');
-            await datasetsPage.selectDateInDatepicker('31 Jan 1901');
+            await datasetsPage.selectDateInDatepicker(pastDate.DD_Mon_YYYYformat);
             await datasetsPage.clickStartOrEndDateField('End Date');
-            await datasetsPage.selectDateInDatepicker('09 nov 1984');
-            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit()).startDate).toEqual('01/31/1901');
-            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit()).endDate).toEqual('11/09/1984');
+            await datasetsPage.selectDateInDatepicker(futureDate.DD_Mon_YYYYformat);
+            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit()).startDate).toEqual(pastDate.MM_DD_YYYYformat);
+            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionEdit()).endDate).toEqual(futureDate.MM_DD_YYYYformat);
+        })
+        await test.step('Verify that selected dates and geospatial coverage can be saved', async()=>{
+            await datasetsPage.fillGeospatialCoverageField('New York, Forkland');
+            await datasetsPage.clickSaveForSection('Coverage');
+            await expect (datasetsPage.getFlashMessageLocator()).toBeVisible();
+            expect (await datasetsPage.getFlashMessageText()).toContain('Successfully updated the coverage.');
+            await datasetsPage.reloadPage();
+            expect(await datasetsPage.isStartEndDateFieldVisible("Start Date")).toBe(false);
+            expect(await datasetsPage.isStartEndDateFieldVisible("End Date")).toBe(false);
+            expect(await datasetsPage.isGeospatialCoverageFieldVisible()).toBe(false);
+            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionView()).startDate).toEqual(pastDate.MM_DD_YYYYformat);
+            expect ((await datasetsPage.getSelectedDateInStartAndEndCoverageDatepickerOnSectionView()).endDate).toEqual(futureDate.MM_DD_YYYYformat);
+            expect (await datasetsPage.getDatasetGeospatialCoverageOnView()).toEqual('New York, Forkland');
         })
         await test.step('Postcondition. Remove created dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
