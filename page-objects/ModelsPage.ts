@@ -221,7 +221,7 @@ export class Models extends BaseBusinessObjectPage{
         await this.licenseListOnCreate.click();
         const optionsList = await this.page.locator('[role="listbox"] [role="option"]:not([aria-disabled="true"])').allInnerTexts();
         let selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)];
-        selectedOption==='Gemma'||selectedOption==='Other (specified in description)'?selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)]:selectedOption;
+        //selectedOption==='Unknown'||selectedOption==='Gemma'||selectedOption==='Other (specified in description)'?selectedOption = optionsList[Math.floor(Math.random()*optionsList.length)]:selectedOption;
         await this.page.locator('[role="listbox"] [role="option"]',{hasText:selectedOption}).click();
         return selectedOption.replace('info','')
     }
@@ -251,7 +251,9 @@ export class Models extends BaseBusinessObjectPage{
     }
 
     public async getModelVariationLicenseOnView(){
-        const licenseText = await this.page.locator('a[rel="noopener noreferrer"]').innerText();
+        const licenseLocator = this.page.locator('a[rel="noopener noreferrer"]');
+        const otherUnknownLocator= this.page.locator('//span[contains(text(),"License")]/following-sibling::p[not(a)]').first()
+        const licenseText = await licenseLocator.or(otherUnknownLocator).innerText();
         return licenseText.replace(' open_in_new','')
     }
 

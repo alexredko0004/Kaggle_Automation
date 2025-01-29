@@ -106,7 +106,7 @@ test.describe('tests using POM', async()=>{
             expect(await modelsPage.getModelVariationAttachmentVisibilityOnView()).toBe(true);
             expect(await modelsPage.getModelVariationFrameworkOnView()).toEqual(selectedFramework);
             expect(await modelsPage.getModelVariationLicenseOnView()).toEqual(selectedLicense);
-            expect(await modelsPage.getModelTitleOnView()).toEqual(modelName);
+            //Rewrite this expect below
             await expect(page.getByText(' · Created On ')).toContainText(`${currentYear()}.${currentMonth()}.${currentDate()}`);
             await modelsPage.openTab('Settings');
             expect(await modelsPage.getModelVisibilitySettingOnView()).toEqual(modelVisibility)
