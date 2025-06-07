@@ -190,7 +190,7 @@ test.describe('tests using POM', async()=>{
             await modelsPage.clickThreeDotsBtnOnProfile();
             await modelsPage.selectOptionFromThreeDotsMenu('Delete model');
             expect(await modelsPage.isConfirmationPopupShown()).toBe(true);
-            expect(await modelsPage.getConfirmationPopupHeaderInnerText()).toEqual('Confirm Deletian');
+            expect(await modelsPage.getConfirmationPopupHeaderInnerText()).toEqual('Confirm Deletion');
             expect(await modelsPage.getConfirmationPopupInnerText()).toEqual(modelDeletionConfirmationPopupInnerText);
         })
         await test.step('Verify that redirect happens once model is removed', async()=>{
