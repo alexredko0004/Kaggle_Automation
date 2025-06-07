@@ -494,9 +494,9 @@ export class Datasets extends BaseBusinessObjectPage{
         const yearToSelectMatch = date.match(/\d{4}/);
         const yearToSelect = (yearToSelectMatch&&yearToSelectMatch.length>0)?yearToSelectMatch[0]:'not found';
 
-        const monthToSelectMatch = date.match(/[jJ]an|[fF]eb|[mM]ar|[aA]pr|[mM]ay|[jJ]u[nl]|[sS]ep|[oO]ct|[nN]ov|[dD]ec/);
+        const monthToSelectMatch = date.match(/[jJ]an|[fF]eb|[mM]ar|[aA]pr|[mM]ay|[jJ]u[nl]|[aA]ug|[sS]ep|[oO]ct|[nN]ov|[dD]ec/);
         const monthToSelect = (monthToSelectMatch&&monthToSelectMatch.length>0)?monthToSelectMatch[0]:'not found';
-
+        
         const dayToSelectMatch = date.match(/^\d{1,2}/);
         let dayToSelect = (dayToSelectMatch&&dayToSelectMatch.length>0)?dayToSelectMatch[0]:'not found';
         dayToSelect = dayToSelect[0]=='0'?dayToSelect.replace('0',''):dayToSelect;

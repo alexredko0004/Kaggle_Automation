@@ -71,7 +71,7 @@ test.describe('tests using POM', async()=>{
             usabilityStats = await datasetsPage.getDatasetCompletenessCredibilityCompatibilityStats()
             await datasetsPage.clickRightBtnForPendingActions();
             await datasetsPage.clickSpecifyProvenancePendingAction();
-            expect(await datasetsPage.isSourcesInputVisible()).toBe(true);
+            expect(await datasetsPage.isSourcesInputVisible()).toBe(false);
             expect(await datasetsPage.isCollectionMethodologyInputVisible()).toBe(true);
         })
         await test.step('Provide source and collection methodology and verify it can be saved', async()=>{

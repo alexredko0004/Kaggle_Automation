@@ -25,7 +25,7 @@ export const getRandomPastDate = function (){
     date.setDate(randomPastDay);
     return {
         DD_Mon_YYYYformat: `${date.getDate()} ${date.toLocaleString('En-US',{month:'short'})} ${date.getFullYear()}`,
-        MM_DD_YYYYformat: `${date.toLocaleString('En-US',{month:'2-digit'})}/${date.getDate()}/${date.getFullYear()}`
+        MM_DD_YYYYformat: `${date.toLocaleString('En-US',{month:'2-digit'})}/${date.getDate()<10?'0'+date.getDate():date.getDate()}/${date.getFullYear()}`
     }
 }
 
@@ -38,6 +38,6 @@ export const getRandomFutureDate = function (){
     date1.setDate(randomFutureDay);
     return {
         DD_Mon_YYYYformat: `${date1.getDate()} ${date1.toLocaleString('En-US',{month:'short'})} ${date1.getFullYear()}`,
-        MM_DD_YYYYformat: `${date1.toLocaleString('En-US',{month:'2-digit'})}/${date1.getDate()}/${date1.getFullYear()}`
+        MM_DD_YYYYformat: `${date1.toLocaleString('En-US',{month:'2-digit'})}/${date1.getDate()<10?'0'+date1.getDate():date1.getDate()}/${date1.getFullYear()}`
     }
 }
