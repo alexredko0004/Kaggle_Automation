@@ -3,7 +3,7 @@ run-name: Smoke Test Run
 
 on:
   schedule:
-    - cron: '0 10 * * *'
+    - cron: '0 10 1,5,10,15,20,25,30 * *'
   workflow_dispatch:
 
 jobs:
