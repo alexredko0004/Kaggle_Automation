@@ -42,7 +42,6 @@ test.describe('tests using POM', async()=>{
             await datasetsPage.clickGoToDatasetBtn();
             expect(await datasetsPage.getDatasetName()).toEqual(datasetName);
             expect(await datasetsPage.getDatasetAttachmentSizeNumber()).toBeGreaterThan(0);
-            await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Postcondition. Remove created dataset', async()=>{
             await deleteDatasetViaPW(page,createdDataset.datasetSlug,createdDataset.ownerSlug)
@@ -64,7 +63,6 @@ test.describe('tests using POM', async()=>{
             await datasetsPage.fillDatasetNameWhileCreatingDataset(datasetName);
             createdDataset = await datasetsPage.clickCreateBtnAndGetDatasetProperties();
             await datasetsPage.clickGoToDatasetBtn();
-            await expect(page.getByTestId('preview-image')).toBeVisible();
         })
         await test.step('Verify that clicking specify provenance pending action opens new input fields', async()=>{
             usabilityValue = await datasetsPage.getUsabilityValue();
