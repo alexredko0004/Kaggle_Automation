@@ -6,7 +6,7 @@ export abstract class BasePage{
     flashMessage: Locator
     tooltip: Locator
 
-    constructor(page){
+    constructor(page:Page){
         this.page = page
         this.confirmationDialog = page.getByRole('dialog')
         this.flashMessage = page.locator('.notistack-SnackbarContainer [role="alert"]')/*.getByRole('alert')*/
@@ -22,7 +22,7 @@ export abstract class BasePage{
         await this.confirmationDialog.locator('button',{has:this.page.getByText(btnName)}).click()
     }
 
-    public async isLocatorInViewport(locator:Locator):Promise<boolean>{
+    public async isLocatorInViewport(locator:Locator):Promise<boolean|undefined>{
         const boundingBox = await locator.boundingBox();
         let isLocatorInViewport;
         if (boundingBox) {

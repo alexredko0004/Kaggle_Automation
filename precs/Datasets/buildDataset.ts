@@ -26,17 +26,17 @@ export interface DatasetObject {
  * Class for managing dataset information.
  */
 export class Dataset {
-    basicInfo: object;
-    databundleVersionType:string;
+    basicInfo!: object;
+    databundleVersionType!:string;
     remoteUrlInfos:RemoteUrlInfo[]=[];
-    files:[];
-    directories:[];
-    title:string;
-    slug:string;
-    isPrivate:boolean;
-    licenseId:number;
-    ownerUserId:number;
-    referrer:string
+    files!:[];
+    directories!:[];
+    title!:string;
+    slug!:string;
+    isPrivate!:boolean;
+    licenseId!:number;
+    ownerUserId!:number;
+    referrer!:string
 
     /** 
      * Static method to create an instance of Dataset.

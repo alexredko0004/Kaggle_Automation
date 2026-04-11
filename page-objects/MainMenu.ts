@@ -1,4 +1,4 @@
-import { Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 import {BasePage} from './BasePage'
 
 export class MainMenu extends BasePage{
@@ -8,7 +8,7 @@ export class MainMenu extends BasePage{
     readonly modelsItem: Locator
     readonly plusBtn: Locator
 
-    constructor(page){
+    constructor(page:Page){
         super(page)
         this.creationMenu = this.page.locator('.mdc-menu[aria-hidden="false"]')
         this.datasetsItem = page.locator('[data-click-log-id="datasets"]')

@@ -1,4 +1,4 @@
-import { Locator, expect} from "@playwright/test";
+import { Locator, Page, expect} from "@playwright/test";
 import { BaseBusinessObjectPage } from "./BaseBusinessObjectPage";
 import { waitForLocator } from "../helpers/waitForLocator";
 
@@ -35,12 +35,11 @@ export class Models extends BaseBusinessObjectPage{
     private readonly createBtn: Locator
     private readonly upvoteBtn: Locator
     private readonly upvotesCounter: Locator
+    resetBtn!: Locator
+    trippleDotsBtn!: Locator
 
-    resetBtn: Locator
-    trippleDotsBtn: Locator
 
-
-    constructor(page){
+    constructor(page:Page){
         super(page)
         this.modelNameFieldOnCreate = page.getByPlaceholder('Model Name')
         this.urlEditBtn = page.locator('.drawer-outer-container button').nth(1)
@@ -236,7 +235,7 @@ export class Models extends BaseBusinessObjectPage{
         return properInnerText
     }
 
-    public async getModelVariationSlugVisibilityOnView(variationSlug){
+    public async getModelVariationSlugVisibilityOnView(variationSlug:string){
         await this.page.waitForTimeout(2000);
         return await this.page.locator('div[aria-label="Select Variation"]').getByText(variationSlug).isVisible()
     }
